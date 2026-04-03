@@ -1,0 +1,18 @@
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Meeting history (personal data)
+meetingmeter_history.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Distribution zip (upload separately to Gumroad)
+*.zip

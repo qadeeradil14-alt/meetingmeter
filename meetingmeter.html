@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MeetingMeter</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --surface2: #22222f;
+      --border: #2e2e3e;
+      --text: #f0f0f5;
+      --muted: #7a7a9a;
+      --accent: #7c6af7;
+      --accent-glow: rgba(124,106,247,0.25);
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --gold: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .tagline { color: var(--muted); font-size: 12px; }
+
+    /* ── Layout ── */
+    .app {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 65px);
+    }
+
+    .left-panel {
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 32px 28px;
+      gap: 24px;
+    }
+
+    /* ── Section labels ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── Meeting title ── */
+    #meeting-title {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #meeting-title:focus { border-color: var(--accent); }
+    #meeting-title::placeholder { color: var(--muted); }
+
+    /* ── Attendees ── */
+    .attendee-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .attendee-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      animation: slide-in 0.15s ease;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .attendee-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .attendee-name {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      min-width: 0;
+    }
+
+    .attendee-name::placeholder { color: var(--muted); }
+
+    .role-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 11px;
+      padding: 3px 6px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .role-select:focus { border-color: var(--accent); }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .remove-btn:hover { color: var(--red); background: rgba(248,113,113,0.1); }
+
+    .add-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 9px 12px;
+      background: none;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Cost display ── */
+    .cost-hero {
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .cost-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .cost-number {
+      font-size: 80px;
+      font-weight: 800;
+      letter-spacing: -3px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: transform 0.1s;
+      text-shadow: none;
+      filter: drop-shadow(0 0 20px rgba(245,158,11,0.4));
+    }
+
+    .cost-number.tick {
+      transform: scale(1.02);
+    }
+
+    .cost-cents {
+      font-size: 36px;
+      font-weight: 700;
+    }
+
+    /* ── Timer ── */
+    .timer-display {
+      font-size: 48px;
+      font-weight: 300;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 4px;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      color: white;
+      box-shadow: 0 4px 20px rgba(124,106,247,0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: 0 6px 28px rgba(124,106,247,0.5);
+    }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.12);
+      color: var(--red);
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(248,113,113,0.2);
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover:not(:disabled) { background: var(--border); }
+
+    /* ── Per-person breakdown ── */
+    .breakdown {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .breakdown-header {
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .breakdown-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid #1e1e2a;
+      gap: 10px;
+    }
+
+    .breakdown-row:last-child { border-bottom: none; }
+
+    .breakdown-avatar {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .breakdown-name { flex: 1; font-size: 13px; }
+    .breakdown-role { font-size: 11px; color: var(--muted); }
+    .breakdown-cost {
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--gold);
+    }
+
+    /* ── History ── */
+    .history-section {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .history-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slide-in 0.2s ease;
+    }
+
+    .history-icon {
+      width: 36px; height: 36px;
+      background: var(--surface2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .history-info { flex: 1; min-width: 0; }
+    .history-title {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .history-cost {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .history-del {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+
+    .history-del:hover { color: var(--red); }
+
+    .empty-state {
+      text-align: center;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+
+    /* ── Save modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      display: none;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal h2 { font-size: 16px; font-weight: 700; }
+    .modal p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    .modal-summary {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .modal-summary span { color: var(--muted); font-size: 13px; }
+    .modal-summary strong { color: var(--gold); font-size: 18px; }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── Stat chips ── */
+    .stat-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      text-align: center;
+    }
+
+    .stat-chip-val {
+      font-size: 18px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+
+    .stat-chip-lbl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Running indicator ── */
+    .running-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.3);
+      color: var(--green);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .running-dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">💸</div>
+    MeetingMeter
+  </div>
+  <span class="tagline">Know the real cost of every meeting</span>
+</header>
+
+<div class="app">
+
+  <!-- LEFT: Setup -->
+  <div class="left-panel">
+
+    <div>
+      <div class="section-label">Meeting Title</div>
+      <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
+    </div>
+
+    <div>
+      <div class="section-label">Attendees</div>
+      <div class="attendee-list" id="attendee-list"></div>
+      <button class="add-btn" id="add-attendee-btn" style="margin-top:8px">
+        + Add Attendee
+      </button>
+    </div>
+
+    <div>
+      <div class="section-label">Total Rate</div>
+      <div style="font-size:13px;color:var(--muted)" id="rate-summary">Add attendees to see rate</div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Timer + Cost -->
+  <div class="right-panel">
+
+    <div id="running-indicator" class="running-pill hidden">
+      <div class="running-dot"></div> Meeting in progress
+    </div>
+
+    <div class="cost-hero">
+      <div class="cost-label">Meeting Cost</div>
+      <div class="cost-number" id="cost-display">$0<span class="cost-cents">.00</span></div>
+    </div>
+
+    <div class="timer-display" id="timer-display">00:00:00</div>
+
+    <div class="stat-chips">
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat-attendees">0</div>
+        <div class="stat-chip-lbl">Attendees</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat-rate">$0/min</div>
+        <div class="stat-chip-lbl">Burn Rate</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-chip-val" id="stat-hourly">$0/hr</div>
+        <div class="stat-chip-lbl">Hourly Cost</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="start-btn">▶ Start</button>
+      <button class="btn btn-ghost hidden" id="pause-btn">⏸ Pause</button>
+      <button class="btn btn-danger hidden" id="stop-btn">■ Stop & Save</button>
+      <button class="btn btn-ghost hidden" id="reset-btn">↺ Reset</button>
+    </div>
+
+    <!-- Per-person breakdown -->
+    <div class="breakdown" id="breakdown-card">
+      <div class="breakdown-header">
+        <span>Per Person</span>
+        <span>Cost So Far</span>
+      </div>
+      <div id="breakdown-body"></div>
+    </div>
+
+    <!-- History -->
+    <div class="history-section">
+      <div class="history-header">
+        <div class="section-label" style="margin:0">Past Meetings</div>
+        <button class="btn btn-ghost" id="clear-history-btn"
+          style="padding:4px 10px;font-size:11px">Clear All</button>
+      </div>
+      <div class="history-list" id="history-list">
+        <div class="empty-state">No meetings saved yet.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Save modal -->
+<div class="modal-overlay" id="save-modal">
+  <div class="modal">
+    <h2>Save Meeting?</h2>
+    <p>This meeting will be saved to your history.</p>
+    <div class="modal-summary">
+      <span id="modal-duration">–</span>
+      <strong id="modal-cost">$0.00</strong>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-discard">Discard</button>
+      <button class="btn btn-primary" id="modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = "http://localhost:8766";
+
+  // ── Salary presets (annual → per-second) ──────────────────
+  const ROLES = {
+    "Intern":      40_000,
+    "Junior":      70_000,
+    "Mid-level":  100_000,
+    "Senior":     140_000,
+    "Manager":    160_000,
+    "Director":   210_000,
+    "VP":         280_000,
+    "C-Level":    450_000,
+  };
+
+  const WORKING_SECONDS = 2080 * 3600; // 2080 working hours/year
+
+  function salaryToPerSecond(annual) {
+    return annual / WORKING_SECONDS;
+  }
+
+  // ── State ──────────────────────────────────────────────────
+  let attendees = [];  // { id, name, role }
+  let timerInterval = null;
+  let elapsedSeconds = 0;
+  let running = false;
+  let paused = false;
+
+  // ── Attendees ──────────────────────────────────────────────
+  function addAttendee() {
+    const id = Date.now().toString();
+    attendees.push({ id, name: "", role: "Mid-level" });
+    renderAttendees();
+    // Focus new name input
+    setTimeout(() => {
+      const inp = document.querySelector(`[data-id="${id}"] .attendee-name`);
+      if (inp) inp.focus();
+    }, 50);
+  }
+
+  function removeAttendee(id) {
+    attendees = attendees.filter(a => a.id !== id);
+    renderAttendees();
+    updateStats();
+  }
+
+  function renderAttendees() {
+    const list = document.getElementById("attendee-list");
+    list.innerHTML = "";
+    attendees.forEach(a => {
+      const row = document.createElement("div");
+      row.className = "attendee-row";
+      row.dataset.id = a.id;
+      const initials = a.name ? a.name.slice(0,2).toUpperCase() : "?";
+      row.innerHTML = `
+        <div class="attendee-avatar">${initials}</div>
+        <input class="attendee-name" type="text" placeholder="Name" value="${a.name}" />
+        <select class="role-select">
+          ${Object.keys(ROLES).map(r =>
+            `<option value="${r}" ${r === a.role ? "selected" : ""}>${r}</option>`
+          ).join("")}
+        </select>
+        <button class="remove-btn" title="Remove">×</button>
+      `;
+      row.querySelector(".attendee-name").addEventListener("input", e => {
+        a.name = e.target.value;
+        row.querySelector(".attendee-avatar").textContent =
+          a.name ? a.name.slice(0,2).toUpperCase() : "?";
+        updateStats();
+      });
+      row.querySelector(".role-select").addEventListener("change", e => {
+        a.role = e.target.value;
+        updateStats();
+      });
+      row.querySelector(".remove-btn").addEventListener("click", () => removeAttendee(a.id));
+      list.appendChild(row);
+    });
+    updateStats();
+  }
+
+  // ── Rate calculation ───────────────────────────────────────
+  function totalPerSecond() {
+    return attendees.reduce((sum, a) => sum + salaryToPerSecond(ROLES[a.role]), 0);
+  }
+
+  function updateStats() {
+    const perSec = totalPerSecond();
+    const perMin = perSec * 60;
+    const perHr  = perSec * 3600;
+
+    document.getElementById("stat-attendees").textContent = attendees.length;
+    document.getElementById("stat-rate").textContent = "$" + perMin.toFixed(2) + "/min";
+    document.getElementById("stat-hourly").textContent = "$" + perHr.toFixed(0) + "/hr";
+    document.getElementById("rate-summary").textContent =
+      attendees.length
+        ? `$${perMin.toFixed(2)}/min · $${perHr.toFixed(0)}/hr`
+        : "Add attendees to see rate";
+
+    updateCostDisplay();
+    updateBreakdown();
+  }
+
+  // ── Timer ──────────────────────────────────────────────────
+  function fmtTime(s) {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return [h, m, sec].map(n => String(n).padStart(2, "0")).join(":");
+  }
+
+  function fmtCost(dollars) {
+    if (dollars >= 1000) {
+      return "$" + dollars.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    const whole = Math.floor(dollars);
+    const cents = Math.round((dollars - whole) * 100).toString().padStart(2, "0");
+    return `$${whole}<span class="cost-cents">.${cents}</span>`;
+  }
+
+  function updateCostDisplay() {
+    const cost = totalPerSecond() * elapsedSeconds;
+    const el = document.getElementById("cost-display");
+    el.innerHTML = fmtCost(cost);
+    el.classList.add("tick");
+    setTimeout(() => el.classList.remove("tick"), 100);
+  }
+
+  function updateBreakdown() {
+    const body = document.getElementById("breakdown-body");
+    if (attendees.length === 0) {
+      body.innerHTML = `<div style="padding:14px 16px;color:var(--muted);font-size:13px;text-align:center">Add attendees above</div>`;
+      return;
+    }
+    body.innerHTML = "";
+    attendees.forEach(a => {
+      const cost = salaryToPerSecond(ROLES[a.role]) * elapsedSeconds;
+      const row = document.createElement("div");
+      row.className = "breakdown-row";
+      const initials = a.name ? a.name.slice(0,2).toUpperCase() : "?";
+      row.innerHTML = `
+        <div class="breakdown-avatar">${initials}</div>
+        <div>
+          <div class="breakdown-name">${a.name || "Unnamed"}</div>
+          <div class="breakdown-role">${a.role} · $${(salaryToPerSecond(ROLES[a.role])*60).toFixed(2)}/min</div>
+        </div>
+        <div class="breakdown-cost">$${cost.toFixed(2)}</div>
+      `;
+      body.appendChild(row);
+    });
+  }
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      document.getElementById("timer-display").textContent = fmtTime(elapsedSeconds);
+      updateCostDisplay();
+      updateBreakdown();
+    }, 1000);
+  }
+
+  // ── Controls ───────────────────────────────────────────────
+  document.getElementById("start-btn").addEventListener("click", () => {
+    if (attendees.length === 0) {
+      alert("Add at least one attendee before starting.");
+      return;
+    }
+    running = true; paused = false;
+    document.getElementById("start-btn").classList.add("hidden");
+    document.getElementById("pause-btn").classList.remove("hidden");
+    document.getElementById("stop-btn").classList.remove("hidden");
+    document.getElementById("running-indicator").classList.remove("hidden");
+    startTimer();
+  });
+
+  document.getElementById("pause-btn").addEventListener("click", () => {
+    if (!paused) {
+      clearInterval(timerInterval);
+      paused = true;
+      document.getElementById("pause-btn").textContent = "▶ Resume";
+    } else {
+      startTimer();
+      paused = false;
+      document.getElementById("pause-btn").textContent = "⏸ Pause";
+    }
+  });
+
+  document.getElementById("stop-btn").addEventListener("click", () => {
+    clearInterval(timerInterval);
+    running = false;
+    document.getElementById("running-indicator").classList.add("hidden");
+
+    // Show save modal
+    const cost = (totalPerSecond() * elapsedSeconds).toFixed(2);
+    document.getElementById("modal-duration").textContent = fmtTime(elapsedSeconds);
+    document.getElementById("modal-cost").textContent = "$" + cost;
+    document.getElementById("save-modal").style.display = "flex";
+  });
+
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    clearInterval(timerInterval);
+    elapsedSeconds = 0; running = false; paused = false;
+    document.getElementById("timer-display").textContent = "00:00:00";
+    document.getElementById("start-btn").classList.remove("hidden");
+    document.getElementById("pause-btn").classList.add("hidden");
+    document.getElementById("stop-btn").classList.add("hidden");
+    document.getElementById("reset-btn").classList.add("hidden");
+    document.getElementById("running-indicator").classList.add("hidden");
+    document.getElementById("pause-btn").textContent = "⏸ Pause";
+    updateCostDisplay();
+    updateBreakdown();
+  });
+
+  document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
+
+  // ── Save modal ─────────────────────────────────────────────
+  async function saveMeeting() {
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = totalPerSecond() * elapsedSeconds;
+    try {
+      await fetch(`${API}/api/history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          duration_seconds: elapsedSeconds,
+          total_cost: parseFloat(cost.toFixed(2)),
+          attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
+        }),
+      });
+      await loadHistory();
+    } catch (e) {
+      console.error("Failed to save meeting", e);
+    }
+  }
+
+  document.getElementById("modal-save").addEventListener("click", async () => {
+    document.getElementById("save-modal").style.display = "none";
+    await saveMeeting();
+    resetAfterSave();
+  });
+
+  document.getElementById("modal-discard").addEventListener("click", () => {
+    document.getElementById("save-modal").style.display = "none";
+    resetAfterSave();
+  });
+
+  function resetAfterSave() {
+    elapsedSeconds = 0;
+    document.getElementById("timer-display").textContent = "00:00:00";
+    document.getElementById("start-btn").classList.remove("hidden");
+    document.getElementById("pause-btn").classList.add("hidden");
+    document.getElementById("stop-btn").classList.add("hidden");
+    document.getElementById("reset-btn").classList.add("hidden");
+    document.getElementById("pause-btn").textContent = "⏸ Pause";
+    updateCostDisplay();
+    updateBreakdown();
+  }
+
+  // ── History ────────────────────────────────────────────────
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${API}/api/history`);
+      const data = await res.json();
+      renderHistory(data);
+    } catch (e) {
+      // server not available yet
+    }
+  }
+
+  function renderHistory(items) {
+    const list = document.getElementById("history-list");
+    if (items.length === 0) {
+      list.innerHTML = `<div class="empty-state">No meetings saved yet.</div>`;
+      return;
+    }
+    list.innerHTML = "";
+    items.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "history-card";
+      const date = new Date(item.timestamp * 1000);
+      const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      card.innerHTML = `
+        <div class="history-icon">📋</div>
+        <div class="history-info">
+          <div class="history-title">${item.title}</div>
+          <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
+        </div>
+        <div class="history-cost">$${item.total_cost.toFixed(2)}</div>
+        <button class="history-del" data-id="${item.id}" title="Delete">×</button>
+      `;
+      card.querySelector(".history-del").addEventListener("click", async (e) => {
+        const id = e.target.dataset.id;
+        await fetch(`${API}/api/history/${id}`, { method: "DELETE" });
+        await loadHistory();
+      });
+      list.appendChild(card);
+    });
+  }
+
+  document.getElementById("clear-history-btn").addEventListener("click", async () => {
+    if (confirm("Clear all meeting history?")) {
+      await fetch(`${API}/api/history`, { method: "DELETE" });
+      await loadHistory();
+    }
+  });
+
+  // ── Init ───────────────────────────────────────────────────
+  addAttendee(); // start with one blank attendee
+  loadHistory();
+</script>
+</body>
+</html>
