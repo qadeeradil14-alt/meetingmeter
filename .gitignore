@@ -1,7 +1,9 @@
 # PyInstaller build artifacts
 build/
 dist/
-*.spec
+
+# Local spec files (Windows spec committed intentionally)
+meetingmeter.spec
 
 # Meeting history (personal data)
 meetingmeter_history.json

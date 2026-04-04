@@ -12,11 +12,15 @@ import time
 import uuid
 import signal
 import socket
+import platform
 import threading
 import webbrowser
 import tkinter as tk
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
+
+# Cross-platform font: SF Pro on Mac, Segoe UI on Windows
+_FONT = _FONT if platform.system() == "Darwin" else "Segoe UI"
 
 PORT = 8766
 URL  = f"http://localhost:{PORT}"
@@ -172,16 +176,16 @@ def build_ui():
 
     tk.Label(root, text="💸  MeetingMeter",
         bg="#0f0f13", fg="#f0f0f5",
-        font=("SF Pro Display", 16, "bold")).pack(pady=(22, 4))
+        font=(_FONT, 16, "bold")).pack(pady=(22, 4))
 
     tk.Label(root, text="Know the real cost of every meeting",
         bg="#0f0f13", fg="#7a7a9a",
-        font=("SF Pro Display", 11)).pack(pady=(0, 14))
+        font=(_FONT, 11)).pack(pady=(0, 14))
 
     status_var = tk.StringVar(value="Starting…")
     status_lbl = tk.Label(root, textvariable=status_var,
         bg="#0f0f13", fg="#7a7a9a",
-        font=("SF Pro Display", 11))
+        font=(_FONT, 11))
     status_lbl.pack(pady=(0, 14))
 
     btn_frame = tk.Frame(root, bg="#0f0f13")
@@ -191,7 +195,7 @@ def build_ui():
         btn_frame, text="Open App",
         bg="#7c6af7", fg="white",
         activebackground="#a78bfa", activeforeground="white",
-        font=("SF Pro Display", 12, "bold"),
+        font=(_FONT, 12, "bold"),
         relief="flat", bd=0, padx=18, pady=7, cursor="hand2",
         command=lambda: webbrowser.open(URL),
     )
@@ -205,7 +209,7 @@ def build_ui():
         btn_frame, text="Quit",
         bg="#1a1a24", fg="#f0f0f5",
         activebackground="#2e2e3e", activeforeground="#f0f0f5",
-        font=("SF Pro Display", 12),
+        font=(_FONT, 12),
         relief="flat", bd=0, padx=18, pady=7, cursor="hand2",
         command=on_quit,
     ).grid(row=0, column=1, padx=6)
