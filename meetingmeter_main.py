@@ -20,7 +20,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
 # Cross-platform font: SF Pro on Mac, Segoe UI on Windows
-_FONT = _FONT if platform.system() == "Darwin" else "Segoe UI"
+_FONT = "Helvetica Neue" if platform.system() == "Darwin" else "Segoe UI"
 
 PORT = 8766
 URL  = f"http://localhost:{PORT}"
