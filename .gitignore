@@ -2,9 +2,6 @@
 build/
 dist/
 
-# Local spec files (Windows spec committed intentionally)
-meetingmeter.spec
-
 # Meeting history (personal data)
 meetingmeter_history.json
 
