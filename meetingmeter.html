@@ -1029,12 +1029,15 @@
     const perMin = perSec * 60;
     const perHr  = perSec * 3600;
 
+    const sym = currencySymbol();
+    const rateMin = toCurrentCurrency(perMin);
+    const rateHr  = toCurrentCurrency(perHr);
     document.getElementById("stat-attendees").textContent = attendees.length;
-    document.getElementById("stat-rate").textContent = "$" + perMin.toFixed(2) + "/min";
-    document.getElementById("stat-hourly").textContent = "$" + perHr.toFixed(0) + "/hr";
+    document.getElementById("stat-rate").textContent = sym + rateMin.toFixed(2) + "/min";
+    document.getElementById("stat-hourly").textContent = sym + Math.round(rateHr) + "/hr";
     document.getElementById("rate-summary").textContent =
       attendees.length
-        ? `$${perMin.toFixed(2)}/min · $${perHr.toFixed(0)}/hr`
+        ? `${sym}${rateMin.toFixed(2)}/min · ${sym}${Math.round(rateHr)}/hr`
         : "Add attendees to see rate";
 
     updateCostDisplay();
@@ -1049,13 +1052,9 @@
     return [h, m, sec].map(n => String(n).padStart(2, "0")).join(":");
   }
 
-  function fmtCost(dollars) {
-    if (dollars >= 1000) {
-      return "$" + dollars.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    }
-    const whole = Math.floor(dollars);
-    const cents = Math.round((dollars - whole) * 100).toString().padStart(2, "0");
-    return `$${whole}<span class="cost-cents">.${cents}</span>`;
+  function fmtCost(usd) {
+    // Delegate to fmtMoney so currency symbol + conversion is always correct
+    return fmtMoney(usd);
   }
 
   function updateCostDisplay() {
@@ -1082,9 +1081,9 @@
         <div class="breakdown-avatar">${initials}</div>
         <div>
           <div class="breakdown-name">${a.name || "Unnamed"}</div>
-          <div class="breakdown-role">${a.role} · $${(attendeePerSecond(a)*60).toFixed(2)}/min</div>
+          <div class="breakdown-role">${a.role} · ${fmtMoneyPlain(attendeePerSecond(a)*60)}/min</div>
         </div>
-        <div class="breakdown-cost">$${cost.toFixed(2)}</div>
+        <div class="breakdown-cost">${fmtMoneyPlain(cost)}</div>
       `;
       body.appendChild(row);
     });
@@ -1131,9 +1130,9 @@
     document.getElementById("running-indicator").classList.add("hidden");
 
     // Show save modal
-    const cost = (totalPerSecond() * elapsedSeconds).toFixed(2);
+    const costUSD = totalPerSecond() * elapsedSeconds;
     document.getElementById("modal-duration").textContent = fmtTime(elapsedSeconds);
-    document.getElementById("modal-cost").textContent = "$" + cost;
+    document.getElementById("modal-cost").textContent = fmtMoneyPlain(costUSD);
     document.getElementById("save-modal").style.display = "flex";
   });
 
