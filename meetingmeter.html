@@ -582,7 +582,20 @@
     MeetingMeter
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
-  <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
+  <div style="display:flex;gap:8px;align-items:center">
+    <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
+      border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
+      <option value="USD">🇺🇸 USD $</option>
+      <option value="GBP">🇬🇧 GBP £</option>
+      <option value="EUR">🇪🇺 EUR €</option>
+      <option value="CAD">🇨🇦 CAD $</option>
+      <option value="AUD">🇦🇺 AUD $</option>
+      <option value="INR">🇮🇳 INR ₹</option>
+      <option value="JPY">🇯🇵 JPY ¥</option>
+    </select>
+    <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
+    <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
+  </div>
 </header>
 
 <div class="app">
@@ -1082,6 +1095,146 @@
       await fetch(`${API}/api/history`, { method: "DELETE" });
       await loadHistory();
     }
+  });
+
+  // ── Currency ───────────────────────────────────────────────
+  const CURRENCIES = {
+    USD: { symbol: "$",  name: "USD", rate: 1 },
+    GBP: { symbol: "£",  name: "GBP", rate: 0.79 },
+    EUR: { symbol: "€",  name: "EUR", rate: 0.92 },
+    CAD: { symbol: "$",  name: "CAD", rate: 1.36 },
+    AUD: { symbol: "$",  name: "AUD", rate: 1.53 },
+    INR: { symbol: "₹",  name: "INR", rate: 83.5 },
+    JPY: { symbol: "¥",  name: "JPY", rate: 149.5 },
+  };
+
+  let currentCurrency = localStorage.getItem("mm_currency") || "USD";
+
+  const currencySelect = document.getElementById("currency-select");
+  currencySelect.value = currentCurrency;
+  currencySelect.addEventListener("change", e => {
+    currentCurrency = e.target.value;
+    localStorage.setItem("mm_currency", currentCurrency);
+    updateCostDisplay();
+    updateBreakdown();
+    updateStats();
+  });
+
+  function currencySymbol() { return CURRENCIES[currentCurrency].symbol; }
+  function toCurrentCurrency(usd) { return usd * CURRENCIES[currentCurrency].rate; }
+
+  function fmtMoney(usd) {
+    const val = toCurrentCurrency(usd);
+    const sym = currencySymbol();
+    if (currentCurrency === "JPY" || currentCurrency === "INR") {
+      return sym + Math.round(val).toLocaleString();
+    }
+    if (val >= 1000) return sym + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    const whole = Math.floor(val);
+    const cents = Math.round((val - whole) * 100).toString().padStart(2, "0");
+    return `${sym}${whole}<span class="cost-cents">.${cents}</span>`;
+  }
+
+  function fmtMoneyPlain(usd) {
+    const val = toCurrentCurrency(usd);
+    const sym = currencySymbol();
+    return sym + val.toFixed(2);
+  }
+
+  // ── Export (PDF via print + CSV) ───────────────────────────
+  document.getElementById("export-btn").addEventListener("click", () => {
+    if (elapsedSeconds === 0 && attendees.length === 0) {
+      alert("Start a meeting first, then export the report.");
+      return;
+    }
+    showExportMenu();
+  });
+
+  function showExportMenu() {
+    const existing = document.getElementById("export-menu");
+    if (existing) { existing.remove(); return; }
+
+    const menu = document.createElement("div");
+    menu.id = "export-menu";
+    menu.style.cssText = `position:fixed;top:60px;right:24px;background:#1c2129;
+      border:1px solid var(--border);border-radius:10px;padding:6px;
+      z-index:200;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,0.5)`;
+    menu.innerHTML = `
+      <button onclick="exportCSV()" style="display:flex;align-items:center;gap:8px;width:100%;
+        background:none;border:none;color:var(--text);padding:8px 12px;cursor:pointer;
+        border-radius:6px;font-size:13px;text-align:left">📊 Export as CSV</button>
+      <button onclick="exportPrint()" style="display:flex;align-items:center;gap:8px;width:100%;
+        background:none;border:none;color:var(--text);padding:8px 12px;cursor:pointer;
+        border-radius:6px;font-size:13px;text-align:left">🖨️ Print / Save PDF</button>
+    `;
+    document.body.appendChild(menu);
+    setTimeout(() => document.addEventListener("click", () => menu.remove(), { once: true }), 50);
+  }
+
+  function exportCSV() {
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const sym = currencySymbol();
+    const cur = currentCurrency;
+    let csv = `Meeting Report\n`;
+    csv += `Title,${title}\n`;
+    csv += `Duration,${fmtTime(elapsedSeconds)}\n`;
+    csv += `Total Cost,${sym}${cost.toFixed(2)} ${cur}\n`;
+    csv += `Currency,${cur}\n\n`;
+    csv += `Name,Role,Salary (Annual),Cost This Meeting\n`;
+    attendees.forEach(a => {
+      const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      csv += `${a.name || "Unnamed"},${a.role},${sym}${salary},${sym}${personCost.toFixed(2)}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `${title.replace(/\s+/g,"-")}-cost-report.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  function exportPrint() {
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const sym = currencySymbol();
+    const rows = attendees.map(a => {
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
+      return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
+        <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
+    }).join("");
+    const html = `<!DOCTYPE html><html><head><title>${title} — Cost Report</title>
+    <style>body{font-family:system-ui;padding:40px;max-width:700px;margin:0 auto}
+    h1{font-size:24px;margin-bottom:4px}
+    .meta{color:#666;font-size:14px;margin-bottom:32px}
+    .total{font-size:48px;font-weight:800;color:#f59e0b;margin:16px 0}
+    table{width:100%;border-collapse:collapse;margin-top:24px}
+    th{text-align:left;padding:8px 12px;background:#f5f5f5;font-size:12px;text-transform:uppercase}
+    td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+    .footer{margin-top:32px;font-size:12px;color:#999}
+    </style></head><body>
+    <h1>💸 Meeting Cost Report</h1>
+    <div class="meta">${title} &nbsp;·&nbsp; Duration: ${fmtTime(elapsedSeconds)}</div>
+    <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${currentCurrency}</span></div>
+    <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <div class="footer">Generated by MeetingMeter · ${new Date().toLocaleString()}</div>
+    </body></html>`;
+    const w = window.open("","_blank");
+    w.document.write(html); w.document.close();
+    setTimeout(() => w.print(), 500);
+  }
+
+  // ── Keyboard shortcuts ─────────────────────────────────────
+  document.addEventListener("keydown", e => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT" || e.target.tagName === "TEXTAREA") return;
+    if (e.code === "Space") {
+      e.preventDefault();
+      if (!running) document.getElementById("start-btn").click();
+      else document.getElementById("pause-btn").click();
+    }
+    if (e.code === "KeyR" && !running) document.getElementById("reset-btn").click();
   });
 
   // ── Init ───────────────────────────────────────────────────
