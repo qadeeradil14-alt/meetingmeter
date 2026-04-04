@@ -79,6 +79,7 @@
       transition: opacity 0.2s, transform 0.1s;
     }
     .btn-buy-nav:hover { opacity: 0.9; transform: scale(1.02); }
+    .nav-links .btn-buy-nav { color: #fff; }
 
     /* ── Hero ── */
     .hero {
@@ -501,6 +502,97 @@
       max-width: 1100px;
       margin: 0 auto;
     }
+
+    /* ── Contact Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .modal-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      resize: vertical;
+    }
+
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: var(--muted); }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus { border-color: var(--accent); }
+
+    .contact-form textarea { min-height: 110px; }
+
+    .contact-success {
+      display: none;
+      text-align: center;
+      padding: 28px;
+      background: rgba(52,211,153,0.08);
+      border: 1px solid rgba(52,211,153,0.3);
+      border-radius: 12px;
+      color: var(--green);
+      font-size: 15px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -515,7 +607,8 @@
     <a href="#features">Features</a>
     <a href="#pricing">Pricing</a>
     <a href="#faq">FAQ</a>
-    <a class="btn-buy-nav" href="https://YOUR_USERNAME.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true">Get MeetingMeter — $9</a>
+    <a href="#" class="open-contact">Contact</a>
+    <a class="btn-buy-nav" href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true">Get MeetingMeter — $9</a>
   </div>
 </nav>
 
@@ -528,7 +621,7 @@
     Add your team, hit start, and watch the number tick up.
   </p>
   <div class="hero-cta">
-    <a href="https://YOUR_USERNAME.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary">💸 Get MeetingMeter — $9</a>
+    <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary">💸 Get MeetingMeter — $9</a>
     <a href="#features" class="btn-secondary">See how it works</a>
   </div>
   <div class="hero-social-proof">
@@ -669,7 +762,7 @@
         <li>Pause &amp; resume timer</li>
         <li>Free future updates</li>
       </ul>
-      <a href="https://YOUR_USERNAME.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-buy" style="display:block;text-decoration:none;text-align:center">
+      <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-buy" style="display:block;text-decoration:none;text-align:center">
         Get MeetingMeter — $9
       </a>
       <p class="pricing-guarantee">🔒 30-day money-back guarantee</p>
@@ -711,8 +804,26 @@
 <section style="padding:80px 24px;text-align:center;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="section-title" style="margin-bottom:16px">Stop letting meetings drain<br>your budget.</div>
   <p style="color:var(--muted);font-size:17px;margin-bottom:36px">Join teams already saving thousands every month.</p>
-  <a href="https://YOUR_USERNAME.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary" style="font-size:17px;padding:18px 44px">💸 Get MeetingMeter — $9</a>
+  <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary" style="font-size:17px;padding:18px 44px">💸 Get MeetingMeter — $9</a>
 </section>
+
+<!-- Contact Modal -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="modal-title">Get in touch</div>
+    <p class="modal-sub">Have a question or feature request? We'd love to hear from you.</p>
+    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xwvwrzvy" method="POST">
+      <input type="text" name="name" placeholder="Your name" required />
+      <input type="email" name="email" placeholder="Your email" required />
+      <textarea name="message" placeholder="Your message" required></textarea>
+      <button type="submit" class="btn-primary" style="justify-content:center;font-size:15px;padding:14px 28px">Send message</button>
+    </form>
+    <div class="contact-success" id="contactSuccess">
+      ✓ Message sent! We'll get back to you soon.
+    </div>
+  </div>
+</div>
 
 <!-- Footer -->
 <footer>
@@ -724,7 +835,7 @@
   <div style="display:flex;gap:24px">
     <a href="#">Privacy</a>
     <a href="#">Terms</a>
-    <a href="#">Contact</a>
+    <a href="#" class="open-contact">Contact</a>
   </div>
 </footer>
 
@@ -737,6 +848,40 @@
       document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
       if (!isOpen) item.classList.add("open");
     });
+  });
+
+  // Contact modal
+  const modal = document.getElementById("contactModal");
+  const openModal = () => modal.classList.add("open");
+  const closeModal = () => modal.classList.remove("open");
+
+  document.querySelectorAll(".open-contact").forEach(a => {
+    a.addEventListener("click", e => { e.preventDefault(); openModal(); });
+  });
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+  // Contact form submit
+  document.getElementById("contactForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const form = e.target;
+    const btn = form.querySelector("button[type=submit]");
+    btn.textContent = "Sending…";
+    btn.disabled = true;
+    const res = await fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { Accept: "application/json" }
+    });
+    if (res.ok) {
+      form.style.display = "none";
+      document.getElementById("contactSuccess").style.display = "block";
+    } else {
+      btn.textContent = "Send message";
+      btn.disabled = false;
+      alert("Something went wrong. Please try again.");
+    }
   });
 
   // Animate cost in hero mockup
