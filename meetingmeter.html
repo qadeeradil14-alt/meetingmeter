@@ -512,6 +512,62 @@
 
     .hidden { display: none !important; }
 
+    /* ── Settings modal ── */
+    .settings-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 16px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .settings-btn:hover { color: var(--text); border-color: var(--accent); }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .settings-row label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .settings-row input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 7px 10px;
+      outline: none;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .settings-row input:focus { border-color: var(--accent); }
+
+    .settings-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .settings-actions { display: flex; gap: 8px; justify-content: space-between; align-items: center; }
+
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -526,6 +582,7 @@
     MeetingMeter
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
+  <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
 </header>
 
 <div class="app">
@@ -613,6 +670,20 @@
   </div>
 </div>
 
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <h2>⚙️ Salary Presets</h2>
+    <p>Set default annual salaries for each role. Changes are saved automatically and persist between sessions.</p>
+    <div class="settings-grid" id="settings-grid"></div>
+    <p class="settings-note">💡 Tip: Use your company's actual pay bands for accurate results. Values are in USD per year.</p>
+    <div class="settings-actions">
+      <button class="btn btn-ghost" id="settings-reset" style="font-size:12px;padding:6px 12px">↺ Reset to defaults</button>
+      <button class="btn btn-primary" id="settings-close">Save & Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Save modal -->
 <div class="modal-overlay" id="save-modal">
   <div class="modal">
@@ -633,7 +704,7 @@
   const API = "http://localhost:8766";
 
   // ── Salary presets (annual → per-second) ──────────────────
-  const ROLES = {
+  const DEFAULT_ROLES = {
     "Intern":      40_000,
     "Junior":      70_000,
     "Mid-level":  100_000,
@@ -644,6 +715,65 @@
     "C-Level":    450_000,
     "Custom":          0,
   };
+
+  // Load saved presets from localStorage, fall back to defaults
+  function loadRoles() {
+    try {
+      const saved = localStorage.getItem("mm_salary_presets");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return { ...DEFAULT_ROLES, ...parsed, "Custom": 0 };
+      }
+    } catch (e) {}
+    return { ...DEFAULT_ROLES };
+  }
+
+  function saveRoles(roles) {
+    const toSave = { ...roles };
+    delete toSave["Custom"];
+    localStorage.setItem("mm_salary_presets", JSON.stringify(toSave));
+  }
+
+  let ROLES = loadRoles();
+
+  // ── Settings modal ─────────────────────────────────────────
+  function openSettings() {
+    const grid = document.getElementById("settings-grid");
+    grid.innerHTML = "";
+    Object.entries(ROLES).forEach(([role, salary]) => {
+      if (role === "Custom") return;
+      const row = document.createElement("div");
+      row.className = "settings-row";
+      row.innerHTML = `
+        <label>${role}</label>
+        <input type="number" data-role="${role}" value="${salary}" min="0" step="1000"
+          placeholder="Annual salary" />
+      `;
+      grid.appendChild(row);
+    });
+    document.getElementById("settings-modal").style.display = "flex";
+  }
+
+  function closeSettings() {
+    // Read all inputs and update ROLES
+    document.querySelectorAll("#settings-grid input[data-role]").forEach(input => {
+      const role = input.dataset.role;
+      const val = parseFloat(input.value) || 0;
+      ROLES[role] = val;
+    });
+    saveRoles(ROLES);
+    document.getElementById("settings-modal").style.display = "none";
+    renderAttendees(); // refresh dropdowns + recalculate
+    updateStats();
+  }
+
+  document.getElementById("settings-btn").addEventListener("click", openSettings);
+  document.getElementById("settings-close").addEventListener("click", closeSettings);
+  document.getElementById("settings-reset").addEventListener("click", () => {
+    ROLES = { ...DEFAULT_ROLES };
+    localStorage.removeItem("mm_salary_presets");
+    openSettings(); // re-render with defaults
+  });
 
   const WORKING_SECONDS = 2080 * 3600; // 2080 working hours/year
 
