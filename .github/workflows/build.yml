@@ -17,7 +17,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyinstaller pywebview pyobjc-core pyobjc-framework-WebKit pyobjc-framework-Cocoa
+        run: pip install pyinstaller pywebview pyobjc-core pyobjc-framework-WebKit pyobjc-framework-Cocoa reportlab
 
       - name: Build macOS app
         run: python -m PyInstaller meetingmeter.spec --distpath ./dist --workpath ./build --noconfirm
@@ -42,7 +42,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyinstaller pywebview pythonnet
+        run: pip install pyinstaller pywebview pythonnet reportlab
 
       - name: Build Windows exe
         run: python -m PyInstaller meetingmeter_win.spec --distpath ./dist --workpath ./build --noconfirm
