@@ -526,10 +526,17 @@
     .settings-btn:hover { color: var(--text); border-color: var(--accent); }
 
     .settings-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    /* Built-in roles use a 2-column grid layout */
+    .settings-builtin-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-top: 4px;
     }
 
     .settings-row {
@@ -558,6 +565,73 @@
     }
 
     .settings-row input:focus { border-color: var(--accent); }
+
+    /* Custom roles section */
+    .settings-section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .settings-section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Custom role row: [name input] [salary input] [× btn] */
+    .custom-role-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 6px;
+      align-items: center;
+    }
+    .custom-role-row input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 7px 10px;
+      outline: none;
+    }
+    .custom-role-row input:focus { border-color: var(--accent); }
+    .custom-role-row .custom-role-name { border-color: rgba(139,92,246,0.4); }
+
+    .delete-role-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 16px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+    .delete-role-btn:hover { color: #f87171; border-color: #f87171; background: rgba(248,113,113,0.08); }
+
+    .add-role-btn {
+      margin-top: 2px;
+      font-size: 12px;
+      padding: 7px 12px;
+      border: 1px dashed var(--accent);
+      color: var(--accent);
+      background: rgba(139,92,246,0.06);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-align: center;
+    }
+    .add-role-btn:hover { background: rgba(139,92,246,0.14); }
 
     .settings-note {
       font-size: 11px;
@@ -685,11 +759,11 @@
 
 <!-- Settings modal -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal">
+  <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
-    <p>Set default annual salaries for each role. Changes are saved automatically and persist between sessions.</p>
+    <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
     <div class="settings-grid" id="settings-grid"></div>
-    <p class="settings-note">💡 Tip: Use your company's actual pay bands for accurate results. Values are in USD per year.</p>
+    <p class="settings-note">💡 Tip: Use your company's actual pay bands. Values are annual salary in USD.</p>
     <div class="settings-actions">
       <button class="btn btn-ghost" id="settings-reset" style="font-size:12px;padding:6px 12px">↺ Reset to defaults</button>
       <button class="btn btn-primary" id="settings-close">Save & Close</button>
@@ -741,6 +815,17 @@
     return { ...DEFAULT_ROLES };
   }
 
+  // Track which role names are user-created (vs built-in)
+  function getUserRoleNames() {
+    try {
+      const s = localStorage.getItem("mm_user_roles");
+      return s ? JSON.parse(s) : [];
+    } catch(e) { return []; }
+  }
+  function saveUserRoleNames(names) {
+    localStorage.setItem("mm_user_roles", JSON.stringify(names));
+  }
+
   function saveRoles(roles) {
     const toSave = { ...roles };
     delete toSave["Custom"];
@@ -753,30 +838,93 @@
   function openSettings() {
     const grid = document.getElementById("settings-grid");
     grid.innerHTML = "";
-    Object.entries(ROLES).forEach(([role, salary]) => {
+
+    // ── Built-in roles (2-column grid) ──
+    const builtInSection = document.createElement("div");
+    builtInSection.className = "settings-builtin-grid";
+    Object.keys(DEFAULT_ROLES).forEach(role => {
       if (role === "Custom") return;
       const row = document.createElement("div");
       row.className = "settings-row";
       row.innerHTML = `
         <label>${role}</label>
-        <input type="number" data-role="${role}" value="${salary}" min="0" step="1000"
+        <input type="number" data-role="${role}" value="${ROLES[role] || 0}" min="0" step="1000"
           placeholder="Annual salary" />
       `;
-      grid.appendChild(row);
+      builtInSection.appendChild(row);
     });
+    grid.appendChild(builtInSection);
+
+    // ── Custom roles section title ──
+    const secTitle = document.createElement("div");
+    secTitle.className = "settings-section-title";
+    secTitle.textContent = "Custom Roles";
+    grid.appendChild(secTitle);
+
+    // ── Existing user-created roles ──
+    const userRoles = getUserRoleNames();
+    userRoles.forEach(role => {
+      _appendCustomRoleRow(grid, role, ROLES[role] || 0);
+    });
+
+    // ── "+ Add Custom Role" button ──
+    const addBtn = document.createElement("button");
+    addBtn.className = "add-role-btn";
+    addBtn.textContent = "+ Add Custom Role";
+    addBtn.type = "button";
+    addBtn.onclick = () => {
+      _appendCustomRoleRow(grid, "", 0, true);
+    };
+    grid.appendChild(addBtn);
+
     document.getElementById("settings-modal").style.display = "flex";
   }
 
+  // Helper: append one custom-role row (name input + salary input + delete btn)
+  function _appendCustomRoleRow(grid, name, salary, focusName = false) {
+    const row = document.createElement("div");
+    row.className = "custom-role-row";
+    row.innerHTML = `
+      <input type="text"   class="custom-role-name"   placeholder="Role title (e.g. IT Admin)" value="${name}" />
+      <input type="number" class="custom-role-salary"  placeholder="Annual salary" value="${salary || ""}" min="0" step="1000" />
+      <button class="delete-role-btn" type="button" title="Remove role">×</button>
+    `;
+    row.querySelector(".delete-role-btn").onclick = () => row.remove();
+    // Insert before the Add button
+    const addBtn = grid.querySelector(".add-role-btn");
+    if (addBtn) grid.insertBefore(row, addBtn);
+    else grid.appendChild(row);
+    if (focusName) row.querySelector(".custom-role-name").focus();
+  }
+
   function closeSettings() {
-    // Read all inputs and update ROLES
+    // 1. Read built-in role salary inputs
     document.querySelectorAll("#settings-grid input[data-role]").forEach(input => {
       const role = input.dataset.role;
       const val = parseFloat(input.value) || 0;
       ROLES[role] = val;
     });
+
+    // 2. Read custom role rows
+    const newUserRoleNames = [];
+    document.querySelectorAll("#settings-grid .custom-role-row").forEach(row => {
+      const nameVal = row.querySelector(".custom-role-name").value.trim();
+      const salaryVal = parseFloat(row.querySelector(".custom-role-salary").value) || 0;
+      if (nameVal) {
+        ROLES[nameVal] = salaryVal;
+        newUserRoleNames.push(nameVal);
+      }
+    });
+
+    // 3. Remove deleted custom roles from ROLES
+    getUserRoleNames().forEach(r => {
+      if (!newUserRoleNames.includes(r)) delete ROLES[r];
+    });
+
+    saveUserRoleNames(newUserRoleNames);
     saveRoles(ROLES);
     document.getElementById("settings-modal").style.display = "none";
-    renderAttendees(); // refresh dropdowns + recalculate
+    renderAttendees();
     updateStats();
   }
 
@@ -785,6 +933,7 @@
   document.getElementById("settings-reset").addEventListener("click", () => {
     ROLES = { ...DEFAULT_ROLES };
     localStorage.removeItem("mm_salary_presets");
+    localStorage.removeItem("mm_user_roles");
     openSettings(); // re-render with defaults
   });
 
