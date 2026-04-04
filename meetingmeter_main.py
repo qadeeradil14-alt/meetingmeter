@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 MeetingMeter — standalone launcher.
-This is the PyInstaller entry point. It bundles the server, UI, and control
-window into one executable that works on any Mac or Windows machine.
+Uses pywebview for a native app window — no browser chrome, no localhost URL visible.
 """
 
 import json
@@ -10,20 +9,15 @@ import os
 import sys
 import time
 import uuid
-import signal
 import socket
-import platform
 import threading
-import webbrowser
-import tkinter as tk
+import webview
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
-# Cross-platform font: SF Pro on Mac, Segoe UI on Windows
-_FONT = "Helvetica Neue" if platform.system() == "Darwin" else "Segoe UI"
-
 PORT = 8766
 URL  = f"http://localhost:{PORT}"
+
 
 # ── Path resolution (dev vs PyInstaller bundle) ────────────────────────────
 def resource_path(filename):
@@ -148,11 +142,6 @@ def start_server():
     _server = HTTPServer(("localhost", PORT), Handler)
     threading.Thread(target=_server.serve_forever, daemon=True).start()
 
-def stop_server():
-    global _server
-    if _server:
-        _server.shutdown()
-
 def wait_for_server(timeout=6):
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -162,73 +151,21 @@ def wait_for_server(timeout=6):
     return False
 
 
-# ── Tkinter control window ─────────────────────────────────────────────────
-def build_ui():
-    root = tk.Tk()
-    root.title("MeetingMeter")
-    root.resizable(False, False)
-    root.configure(bg="#0f0f13")
-
-    w, h = 340, 185
-    x = (root.winfo_screenwidth()  - w) // 2
-    y = (root.winfo_screenheight() - h) // 2
-    root.geometry(f"{w}x{h}+{x}+{y}")
-
-    tk.Label(root, text="💸  MeetingMeter",
-        bg="#0f0f13", fg="#f0f0f5",
-        font=(_FONT, 16, "bold")).pack(pady=(22, 4))
-
-    tk.Label(root, text="Know the real cost of every meeting",
-        bg="#0f0f13", fg="#7a7a9a",
-        font=(_FONT, 11)).pack(pady=(0, 14))
-
-    status_var = tk.StringVar(value="Starting…")
-    status_lbl = tk.Label(root, textvariable=status_var,
-        bg="#0f0f13", fg="#7a7a9a",
-        font=(_FONT, 11))
-    status_lbl.pack(pady=(0, 14))
-
-    btn_frame = tk.Frame(root, bg="#0f0f13")
-    btn_frame.pack()
-
-    open_btn = tk.Button(
-        btn_frame, text="Open App",
-        bg="#7c6af7", fg="white",
-        activebackground="#a78bfa", activeforeground="white",
-        font=(_FONT, 12, "bold"),
-        relief="flat", bd=0, padx=18, pady=7, cursor="hand2",
-        command=lambda: webbrowser.open(URL),
-    )
-    open_btn.grid(row=0, column=0, padx=6)
-
-    def on_quit():
-        stop_server()
-        root.destroy()
-
-    tk.Button(
-        btn_frame, text="Quit",
-        bg="#1a1a24", fg="#f0f0f5",
-        activebackground="#2e2e3e", activeforeground="#f0f0f5",
-        font=(_FONT, 12),
-        relief="flat", bd=0, padx=18, pady=7, cursor="hand2",
-        command=on_quit,
-    ).grid(row=0, column=1, padx=6)
-
-    root.protocol("WM_DELETE_WINDOW", on_quit)
-
-    def init():
-        start_server()
-        if wait_for_server():
-            status_var.set("Running  ●")
-            status_lbl.config(fg="#34d399")
-            webbrowser.open(URL)
-        else:
-            status_var.set("Failed to start")
-            status_lbl.config(fg="#f87171")
-
-    threading.Thread(target=init, daemon=True).start()
-    root.mainloop()
-
-
+# ── Main entry point ───────────────────────────────────────────────────────
 if __name__ == "__main__":
-    build_ui()
+    # Start the local API server in a background thread
+    start_server()
+    wait_for_server()
+
+    # Open a native desktop window — no browser chrome, no localhost URL
+    window = webview.create_window(
+        title="MeetingMeter",
+        url=URL,
+        width=980,
+        height=740,
+        min_size=(800, 600),
+        resizable=True,
+        text_select=False,
+        background_color="#0f0f13",
+    )
+    webview.start()

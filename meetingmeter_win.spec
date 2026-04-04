@@ -1,20 +1,31 @@
 # -*- mode: python ; coding: utf-8 -*-
 # Windows build spec — produces a single MeetingMeter.exe
+from PyInstaller.utils.hooks import collect_all
 
 block_cipher = None
+
+# Collect all pywebview modules, binaries, and data files
+webview_datas, webview_binaries, webview_hiddenimports = collect_all('webview')
 
 a = Analysis(
     ['meetingmeter_main.py'],
     pathex=[],
-    binaries=[],
-    datas=[
-        ('meetingmeter.html', '.'),
+    binaries=webview_binaries,
+    datas=[('meetingmeter.html', '.')] + webview_datas,
+    hiddenimports=webview_hiddenimports + [
+        'webview',
+        'webview.platforms.edgechromium',
+        'webview.platforms.mshtml',
+        'clr',
+        'System',
+        'System.Windows.Forms',
+        'System.Threading',
+        'System.Threading.Thread',
     ],
-    hiddenimports=['tkinter', 'tkinter.ttk'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['tkinter'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,

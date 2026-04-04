@@ -1,7 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+from PyInstaller.utils.hooks import collect_all
 
 block_cipher = None
+
+# Collect all pywebview modules, binaries, and data files
+webview_datas, webview_binaries, webview_hiddenimports = collect_all('webview')
 
 # Use icon if available (local dev), otherwise skip (CI)
 _icns = os.path.join(os.path.dirname(os.path.abspath(SPEC)), 'MeetingMeter.app', 'Contents', 'Resources', 'AppIcon.icns')
@@ -10,15 +14,20 @@ _icon = _icns if os.path.exists(_icns) else None
 a = Analysis(
     ['meetingmeter_main.py'],
     pathex=[],
-    binaries=[],
-    datas=[
-        ('meetingmeter.html', '.'),
+    binaries=webview_binaries,
+    datas=[('meetingmeter.html', '.')] + webview_datas,
+    hiddenimports=webview_hiddenimports + [
+        'webview',
+        'webview.platforms.cocoa',
+        'objc',
+        'Foundation',
+        'AppKit',
+        'WebKit',
     ],
-    hiddenimports=['tkinter', 'tkinter.ttk'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['tkinter'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
