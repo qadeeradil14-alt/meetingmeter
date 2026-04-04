@@ -642,12 +642,18 @@
     "Director":   210_000,
     "VP":         280_000,
     "C-Level":    450_000,
+    "Custom":          0,
   };
 
   const WORKING_SECONDS = 2080 * 3600; // 2080 working hours/year
 
   function salaryToPerSecond(annual) {
     return annual / WORKING_SECONDS;
+  }
+
+  function attendeePerSecond(a) {
+    const salary = a.role === "Custom" ? (a.customSalary || 0) : ROLES[a.role];
+    return salaryToPerSecond(salary);
   }
 
   // ── State ──────────────────────────────────────────────────
@@ -660,7 +666,7 @@
   // ── Attendees ──────────────────────────────────────────────
   function addAttendee() {
     const id = Date.now().toString();
-    attendees.push({ id, name: "", role: "Mid-level" });
+    attendees.push({ id, name: "", role: "Mid-level", customSalary: 0 });
     renderAttendees();
     // Focus new name input
     setTimeout(() => {
@@ -691,6 +697,12 @@
             `<option value="${r}" ${r === a.role ? "selected" : ""}>${r}</option>`
           ).join("")}
         </select>
+        <input class="salary-input" type="number" placeholder="Annual $" min="0" step="1000"
+          value="${a.customSalary || ""}"
+          style="display:${a.role === 'Custom' ? 'block' : 'none'};
+            width:100px; background:var(--surface); border:1px solid var(--border);
+            border-radius:6px; color:var(--text); font-size:12px; padding:4px 8px;
+            outline:none;" />
         <button class="remove-btn" title="Remove">×</button>
       `;
       row.querySelector(".attendee-name").addEventListener("input", e => {
@@ -701,6 +713,12 @@
       });
       row.querySelector(".role-select").addEventListener("change", e => {
         a.role = e.target.value;
+        const salInput = row.querySelector(".salary-input");
+        salInput.style.display = a.role === "Custom" ? "block" : "none";
+        updateStats();
+      });
+      row.querySelector(".salary-input").addEventListener("input", e => {
+        a.customSalary = parseFloat(e.target.value) || 0;
         updateStats();
       });
       row.querySelector(".remove-btn").addEventListener("click", () => removeAttendee(a.id));
@@ -711,7 +729,7 @@
 
   // ── Rate calculation ───────────────────────────────────────
   function totalPerSecond() {
-    return attendees.reduce((sum, a) => sum + salaryToPerSecond(ROLES[a.role]), 0);
+    return attendees.reduce((sum, a) => sum + attendeePerSecond(a), 0);
   }
 
   function updateStats() {
@@ -764,7 +782,7 @@
     }
     body.innerHTML = "";
     attendees.forEach(a => {
-      const cost = salaryToPerSecond(ROLES[a.role]) * elapsedSeconds;
+      const cost = attendeePerSecond(a) * elapsedSeconds;
       const row = document.createElement("div");
       row.className = "breakdown-row";
       const initials = a.name ? a.name.slice(0,2).toUpperCase() : "?";
@@ -772,7 +790,7 @@
         <div class="breakdown-avatar">${initials}</div>
         <div>
           <div class="breakdown-name">${a.name || "Unnamed"}</div>
-          <div class="breakdown-role">${a.role} · $${(salaryToPerSecond(ROLES[a.role])*60).toFixed(2)}/min</div>
+          <div class="breakdown-role">${a.role} · $${(attendeePerSecond(a)*60).toFixed(2)}/min</div>
         </div>
         <div class="breakdown-cost">$${cost.toFixed(2)}</div>
       `;
