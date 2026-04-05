@@ -1345,28 +1345,44 @@
     const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
     const sym = currencySymbol();
     const cur = currentCurrency;
-    let csv = `Meeting Report\n`;
-    csv += `Title,${title}\n`;
-    csv += `Duration,${fmtTime(elapsedSeconds)}\n`;
-    csv += `Total Cost,${sym}${cost.toFixed(2)} ${cur}\n`;
-    csv += `Currency,${cur}\n\n`;
-    csv += `Name,Role,Salary (Annual),Cost This Meeting\n`;
-    attendees.forEach(a => {
-      const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-      const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
-      csv += `${a.name || "Unnamed"},${a.role},${sym}${salary},${sym}${personCost.toFixed(2)}\n`;
-    });
-    const filename = `${title.replace(/\s+/g, "-")}-cost-report.csv`;
+    const filename = title.replace(/\s+/g, "-") + "-cost-report.csv";
 
     if (window.pywebview && window.pywebview.api) {
-      // Native app: use Python file dialog
-      window.pywebview.api.save_csv(csv, filename).then(res => {
+      // Send raw data to Python — Python builds the CSV so no encoding bridge issues
+      const rows = attendees.map(a => {
+        const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+        return {
+          name: a.name || "Unnamed",
+          role: a.role,
+          salary: sym + salary,
+          cost: sym + personCost.toFixed(2),
+        };
+      });
+      window.pywebview.api.save_csv({
+        title,
+        duration: fmtTime(elapsedSeconds),
+        total_cost: sym + cost.toFixed(2) + " " + cur,
+        currency: cur,
+        attendees: rows,
+      }, filename).then(res => {
         if (res && res.ok) showToast("✅ CSV saved to " + res.path.split("/").pop());
         else if (res && res.error) showToast("⚠️ " + res.error);
       });
     } else {
-      // Browser fallback
-      const blob = new Blob([csv], { type: "text/csv" });
+      // Browser fallback — build CSV in JS
+      let csv = "Meeting Report\n";
+      csv += "Title," + title + "\n";
+      csv += "Duration," + fmtTime(elapsedSeconds) + "\n";
+      csv += "Total Cost," + sym + cost.toFixed(2) + " " + cur + "\n";
+      csv += "Currency," + cur + "\n\n";
+      csv += "Name,Role,Salary (Annual),Cost This Meeting\n";
+      attendees.forEach(a => {
+        const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + salary + "," + sym + personCost.toFixed(2) + "\n";
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = filename;

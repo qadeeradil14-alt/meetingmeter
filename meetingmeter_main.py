@@ -20,8 +20,8 @@ from urllib.parse import urlparse
 class Api:
     """Methods here are callable from JavaScript as window.pywebview.api.*"""
 
-    def save_csv(self, content, filename):
-        """Show native Save dialog and write CSV file."""
+    def save_csv(self, data, filename):
+        """Build CSV in Python (avoids encoding issues in JS→Python bridge) and save."""
         try:
             result = webview.windows[0].create_file_dialog(
                 webview.SAVE_DIALOG,
@@ -32,7 +32,25 @@ class Api:
             if not result:
                 return {"ok": False}
             path = result[0] if isinstance(result, (list, tuple)) else result
-            # utf-8-sig writes a BOM so Excel opens special chars (', €, etc.) correctly
+
+            # Build CSV entirely in Python — no encoding bridge problems
+            lines = [
+                "Meeting Report",
+                f"Title,\"{data.get('title', '')}\"",
+                f"Duration,{data.get('duration', '')}",
+                f"Total Cost,{data.get('total_cost', '')}",
+                f"Currency,{data.get('currency', '')}",
+                "",
+                "Name,Role,Salary (Annual),Cost This Meeting",
+            ]
+            for a in data.get("attendees", []):
+                name = a.get("name", "Unnamed").replace('"', '""')
+                role = a.get("role", "").replace('"', '""')
+                lines.append(f'"{name}","{role}",{a.get("salary","")},{a.get("cost","")}')
+
+            content = "\n".join(lines) + "\n"
+
+            # utf-8-sig = UTF-8 with BOM — Excel on Mac & Windows reads special chars correctly
             with open(path, "w", newline="", encoding="utf-8-sig") as f:
                 f.write(content)
             return {"ok": True, "path": path}
