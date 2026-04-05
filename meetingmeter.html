@@ -954,6 +954,7 @@
   let elapsedSeconds = 0;
   let running = false;
   let paused = false;
+  let lastCompletedMeeting = null; // snapshot for exporting after save/discard
 
   // ── Attendees ──────────────────────────────────────────────
   function addAttendee() {
@@ -1185,6 +1186,12 @@
   });
 
   function resetAfterSave() {
+    // Snapshot before wiping so Export still works after save
+    lastCompletedMeeting = {
+      title: document.getElementById("meeting-title").value || "Untitled Meeting",
+      seconds: elapsedSeconds,
+      attendees: attendees.map(a => ({ ...a })),
+    };
     elapsedSeconds = 0;
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
@@ -1194,6 +1201,19 @@
     document.getElementById("pause-btn").textContent = "⏸ Pause";
     updateCostDisplay();
     updateBreakdown();
+  }
+
+  // Returns data for export — uses live state during a meeting,
+  // falls back to last completed meeting snapshot after save/reset
+  function getExportData() {
+    if (elapsedSeconds > 0) {
+      return {
+        title: document.getElementById("meeting-title").value || "Untitled Meeting",
+        seconds: elapsedSeconds,
+        attendees: attendees,
+      };
+    }
+    return lastCompletedMeeting;
   }
 
   // ── History ────────────────────────────────────────────────
@@ -1291,7 +1311,7 @@
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
-    if (elapsedSeconds === 0 && attendees.length === 0) {
+    if (!getExportData()) {
       alert("Start a meeting first, then export the report.");
       return;
     }
@@ -1341,27 +1361,28 @@
   }
 
   function exportCSV() {
-    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const data = getExportData();
+    if (!data) return;
+    const { title, seconds, attendees: snap } = data;
+    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
     const sym = currencySymbol();
     const cur = currentCurrency;
     const filename = title.replace(/\s+/g, "-") + "-cost-report.csv";
 
     if (window.pywebview && window.pywebview.api) {
-      // Send raw data to Python — Python builds the CSV so no encoding bridge issues
-      const rows = attendees.map(a => {
+      const rows = snap.map(a => {
         const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
         return {
           name: a.name || "Unnamed",
           role: a.role,
-          salary: sym + salary,
+          salary: sym + Math.round(toCurrentCurrency(salary)),
           cost: sym + personCost.toFixed(2),
         };
       });
       window.pywebview.api.save_csv({
         title,
-        duration: fmtTime(elapsedSeconds),
+        duration: fmtTime(seconds),
         total_cost: sym + cost.toFixed(2) + " " + cur,
         currency: cur,
         attendees: rows,
@@ -1370,18 +1391,16 @@
         else if (res && res.error) showToast("⚠️ " + res.error);
       });
     } else {
-      // Browser fallback — build CSV in JS
       let csv = "Meeting Report\n";
       csv += "Title," + title + "\n";
-      csv += "Duration," + fmtTime(elapsedSeconds) + "\n";
+      csv += "Duration," + fmtTime(seconds) + "\n";
       csv += "Total Cost," + sym + cost.toFixed(2) + " " + cur + "\n";
       csv += "Currency," + cur + "\n\n";
       csv += `Name,Role,Salary (Annual ${cur}),Cost This Meeting (${cur})\n`;
-      attendees.forEach(a => {
+      snap.forEach(a => {
         const salaryUSD = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-        const salaryCur = toCurrentCurrency(salaryUSD);
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
-        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(salaryCur) + "," + sym + personCost.toFixed(2) + "\n";
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
+        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(toCurrentCurrency(salaryUSD)) + "," + sym + personCost.toFixed(2) + "\n";
       });
       const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
@@ -1392,15 +1411,16 @@
   }
 
   function exportPrint() {
-    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const data = getExportData();
+    if (!data) return;
+    const { title, seconds, attendees: snap } = data;
+    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
     const sym = currencySymbol();
     const cur = currentCurrency;
 
     if (window.pywebview && window.pywebview.api) {
-      // Native app: generate PDF via Python (reportlab)
-      const attendeeData = attendees.map(a => {
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      const attendeeData = snap.map(a => {
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
         const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
         return {
           name: a.name || "Unnamed",
@@ -1411,7 +1431,7 @@
       });
       window.pywebview.api.save_pdf({
         title,
-        duration: fmtTime(elapsedSeconds),
+        duration: fmtTime(seconds),
         total_cost: `${sym}${cost.toFixed(2)}`,
         currency: cur,
         sym,
@@ -1421,9 +1441,8 @@
         else if (res && res.error) showToast("⚠️ " + res.error);
       });
     } else {
-      // Browser fallback: open print dialog
-      const rows = attendees.map(a => {
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      const rows = snap.map(a => {
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
         const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
         return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
           <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
@@ -1438,7 +1457,7 @@
       .footer{margin-top:32px;font-size:12px;color:#999}
       </style></head><body>
       <h1>💸 Meeting Cost Report</h1>
-      <div class="meta">${title} · Duration: ${fmtTime(elapsedSeconds)}</div>
+      <div class="meta">${title} · Duration: ${fmtTime(seconds)}</div>
       <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${cur}</span></div>
       <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
       <tbody>${rows}</tbody></table>
