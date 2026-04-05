@@ -1376,11 +1376,12 @@
       csv += "Duration," + fmtTime(elapsedSeconds) + "\n";
       csv += "Total Cost," + sym + cost.toFixed(2) + " " + cur + "\n";
       csv += "Currency," + cur + "\n\n";
-      csv += "Name,Role,Salary (Annual),Cost This Meeting\n";
+      csv += `Name,Role,Salary (Annual ${cur}),Cost This Meeting (${cur})\n`;
       attendees.forEach(a => {
-        const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const salaryUSD = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const salaryCur = toCurrentCurrency(salaryUSD);
         const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
-        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + salary + "," + sym + personCost.toFixed(2) + "\n";
+        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(salaryCur) + "," + sym + personCost.toFixed(2) + "\n";
       });
       const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
