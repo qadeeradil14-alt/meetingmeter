@@ -32,7 +32,8 @@ class Api:
             if not result:
                 return {"ok": False}
             path = result[0] if isinstance(result, (list, tuple)) else result
-            with open(path, "w", newline="", encoding="utf-8") as f:
+            # utf-8-sig writes a BOM so Excel opens special chars (', €, etc.) correctly
+            with open(path, "w", newline="", encoding="utf-8-sig") as f:
                 f.write(content)
             return {"ok": True, "path": path}
         except Exception as e:
@@ -42,10 +43,10 @@ class Api:
         """Generate a PDF report via reportlab and save with native dialog."""
         try:
             from reportlab.lib.pagesizes import letter
-            from reportlab.lib.styles import ParagraphStyle
-            from reportlab.lib.units import inch
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import inch, pt
             from reportlab.lib import colors
-            from reportlab.lib.enums import TA_CENTER
+            from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
             from reportlab.platypus import (
                 SimpleDocTemplate, Paragraph, Spacer,
                 Table, TableStyle, HRFlowable
@@ -56,7 +57,6 @@ class Api:
             duration = data.get("duration", "00:00:00")
             total    = data.get("total_cost", "$0.00")
             currency = data.get("currency", "USD")
-            sym      = data.get("sym", "$")
             rows     = data.get("attendees", [])
             generated = datetime.datetime.now().strftime("%B %d, %Y at %I:%M %p")
 
@@ -70,6 +70,7 @@ class Api:
                 return {"ok": False}
             path = result[0] if isinstance(result, (list, tuple)) else result
 
+            # ── Colours ───────────────────────────────────────────
             gold   = colors.HexColor("#f59e0b")
             dark   = colors.HexColor("#111827")
             muted  = colors.HexColor("#6b7280")
@@ -77,49 +78,63 @@ class Api:
             subtle = colors.HexColor("#e5e7eb")
             faint  = colors.HexColor("#fafafa")
 
-            def sty(name, **kw):
-                return ParagraphStyle(name, **kw)
+            # ── Base styles ───────────────────────────────────────
+            base = getSampleStyleSheet()["Normal"]
+
+            def s(name, size, color, bold=False, align=TA_LEFT, leading_mult=1.35):
+                return ParagraphStyle(
+                    name, parent=base,
+                    fontSize=size,
+                    leading=size * leading_mult,
+                    textColor=color,
+                    fontName="Helvetica-Bold" if bold else "Helvetica",
+                    alignment=align,
+                )
+
+            # ── Page setup ────────────────────────────────────────
+            L_MARGIN = R_MARGIN = 0.75 * inch
+            PAGE_W = letter[0]
+            avail_w = PAGE_W - L_MARGIN - R_MARGIN   # 7.0 inches exactly
 
             doc = SimpleDocTemplate(
                 path, pagesize=letter,
-                rightMargin=0.75*inch, leftMargin=0.75*inch,
-                topMargin=0.75*inch,  bottomMargin=0.75*inch,
+                leftMargin=L_MARGIN, rightMargin=R_MARGIN,
+                topMargin=0.75 * inch, bottomMargin=0.75 * inch,
             )
+
+            # ── Story ─────────────────────────────────────────────
             story = []
 
-            story.append(Paragraph(
-                '<b>MeetingMeter</b>',
-                sty("brand", fontSize=20, textColor=dark, spaceAfter=2)
-            ))
-            story.append(Paragraph(
-                "Meeting Cost Report",
-                sty("sub", fontSize=12, textColor=muted, spaceAfter=12)
-            ))
-            story.append(HRFlowable(width="100%", thickness=1, color=subtle, spaceAfter=14))
+            # Header
+            story.append(Paragraph("MeetingMeter", s("brand", 22, dark, bold=True)))
+            story.append(Spacer(1, 4))
+            story.append(Paragraph("Meeting Cost Report", s("sub", 12, muted)))
+            story.append(Spacer(1, 14))
+            story.append(HRFlowable(width=avail_w, thickness=1, color=subtle))
+            story.append(Spacer(1, 16))
 
+            # Meeting title + meta
+            story.append(Paragraph(title, s("mtitle", 18, dark, bold=True)))
+            story.append(Spacer(1, 6))
             story.append(Paragraph(
-                f"<b>{title}</b>",
-                sty("mtitle", fontSize=17, textColor=dark, spaceAfter=5)
+                f"Duration: {duration}  \u2022  Currency: {currency}  \u2022  {generated}",
+                s("meta", 10, muted)
             ))
-            story.append(Paragraph(
-                f"Duration: {duration}   |   Currency: {currency}   |   {generated}",
-                sty("meta", fontSize=10, textColor=muted, spaceAfter=18)
-            ))
-            story.append(Paragraph(
-                f"<b>{total}</b>",
-                sty("cost", fontSize=34, textColor=gold, spaceAfter=3)
-            ))
-            story.append(Paragraph(
-                "Total Meeting Cost",
-                sty("clabel", fontSize=11, textColor=muted, spaceAfter=22)
-            ))
-            story.append(HRFlowable(width="100%", thickness=1, color=subtle, spaceAfter=14))
+            story.append(Spacer(1, 20))
 
+            # Total cost (big number)
+            story.append(Paragraph(total, s("cost", 36, gold, bold=True)))
+            story.append(Spacer(1, 6))
+            story.append(Paragraph("Total Meeting Cost", s("clabel", 11, muted)))
+            story.append(Spacer(1, 20))
+            story.append(HRFlowable(width=avail_w, thickness=1, color=subtle))
+            story.append(Spacer(1, 16))
+
+            # Attendee table
             if rows:
-                story.append(Paragraph(
-                    "<b>Cost Per Attendee</b>",
-                    sty("th", fontSize=13, textColor=dark, spaceAfter=8)
-                ))
+                story.append(Paragraph("Cost Per Attendee", s("th", 13, dark, bold=True)))
+                story.append(Spacer(1, 10))
+
                 tdata = [["Name", "Role", "Rate / min", "Cost This Meeting"]]
                 for a in rows:
                     tdata.append([
@@ -128,30 +143,45 @@ class Api:
                         a.get("rate", ""),
                         a.get("cost", ""),
                     ])
-                t = Table(tdata, colWidths=[1.8*inch, 1.6*inch, 1.5*inch, 1.8*inch])
+
+                # Proportional widths that exactly fill avail_w
+                cw = [avail_w * p for p in [0.28, 0.24, 0.22, 0.26]]
+
+                t = Table(tdata, colWidths=cw, repeatRows=1)
                 t.setStyle(TableStyle([
-                    ("BACKGROUND",   (0, 0), (-1, 0), light),
-                    ("TEXTCOLOR",    (0, 0), (-1, 0), muted),
-                    ("FONTNAME",     (0, 0), (-1, 0), "Helvetica-Bold"),
-                    ("FONTSIZE",     (0, 0), (-1, 0), 9),
-                    ("FONTSIZE",     (0, 1), (-1, -1), 11),
-                    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, faint]),
-                    ("GRID",         (0, 0), (-1, -1), 0.5, subtle),
-                    ("LEFTPADDING",  (0, 0), (-1, -1), 10),
-                    ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-                    ("TOPPADDING",   (0, 0), (-1, -1), 8),
-                    ("BOTTOMPADDING",(0, 0), (-1, -1), 8),
-                    ("ALIGN",        (2, 0), (-1, -1), "RIGHT"),
-                    ("FONTNAME",     (3, 1), (3, -1), "Helvetica-Bold"),
-                    ("TEXTCOLOR",    (3, 1), (3, -1), gold),
+                    # Header row
+                    ("BACKGROUND",    (0, 0), (-1, 0), light),
+                    ("TEXTCOLOR",     (0, 0), (-1, 0), muted),
+                    ("FONTNAME",      (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE",      (0, 0), (-1, 0), 9),
+                    ("TOPPADDING",    (0, 0), (-1, 0), 8),
+                    ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+                    # Data rows
+                    ("FONTNAME",      (0, 1), (-1, -1), "Helvetica"),
+                    ("FONTSIZE",      (0, 1), (-1, -1), 11),
+                    ("ROWBACKGROUNDS",(0, 1), (-1, -1), [colors.white, faint]),
+                    ("TOPPADDING",    (0, 1), (-1, -1), 9),
+                    ("BOTTOMPADDING", (0, 1), (-1, -1), 9),
+                    # All cells
+                    ("GRID",          (0, 0), (-1, -1), 0.5, subtle),
+                    ("LEFTPADDING",   (0, 0), (-1, -1), 10),
+                    ("RIGHTPADDING",  (0, 0), (-1, -1), 10),
+                    ("VALIGN",        (0, 0), (-1, -1), "MIDDLE"),
+                    # Right-align rate + cost columns
+                    ("ALIGN",         (2, 0), (-1, -1), "RIGHT"),
+                    # Bold gold for cost column
+                    ("FONTNAME",      (3, 1), (3, -1), "Helvetica-Bold"),
+                    ("TEXTCOLOR",     (3, 1), (3, -1), gold),
                 ]))
                 story.append(t)
 
-            story.append(Spacer(1, 20))
-            story.append(HRFlowable(width="100%", thickness=1, color=subtle, spaceAfter=8))
+            # Footer
+            story.append(Spacer(1, 28))
+            story.append(HRFlowable(width=avail_w, thickness=1, color=subtle))
+            story.append(Spacer(1, 10))
             story.append(Paragraph(
                 "Generated by <b>MeetingMeter</b>",
-                sty("footer", fontSize=9, textColor=muted, alignment=TA_CENTER)
+                s("footer", 9, muted, align=TA_CENTER)
             ))
 
             doc.build(story)
