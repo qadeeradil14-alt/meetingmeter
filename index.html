@@ -855,7 +855,7 @@
     <button class="modal-close" id="modalClose">&times;</button>
     <div class="modal-title">Get in touch</div>
     <p class="modal-sub">Have a question or feature request? We'd love to hear from you.</p>
-    <form class="contact-form" id="contactForm" action="https://formsubmit.co/ajax/qadeeradil@gmail.com" method="POST">
+    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xwvwrzvy" method="POST">
       <input type="text" name="name" placeholder="Your name" required />
       <input type="email" name="email" placeholder="Your email" required />
       <textarea name="message" placeholder="Your message" required></textarea>
@@ -922,7 +922,7 @@
         })
       });
       const json = await res.json();
-      if (json.success === "true" || json.success === true) {
+      if (json.ok || json.success === "true" || json.success === true) {
         form.style.display = "none";
         document.getElementById("contactSuccess").style.display = "block";
       } else {
