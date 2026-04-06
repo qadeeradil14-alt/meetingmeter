@@ -62,7 +62,7 @@ class Api:
         try:
             from reportlab.lib.pagesizes import letter
             from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-            from reportlab.lib.units import inch, pt
+            from reportlab.lib.units import inch
             from reportlab.lib import colors
             from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
             from reportlab.platypus import (
