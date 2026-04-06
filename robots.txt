@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://qadeeradil14-alt.github.io/meetingmeter/sitemap.xml
+Sitemap: https://meetingmeter.tech/sitemap.xml

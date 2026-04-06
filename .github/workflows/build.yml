@@ -31,6 +31,33 @@ jobs:
           name: MeetingMeter-mac
           path: MeetingMeter-mac.zip
 
+  # ── Create private draft release (not publicly visible) ───────────────────
+  release:
+    needs: [build-mac, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Mac artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: MeetingMeter-mac
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: MeetingMeter-win
+
+      - name: Create draft release (private — not publicly visible)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: MeetingMeter Build ${{ github.run_number }}
+          draft: true
+          files: |
+            MeetingMeter-mac.zip
+            MeetingMeter-win.zip
+
   # ── Windows build ──────────────────────────────────────────────────────────
   build-windows:
     runs-on: windows-latest
@@ -56,45 +83,3 @@ jobs:
           name: MeetingMeter-win
           path: MeetingMeter-win.zip
 
-  # ── Create GitHub Release with both files ─────────────────────────────────
-  release:
-    needs: [build-mac, build-windows]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download Mac artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: MeetingMeter-mac
-
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: MeetingMeter-win
-
-      - name: Create or update GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: MeetingMeter — Latest Release
-          body: |
-            ## MeetingMeter
-            Know the real cost of every meeting.
-
-            ### Downloads
-            - **MeetingMeter-mac.zip** — macOS (drag to Applications)
-            - **MeetingMeter-win.zip** — Windows (double-click to run)
-
-            ### macOS security note
-            If macOS blocks the app, open Terminal and run:
-            ```
-            xattr -cr ~/Downloads/MeetingMeter.app
-            ```
-
-            ### Windows security note
-            If Windows SmartScreen shows a warning, click **More info** → **Run anyway**.
-          files: |
-            MeetingMeter-mac.zip
-            MeetingMeter-win.zip
-          make_latest: true
