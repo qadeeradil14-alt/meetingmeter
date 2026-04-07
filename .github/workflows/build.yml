@@ -1,12 +1,12 @@
-name: Build MeetingMeter (Mac + Windows)
+name: Build All Apps (Mac + Windows)
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # Allows manual trigger from GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
-  # ── macOS build ────────────────────────────────────────────────────────────
+  # ── macOS builds ───────────────────────────────────────────────────────────
   build-mac:
     runs-on: macos-latest
     steps:
@@ -17,48 +17,33 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyinstaller pywebview pyobjc-core pyobjc-framework-WebKit pyobjc-framework-Cocoa reportlab
+        run: pip install pyinstaller pywebview pyobjc-core pyobjc-framework-WebKit pyobjc-framework-Cocoa reportlab psutil
 
-      - name: Build macOS app
+      - name: Build MeetingMeter (Mac)
         run: python -m PyInstaller meetingmeter.spec --distpath ./dist --workpath ./build --noconfirm
 
-      - name: Zip app bundle
+      - name: Zip MeetingMeter
         run: zip -r MeetingMeter-mac.zip dist/MeetingMeter.app
 
-      - name: Upload Mac artifact
+      - name: Build SystemMonitor (Mac)
+        run: python -m PyInstaller systemmonitor.spec --distpath ./dist --workpath ./build --noconfirm
+
+      - name: Zip SystemMonitor
+        run: zip -r SystemMonitor-mac.zip dist/SystemMonitor.app
+
+      - name: Upload MeetingMeter Mac artifact
         uses: actions/upload-artifact@v4
         with:
           name: MeetingMeter-mac
           path: MeetingMeter-mac.zip
 
-  # ── Create private draft release (not publicly visible) ───────────────────
-  release:
-    needs: [build-mac, build-windows]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download Mac artifact
-        uses: actions/download-artifact@v4
+      - name: Upload SystemMonitor Mac artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: MeetingMeter-mac
+          name: SystemMonitor-mac
+          path: SystemMonitor-mac.zip
 
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: MeetingMeter-win
-
-      - name: Create draft release (private — not publicly visible)
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: build-${{ github.run_number }}
-          name: MeetingMeter Build ${{ github.run_number }}
-          draft: true
-          files: |
-            MeetingMeter-mac.zip
-            MeetingMeter-win.zip
-
-  # ── Windows build ──────────────────────────────────────────────────────────
+  # ── Windows builds ─────────────────────────────────────────────────────────
   build-windows:
     runs-on: windows-latest
     steps:
@@ -69,17 +54,50 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install pyinstaller pywebview pythonnet reportlab
+        run: pip install pyinstaller pywebview pythonnet reportlab psutil
 
-      - name: Build Windows exe
+      - name: Build MeetingMeter (Windows)
         run: python -m PyInstaller meetingmeter_win.spec --distpath ./dist --workpath ./build --noconfirm
 
-      - name: Zip exe
+      - name: Zip MeetingMeter
         run: Compress-Archive -Path dist/MeetingMeter.exe -DestinationPath MeetingMeter-win.zip
 
-      - name: Upload Windows artifact
+      - name: Build SystemMonitor (Windows)
+        run: python -m PyInstaller systemmonitor_win.spec --distpath ./dist --workpath ./build --noconfirm
+
+      - name: Zip SystemMonitor
+        run: Compress-Archive -Path dist/SystemMonitor.exe -DestinationPath SystemMonitor-win.zip
+
+      - name: Upload MeetingMeter Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: MeetingMeter-win
           path: MeetingMeter-win.zip
 
+      - name: Upload SystemMonitor Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SystemMonitor-win
+          path: SystemMonitor-win.zip
+
+  # ── Release ────────────────────────────────────────────────────────────────
+  release:
+    needs: [build-mac, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }}
+          draft: true
+          files: |
+            MeetingMeter-mac/MeetingMeter-mac.zip
+            MeetingMeter-win/MeetingMeter-win.zip
+            SystemMonitor-mac/SystemMonitor-mac.zip
+            SystemMonitor-win/SystemMonitor-win.zip
