@@ -86,19 +86,28 @@ class handler(BaseHTTPRequestHandler):
         return events[:10]
 
     def _attendees(self, text):
-        """Extract attendee display names from ATTENDEE lines."""
-        names = []
+        """Extract attendee display names from ATTENDEE lines, handling ICS line folding."""
+        # Unfold continuation lines first (RFC 5545: lines starting with space/tab)
+        unfolded = []
         for line in text.splitlines():
-            if not (line.startswith("ATTENDEE") or line.startswith(" ATTENDEE")):
+            if line and line[0] in (" ", "\t") and unfolded:
+                unfolded[-1] += line[1:]
+            else:
+                unfolded.append(line)
+
+        names = []
+        for line in unfolded:
+            if not line.upper().startswith("ATTENDEE"):
                 continue
-            # Extract CN= parameter
+            # Only look at params before the colon (the mailto: value)
+            param_part = line.split(":")[0]
             cn = ""
-            for part in line.split(";"):
+            for part in param_part.split(";"):
                 if part.upper().startswith("CN="):
                     cn = part[3:].strip().strip('"')
                     break
-            # Skip if CN looks like an email or is empty
-            if cn and "@" not in cn and cn.lower() not in ("organizer", ""):
+            # Skip empty, emails, or single-char values
+            if cn and "@" not in cn and len(cn) > 1:
                 names.append(cn)
         return names
 
