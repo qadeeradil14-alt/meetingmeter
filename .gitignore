@@ -1,17 +1,34 @@
-# PyInstaller build artifacts
+# Build artifacts
 build/
 dist/
+*.app/
+*.exe
+*.zip
 
-# Meeting history (personal data)
-meetingmeter_history.json
-
-# Python cache
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
+.Python
+venv/
+env/
 
-# macOS
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+Thumbs.db
 
-# Distribution zip (upload separately to Gumroad)
-*.zip
+# Data (config + history — regenerated per user)
+meetingmeter_config.json
+meetingmeter_history.json
+
+# Local testing
+*.log
+.env
