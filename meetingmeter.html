@@ -1725,8 +1725,10 @@
   });
 
   // ── Mock/Demo Mode ────────────────────────────────────────
-  // Enable demo mode by checking for ?demo query param or localStorage flag
-  let DEMO_MODE = localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
+  // Auto-enable demo mode when NOT running on localhost (i.e. Vercel staging)
+  // Also enable via ?demo query param or localStorage flag
+  const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  let DEMO_MODE = !isLocalhost || localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
 
   if (DEMO_MODE) {
     console.log("🎬 MeetingMeter running in DEMO MODE (no backend required)");

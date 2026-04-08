@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "meetingmeter-staging",
+  "builds": [
+    {
+      "src": "meetingmeter.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/meetingmeter.html"
+    },
+    {
+      "src": "/staging",
+      "dest": "/meetingmeter.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ]
+}
