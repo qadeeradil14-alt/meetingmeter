@@ -99,16 +99,29 @@ class handler(BaseHTTPRequestHandler):
         for line in unfolded:
             if not line.upper().startswith("ATTENDEE"):
                 continue
-            # Only look at params before the colon (the mailto: value)
-            param_part = line.split(":")[0]
+            # Split into param part (before colon) and value part (after colon)
+            colon_idx = line.find(":")
+            param_part = line[:colon_idx] if colon_idx != -1 else line
+            mailto_part = line[colon_idx + 1:] if colon_idx != -1 else ""
+
             cn = ""
             for part in param_part.split(";"):
                 if part.upper().startswith("CN="):
                     cn = part[3:].strip().strip('"')
                     break
-            # Skip empty, emails, or single-char values
+
+            # If CN= is present and not an email, use it
             if cn and "@" not in cn and len(cn) > 1:
                 names.append(cn)
+            else:
+                # Fall back to email prefix (capitalize first letter of each word)
+                email = mailto_part.replace("mailto:", "").strip()
+                if "@" in email:
+                    prefix = email.split("@")[0]
+                    # Strip common suffixes like .meetingmeter, +tag etc.
+                    prefix = prefix.split("+")[0].split(".")[0]
+                    if len(prefix) > 1:
+                        names.append(prefix.capitalize())
         return names
 
     def _field(self, text, name):
