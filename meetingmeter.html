@@ -1389,7 +1389,11 @@
       title,
       duration_seconds: savedDuration,
       total_cost: parseFloat(savedCostUSD.toFixed(2)),
-      attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
+      attendees: attendees.map(a => ({
+        name: a.name || "Unnamed",
+        role: a.role,
+        cost_usd: parseFloat((attendeePerSecond(a) * savedDuration).toFixed(2)),
+      })),
     };
     const history = loadHistoryFromStorage();
     history.unshift(entry);
@@ -1712,7 +1716,7 @@
           currency:    currentCurrency,
           attendees:   entry.attendees.map(a => ({
             name: a.name, role: a.role,
-            cost: sym + toCurrentCurrency(entry.total_cost / (entry.attendees.length || 1)).toFixed(2),
+            cost: sym + toCurrentCurrency(a.cost_usd || 0).toFixed(2),
           })),
         }),
       });
