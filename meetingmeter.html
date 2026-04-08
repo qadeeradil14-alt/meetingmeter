@@ -1316,10 +1316,13 @@
     running = false;
     document.getElementById("running-indicator").classList.add("hidden");
 
+    // Capture duration and cost at this moment
+    savedDuration = elapsedSeconds;
+    savedCostUSD = totalPerSecond() * elapsedSeconds;
+
     // Show save modal
-    const costUSD = totalPerSecond() * elapsedSeconds;
-    document.getElementById("modal-duration").textContent = fmtTime(elapsedSeconds);
-    document.getElementById("modal-cost").textContent = fmtMoneyPlain(costUSD);
+    document.getElementById("modal-duration").textContent = fmtTime(savedDuration);
+    document.getElementById("modal-cost").textContent = fmtMoneyPlain(savedCostUSD);
 
     // Show Slack row if configured, hint if not
     const cfg = loadIntegrations();
@@ -1352,15 +1355,17 @@
   document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
 
   // ── Save modal ─────────────────────────────────────────────
+  let savedDuration = 0;  // Capture duration when Stop is clicked
+  let savedCostUSD = 0;   // Capture cost when Stop is clicked
+
   function saveMeeting() {
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const costUSD = totalPerSecond() * elapsedSeconds;
     const entry = {
       id: Date.now().toString(),
       timestamp: Date.now() / 1000,
       title,
-      duration_seconds: elapsedSeconds,
-      total_cost: parseFloat(costUSD.toFixed(2)),
+      duration_seconds: savedDuration,
+      total_cost: parseFloat(savedCostUSD.toFixed(2)),
       attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
     };
     const history = loadHistoryFromStorage();
