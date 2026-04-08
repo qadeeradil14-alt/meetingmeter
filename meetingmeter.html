@@ -1493,8 +1493,10 @@
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
-    if (elapsedSeconds === 0 && attendees.length === 0) {
-      alert("Start a meeting first, then export the report.");
+    // Use savedDuration if timer has been reset, otherwise current elapsed
+    const exportSecs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
+    if (exportSecs === 0 && attendees.length === 0) {
+      alert("Run a meeting first, then export the report.");
       return;
     }
     showExportMenu();
@@ -1522,19 +1524,21 @@
   }
 
   function exportCSV() {
+    // Use savedDuration/savedCostUSD if timer has already been reset
+    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
     const sym = currencySymbol();
     const cur = currentCurrency;
     let csv = `Meeting Report\n`;
     csv += `Title,${title}\n`;
-    csv += `Duration,${fmtTime(elapsedSeconds)}\n`;
+    csv += `Duration,${fmtTime(secs)}\n`;
     csv += `Total Cost,${sym}${cost.toFixed(2)} ${cur}\n`;
     csv += `Currency,${cur}\n\n`;
     csv += `Name,Role,Salary (Annual),Cost This Meeting\n`;
     attendees.forEach(a => {
       const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-      const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
       csv += `${a.name || "Unnamed"},${a.role},${sym}${salary},${sym}${personCost.toFixed(2)}\n`;
     });
     const blob = new Blob([csv], { type: "text/csv" });
@@ -1545,11 +1549,13 @@
   }
 
   function exportPrint() {
+    // Use savedDuration/savedCostUSD if timer has already been reset
+    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(totalPerSecond() * elapsedSeconds);
+    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
     const sym = currencySymbol();
     const rows = attendees.map(a => {
-      const personCost = toCurrentCurrency(attendeePerSecond(a) * elapsedSeconds);
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
       const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
       return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
         <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
@@ -1565,7 +1571,7 @@
     .footer{margin-top:32px;font-size:12px;color:#999}
     </style></head><body>
     <h1>💸 Meeting Cost Report</h1>
-    <div class="meta">${title} &nbsp;·&nbsp; Duration: ${fmtTime(elapsedSeconds)}</div>
+    <div class="meta">${title} &nbsp;·&nbsp; Duration: ${fmtTime(secs)}</div>
     <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${currentCurrency}</span></div>
     <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
     <tbody>${rows}</tbody></table>
