@@ -1,0 +1,23 @@
+{
+  "version": 2,
+"builds": [
+    { "src": "meetingmeter.html", "use": "@vercel/static" },
+    { "src": "index.html",        "use": "@vercel/static" },
+    { "src": "api/*.py",          "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/api/slack-notify",    "dest": "/api/slack-notify.py" },
+    { "src": "/api/calendar-events", "dest": "/api/calendar-events.py" },
+    { "src": "/staging",             "dest": "/meetingmeter.html" },
+    { "src": "/",                    "dest": "/meetingmeter.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff"   }
+      ]
+    }
+  ]
+}

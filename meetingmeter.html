@@ -646,6 +646,107 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Integrations modal ── */
+    .integration-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .integration-block-title {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .integration-status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: auto;
+    }
+    .integration-status.connected {
+      background: rgba(52,211,153,0.15);
+      color: var(--green);
+      border: 1px solid rgba(52,211,153,0.3);
+    }
+    .integration-status.not-connected {
+      background: rgba(122,122,154,0.1);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .integration-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .integration-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 12px;
+      padding: 8px 10px;
+      outline: none;
+      width: 100%;
+      font-family: monospace;
+    }
+    .integration-input:focus { border-color: var(--accent); }
+    .integration-input::placeholder { color: var(--muted); font-family: inherit; }
+    .integration-row { display: flex; gap: 6px; align-items: center; }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 7px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-sm-primary { background: var(--accent); color: white; }
+    .btn-sm-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-sm-ghost:hover:not(:disabled) { background: var(--border); }
+
+    /* ── Calendar modal ── */
+    .cal-event-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cal-event-card:hover { border-color: var(--accent); background: rgba(124,106,247,0.06); }
+    .cal-event-title { font-size: 13px; font-weight: 600; }
+    .cal-event-meta  { font-size: 11px; color: var(--muted); }
+
+    /* ── Slack checkbox in save modal ── */
+    .slack-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(52,211,153,0.06);
+      border: 1px solid rgba(52,211,153,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .slack-row input[type=checkbox] { accent-color: var(--green); width: 16px; height: 16px; cursor: pointer; }
+    .slack-row label { cursor: pointer; flex: 1; }
+    .slack-setup-hint { font-size: 12px; color: var(--muted); }
+    .slack-setup-hint a { color: var(--accent); text-decoration: none; cursor: pointer; }
+    .slack-setup-hint a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -668,6 +769,7 @@
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
     <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
+    <button class="settings-btn" id="integrations-btn" title="Slack & Calendar integrations">🔗 Integrations</button>
     <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
   </div>
 </header>
@@ -680,6 +782,9 @@
     <div>
       <div class="section-label">Meeting Title</div>
       <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
+      <button class="add-btn" id="cal-import-btn" style="margin-top:8px;border-style:solid;border-color:rgba(124,106,247,0.35);color:var(--accent)">
+        📅 Import from Calendar
+      </button>
     </div>
 
     <div>
@@ -780,6 +885,13 @@
       <span id="modal-duration">–</span>
       <strong id="modal-cost">$0.00</strong>
     </div>
+    <div id="slack-share-row" class="slack-row hidden">
+      <input type="checkbox" id="slack-share-chk" checked />
+      <label for="slack-share-chk">Share summary to Slack</label>
+    </div>
+    <div id="slack-setup-hint" class="slack-setup-hint hidden">
+      <a id="slack-setup-link">+ Connect Slack</a> to share this meeting to a channel
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="modal-discard">Discard</button>
       <button class="btn btn-primary" id="modal-save">Save</button>
@@ -787,8 +899,83 @@
   </div>
 </div>
 
+<!-- Integrations modal -->
+<div class="modal-overlay" id="integrations-modal">
+  <div class="modal" style="width:440px;max-height:90vh;overflow-y:auto;gap:20px">
+    <h2>🔗 Integrations</h2>
+
+    <!-- Slack -->
+    <div class="integration-block">
+      <div class="integration-block-title">
+        <span>💬 Slack</span>
+        <span class="integration-status not-connected" id="slack-status-badge">Not connected</span>
+      </div>
+      <p class="integration-desc">Share a meeting cost summary to any Slack channel via an Incoming Webhook.</p>
+      <div class="integration-row">
+        <input class="integration-input" id="slack-webhook-input"
+          type="password" placeholder="https://hooks.slack.com/services/…" autocomplete="off" />
+        <button class="btn-sm btn-sm-ghost" id="slack-test-btn">Test</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">
+        <a href="https://api.slack.com/messaging/webhooks" target="_blank"
+          style="color:var(--accent);text-decoration:none">How to create a webhook →</a>
+      </div>
+    </div>
+
+    <!-- Google Calendar -->
+    <div class="integration-block">
+      <div class="integration-block-title">
+        <span>📅 Google Calendar</span>
+        <span class="integration-status not-connected" id="gcal-status-badge">Not connected</span>
+      </div>
+      <p class="integration-desc">Import upcoming events to pre-fill meeting title and duration. Uses your calendar's public ICS link.</p>
+      <div class="integration-row">
+        <input class="integration-input" id="gcal-ics-input"
+          type="text" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" />
+        <button class="btn-sm btn-sm-ghost" id="gcal-test-btn">Test</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">
+        In Google Calendar → Settings → your calendar → "Secret address in iCal format"
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-ghost" id="integrations-cancel">Cancel</button>
+      <button class="btn btn-primary" id="integrations-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar import modal -->
+<div class="modal-overlay" id="cal-modal">
+  <div class="modal" style="width:440px;max-height:90vh;overflow-y:auto;">
+    <h2>📅 Import from Calendar</h2>
+    <p>Select an upcoming event to pre-fill the meeting title and duration.</p>
+    <div id="cal-events-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-ghost" id="cal-modal-close">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  const API = "http://localhost:8766";
+  // ── localStorage history helpers ───────────────────────────
+  function loadHistoryFromStorage() {
+    try { return JSON.parse(localStorage.getItem("mm_history") || "[]"); }
+    catch(e) { return []; }
+  }
+  function saveHistoryToStorage(h) {
+    localStorage.setItem("mm_history", JSON.stringify(h));
+  }
+
+  // ── Integration config helpers ─────────────────────────────
+  function loadIntegrations() {
+    try { return JSON.parse(localStorage.getItem("mm_integrations") || "{}"); }
+    catch(e) { return {}; }
+  }
+  function saveIntegrations(cfg) {
+    localStorage.setItem("mm_integrations", JSON.stringify(cfg));
+  }
 
   // ── Salary presets (annual → per-second) ──────────────────
   const DEFAULT_ROLES = {
@@ -1133,6 +1320,18 @@
     const costUSD = totalPerSecond() * elapsedSeconds;
     document.getElementById("modal-duration").textContent = fmtTime(elapsedSeconds);
     document.getElementById("modal-cost").textContent = fmtMoneyPlain(costUSD);
+
+    // Show Slack row if configured, hint if not
+    const cfg = loadIntegrations();
+    const slackRow  = document.getElementById("slack-share-row");
+    const slackHint = document.getElementById("slack-setup-hint");
+    if (cfg.slack_webhook) {
+      slackRow.classList.remove("hidden");
+      slackHint.classList.add("hidden");
+    } else {
+      slackRow.classList.add("hidden");
+      slackHint.classList.remove("hidden");
+    }
     document.getElementById("save-modal").style.display = "flex";
   });
 
@@ -1153,29 +1352,32 @@
   document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
 
   // ── Save modal ─────────────────────────────────────────────
-  async function saveMeeting() {
+  function saveMeeting() {
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = totalPerSecond() * elapsedSeconds;
-    try {
-      await fetch(`${API}/api/history`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          duration_seconds: elapsedSeconds,
-          total_cost: parseFloat(cost.toFixed(2)),
-          attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
-        }),
-      });
-      await loadHistory();
-    } catch (e) {
-      console.error("Failed to save meeting", e);
-    }
+    const costUSD = totalPerSecond() * elapsedSeconds;
+    const entry = {
+      id: Date.now().toString(),
+      timestamp: Date.now() / 1000,
+      title,
+      duration_seconds: elapsedSeconds,
+      total_cost: parseFloat(costUSD.toFixed(2)),
+      attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
+    };
+    const history = loadHistoryFromStorage();
+    history.unshift(entry);
+    saveHistoryToStorage(history);
+    renderHistory(history);
+    return entry;
   }
 
   document.getElementById("modal-save").addEventListener("click", async () => {
     document.getElementById("save-modal").style.display = "none";
-    await saveMeeting();
+    const entry = saveMeeting();
+    // Share to Slack if checked
+    const chk = document.getElementById("slack-share-chk");
+    if (chk && !chk.closest(".hidden") && chk.checked) {
+      await slackNotify(entry);
+    }
     resetAfterSave();
   });
 
@@ -1197,14 +1399,8 @@
   }
 
   // ── History ────────────────────────────────────────────────
-  async function loadHistory() {
-    try {
-      const res = await fetch(`${API}/api/history`);
-      const data = await res.json();
-      renderHistory(data);
-    } catch (e) {
-      // server not available yet
-    }
+  function loadHistory() {
+    renderHistory(loadHistoryFromStorage());
   }
 
   function renderHistory(items) {
@@ -1229,19 +1425,20 @@
         <div class="history-cost">$${item.total_cost.toFixed(2)}</div>
         <button class="history-del" data-id="${item.id}" title="Delete">×</button>
       `;
-      card.querySelector(".history-del").addEventListener("click", async (e) => {
+      card.querySelector(".history-del").addEventListener("click", (e) => {
         const id = e.target.dataset.id;
-        await fetch(`${API}/api/history/${id}`, { method: "DELETE" });
-        await loadHistory();
+        const updated = loadHistoryFromStorage().filter(h => h.id !== id);
+        saveHistoryToStorage(updated);
+        loadHistory();
       });
       list.appendChild(card);
     });
   }
 
-  document.getElementById("clear-history-btn").addEventListener("click", async () => {
+  document.getElementById("clear-history-btn").addEventListener("click", () => {
     if (confirm("Clear all meeting history?")) {
-      await fetch(`${API}/api/history`, { method: "DELETE" });
-      await loadHistory();
+      saveHistoryToStorage([]);
+      loadHistory();
     }
   });
 
@@ -1383,6 +1580,180 @@
       else document.getElementById("pause-btn").click();
     }
     if (e.code === "KeyR" && !running) document.getElementById("reset-btn").click();
+  });
+
+  // ── Integrations modal ────────────────────────────────────
+  function openIntegrations() {
+    const cfg = loadIntegrations();
+    const webhookInput = document.getElementById("slack-webhook-input");
+    const icsInput     = document.getElementById("gcal-ics-input");
+    webhookInput.value = cfg.slack_webhook || "";
+    icsInput.value     = cfg.gcal_ics_url  || "";
+    _refreshIntegrationBadges(cfg);
+    document.getElementById("integrations-modal").style.display = "flex";
+  }
+
+  function _refreshIntegrationBadges(cfg) {
+    const slackBadge = document.getElementById("slack-status-badge");
+    const gcalBadge  = document.getElementById("gcal-status-badge");
+    if (cfg.slack_webhook) {
+      slackBadge.textContent = "Connected";
+      slackBadge.className = "integration-status connected";
+    } else {
+      slackBadge.textContent = "Not connected";
+      slackBadge.className = "integration-status not-connected";
+    }
+    if (cfg.gcal_ics_url) {
+      gcalBadge.textContent = "Connected";
+      gcalBadge.className = "integration-status connected";
+    } else {
+      gcalBadge.textContent = "Not connected";
+      gcalBadge.className = "integration-status not-connected";
+    }
+  }
+
+  document.getElementById("integrations-btn").addEventListener("click", openIntegrations);
+
+  document.getElementById("integrations-cancel").addEventListener("click", () => {
+    document.getElementById("integrations-modal").style.display = "none";
+  });
+
+  document.getElementById("integrations-save").addEventListener("click", () => {
+    const cfg = loadIntegrations();
+    cfg.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
+    cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
+    saveIntegrations(cfg);
+    document.getElementById("integrations-modal").style.display = "none";
+  });
+
+  // "Connect Slack" link in save modal opens integrations
+  document.getElementById("slack-setup-link").addEventListener("click", () => {
+    document.getElementById("save-modal").style.display = "none";
+    openIntegrations();
+  });
+
+  // ── Slack test ─────────────────────────────────────────────
+  document.getElementById("slack-test-btn").addEventListener("click", async () => {
+    const url = document.getElementById("slack-webhook-input").value.trim();
+    if (!url) { alert("Paste a Slack webhook URL first."); return; }
+    const btn = document.getElementById("slack-test-btn");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/slack-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          webhook_url: url,
+          title: "MeetingMeter Test",
+          duration: "00:05:00",
+          total_cost: "$42.00",
+          currency: "USD",
+          attendees: [{ name: "You", role: "Senior", cost: "$42.00" }],
+        }),
+      });
+      const data = await res.json();
+      btn.textContent = data.ok ? "✓ Sent!" : "✗ Failed";
+      if (!data.ok) alert("Slack error: " + (data.error || "unknown"));
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not reach /api/slack-notify: " + e.message);
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+  // ── Slack notify on save ───────────────────────────────────
+  async function slackNotify(entry) {
+    const cfg = loadIntegrations();
+    if (!cfg.slack_webhook) return;
+    const sym = currencySymbol();
+    try {
+      await fetch("/api/slack-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          webhook_url: cfg.slack_webhook,
+          title:       entry.title,
+          duration:    fmtTime(entry.duration_seconds),
+          total_cost:  sym + toCurrentCurrency(entry.total_cost).toFixed(2),
+          currency:    currentCurrency,
+          attendees:   entry.attendees.map(a => ({
+            name: a.name, role: a.role,
+            cost: sym + toCurrentCurrency(entry.total_cost / (entry.attendees.length || 1)).toFixed(2),
+          })),
+        }),
+      });
+    } catch(e) {
+      console.warn("Slack notify failed:", e);
+    }
+  }
+
+  // ── Calendar test ──────────────────────────────────────────
+  document.getElementById("gcal-test-btn").addEventListener("click", async () => {
+    const url = document.getElementById("gcal-ics-input").value.trim();
+    if (!url) { alert("Paste a Google Calendar ICS URL first."); return; }
+    const btn = document.getElementById("gcal-test-btn");
+    btn.textContent = "Fetching…"; btn.disabled = true;
+    try {
+      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(url));
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = `✓ ${data.events.length} events`;
+      } else {
+        btn.textContent = "✗ Failed";
+        alert("Calendar error: " + data.error);
+      }
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not reach /api/calendar-events: " + e.message);
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+  // ── Calendar import modal ──────────────────────────────────
+  document.getElementById("cal-import-btn").addEventListener("click", async () => {
+    const cfg = loadIntegrations();
+    if (!cfg.gcal_ics_url) {
+      openIntegrations();
+      return;
+    }
+    const btn = document.getElementById("cal-import-btn");
+    btn.textContent = "⏳ Loading…"; btn.disabled = true;
+
+    try {
+      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(cfg.gcal_ics_url));
+      const data = await res.json();
+      const list = document.getElementById("cal-events-list");
+      list.innerHTML = "";
+
+      if (!data.ok || data.events.length === 0) {
+        list.innerHTML = `<div class="empty-state">${data.ok ? "No upcoming events in the next 7 days." : data.error}</div>`;
+      } else {
+        data.events.forEach(ev => {
+          const card = document.createElement("div");
+          card.className = "cal-event-card";
+          const hrs = Math.floor(ev.duration_min / 60);
+          const mins = ev.duration_min % 60;
+          const dur  = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
+          card.innerHTML = `
+            <div class="cal-event-title">${ev.summary}</div>
+            <div class="cal-event-meta">${ev.start} · ${dur}${ev.location ? " · 📍 " + ev.location : ""}</div>
+          `;
+          card.addEventListener("click", () => {
+            document.getElementById("meeting-title").value = ev.summary;
+            document.getElementById("cal-modal").style.display = "none";
+          });
+          list.appendChild(card);
+        });
+      }
+      document.getElementById("cal-modal").style.display = "flex";
+    } catch(e) {
+      alert("Could not load calendar: " + e.message);
+    }
+    btn.textContent = "📅 Import from Calendar"; btn.disabled = false;
+  });
+
+  document.getElementById("cal-modal-close").addEventListener("click", () => {
+    document.getElementById("cal-modal").style.display = "none";
   });
 
   // ── Init ───────────────────────────────────────────────────
