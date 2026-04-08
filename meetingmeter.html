@@ -977,6 +977,18 @@
     localStorage.setItem("mm_integrations", JSON.stringify(cfg));
   }
 
+  // ── People role memory (name → {role, customSalary}) ───────
+  function loadPeopleRoles() {
+    try { return JSON.parse(localStorage.getItem("mm_people_roles") || "{}"); }
+    catch(e) { return {}; }
+  }
+  function savePeopleRole(name, role, customSalary) {
+    if (!name || name === "Unnamed") return;
+    const pr = loadPeopleRoles();
+    pr[name.trim()] = { role, customSalary: customSalary || 0 };
+    localStorage.setItem("mm_people_roles", JSON.stringify(pr));
+  }
+
   // ── Salary presets (annual → per-second) ──────────────────
   const DEFAULT_ROLES = {
     "Intern":      40_000,
@@ -1188,16 +1200,27 @@
         a.name = e.target.value;
         row.querySelector(".attendee-avatar").textContent =
           a.name ? a.name.slice(0,2).toUpperCase() : "?";
+        // Look up remembered role for this person
+        const pr = loadPeopleRoles();
+        if (pr[a.name.trim()]) {
+          const mem = pr[a.name.trim()];
+          a.role = mem.role;
+          a.customSalary = mem.customSalary || 0;
+          renderAttendees();
+          return;
+        }
         updateStats();
       });
       row.querySelector(".role-select").addEventListener("change", e => {
         a.role = e.target.value;
         const salInput = row.querySelector(".salary-input");
         salInput.style.display = a.role === "Custom" ? "block" : "none";
+        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
       row.querySelector(".salary-input").addEventListener("input", e => {
         a.customSalary = parseFloat(e.target.value) || 0;
+        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
       row.querySelector(".remove-btn").addEventListener("click", () => removeAttendee(a.id));
@@ -1739,18 +1762,45 @@
       if (!data.ok || data.events.length === 0) {
         list.innerHTML = `<div class="empty-state">${data.ok ? "No upcoming events in the next 7 days." : data.error}</div>`;
       } else {
+        const pr = loadPeopleRoles();
         data.events.forEach(ev => {
           const card = document.createElement("div");
           card.className = "cal-event-card";
-          const hrs = Math.floor(ev.duration_min / 60);
+          const hrs  = Math.floor(ev.duration_min / 60);
           const mins = ev.duration_min % 60;
           const dur  = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
+          const evAttendees = ev.attendees || [];
+          const attendeePreview = evAttendees.length
+            ? evAttendees.map(n => {
+                const known = pr[n.trim()];
+                return `<span style="background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.25);
+                  border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent-light)">
+                  ${n}${known ? " · " + known.role : " · ?"}
+                </span>`;
+              }).join(" ")
+            : "";
           card.innerHTML = `
             <div class="cal-event-title">${ev.summary}</div>
             <div class="cal-event-meta">${ev.start} · ${dur}${ev.location ? " · 📍 " + ev.location : ""}</div>
+            ${attendeePreview ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${attendeePreview}</div>` : ""}
           `;
           card.addEventListener("click", () => {
+            // Fill title
             document.getElementById("meeting-title").value = ev.summary;
+            // Add attendees if any
+            if (evAttendees.length > 0) {
+              attendees = [];
+              evAttendees.forEach(name => {
+                const mem = pr[name.trim()];
+                attendees.push({
+                  id: Date.now().toString() + Math.random(),
+                  name: name.trim(),
+                  role: mem ? mem.role : "Mid-level",
+                  customSalary: mem ? (mem.customSalary || 0) : 0,
+                });
+              });
+              renderAttendees();
+            }
             document.getElementById("cal-modal").style.display = "none";
           });
           list.appendChild(card);

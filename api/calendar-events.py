@@ -57,6 +57,7 @@ class handler(BaseHTTPRequestHandler):
             dtstart  = self._field(block, "DTSTART")
             dtend    = self._field(block, "DTEND")
             location = self._field(block, "LOCATION")
+            attendees = self._attendees(block)
 
             start_ts = self._parse_dt(dtstart)
             end_ts   = self._parse_dt(dtend)
@@ -78,10 +79,28 @@ class handler(BaseHTTPRequestHandler):
                 "start_ts":     start_ts,
                 "duration_min": max(1, duration_min),
                 "location":     location,
+                "attendees":    attendees,
             })
 
         events.sort(key=lambda e: e["start_ts"])
         return events[:10]
+
+    def _attendees(self, text):
+        """Extract attendee display names from ATTENDEE lines."""
+        names = []
+        for line in text.splitlines():
+            if not (line.startswith("ATTENDEE") or line.startswith(" ATTENDEE")):
+                continue
+            # Extract CN= parameter
+            cn = ""
+            for part in line.split(";"):
+                if part.upper().startswith("CN="):
+                    cn = part[3:].strip().strip('"')
+                    break
+            # Skip if CN looks like an email or is empty
+            if cn and "@" not in cn and cn.lower() not in ("organizer", ""):
+                names.append(cn)
+        return names
 
     def _field(self, text, name):
         lines = text.splitlines()
