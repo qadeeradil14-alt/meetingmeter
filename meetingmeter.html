@@ -525,6 +525,38 @@
     }
     .settings-btn:hover { color: var(--text); border-color: var(--accent); }
 
+    /* ── Pro badge ── */
+    .pro-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .lock-icon { font-size: 12px; opacity: 0.6; margin-left: 4px; }
+
+    /* ── Upgrade modal ── */
+    .upgrade-modal { max-width: 420px; text-align: center; gap: 16px; }
+    .upgrade-modal h2 { font-size: 22px; margin: 0; }
+    .upgrade-modal p  { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.5; }
+    .upgrade-features { list-style: none; padding: 0; margin: 0; text-align: left; }
+    .upgrade-features li { font-size: 13px; padding: 5px 0; color: var(--text); }
+    .upgrade-features li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
+    .license-input-row { display: flex; gap: 8px; width: 100%; }
+    .license-input-row input { flex: 1; }
+    .divider-text { color: var(--muted); font-size: 12px; }
+    .btn-gumroad {
+      display: block; width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #000; font-weight: 700; font-size: 15px;
+      border: none; border-radius: 10px; cursor: pointer; text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-gumroad:hover { opacity: 0.9; }
+
     .settings-grid {
       display: flex;
       flex-direction: column;
@@ -758,6 +790,7 @@
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
   <div style="display:flex;gap:8px;align-items:center">
+    <span id="pro-badge" class="pro-badge" style="display:none">PRO</span>
     <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
       <option value="USD">🇺🇸 USD $</option>
@@ -958,7 +991,98 @@
   </div>
 </div>
 
+<!-- Upgrade modal -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal upgrade-modal">
+    <div>
+      <div style="font-size:36px;margin-bottom:4px">🚀</div>
+      <h2>Unlock MeetingMeter Pro</h2>
+      <p>Everything you need to run smarter, more accountable meetings.</p>
+    </div>
+    <ul class="upgrade-features">
+      <li>Unlimited attendees (free = 5 max)</li>
+      <li>Google Calendar import</li>
+      <li>Slack integration</li>
+      <li>PDF &amp; CSV export</li>
+      <li>Role memory across meetings</li>
+    </ul>
+    <a class="btn-gumroad" href="https://qadeeradil.gumroad.com/l/meetingmeter" target="_blank">
+      Get Pro — One-time purchase →
+    </a>
+    <div class="divider-text">Already have a license key?</div>
+    <div class="license-input-row">
+      <input type="text" id="license-key-input" placeholder="Paste your license key…"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+               color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
+      <button class="btn btn-primary" id="license-verify-btn">Verify</button>
+    </div>
+    <div id="license-msg" style="font-size:12px;min-height:16px;text-align:center"></div>
+    <button class="btn btn-ghost" id="upgrade-modal-close">Maybe later</button>
+  </div>
+</div>
+
 <script>
+  // ── Pro / Paywall ──────────────────────────────────────────
+  const FREE_ATTENDEE_LIMIT = 5;
+  const GUMROAD_URL = "https://qadeeradil.gumroad.com/l/meetingmeter";
+
+  function isPro() {
+    return localStorage.getItem("mm_license_status") === "pro";
+  }
+
+  function showUpgradeModal() {
+    document.getElementById("upgrade-modal").style.display = "flex";
+    document.getElementById("license-msg").textContent = "";
+    document.getElementById("license-key-input").value = "";
+  }
+
+  function refreshProUI() {
+    const pro = isPro();
+    document.getElementById("pro-badge").style.display = pro ? "inline-block" : "none";
+    // Lock icons on gated buttons
+    document.getElementById("cal-import-btn").innerHTML =
+      pro ? "📅 Import from Calendar" : "📅 Import from Calendar 🔒";
+    document.getElementById("integrations-btn").innerHTML =
+      pro ? "🔗 Integrations" : "🔗 Integrations 🔒";
+    document.getElementById("export-btn").innerHTML =
+      pro ? "📄 Export" : "📄 Export 🔒";
+  }
+
+  document.getElementById("upgrade-modal-close").addEventListener("click", () => {
+    document.getElementById("upgrade-modal").style.display = "none";
+  });
+
+  document.getElementById("license-verify-btn").addEventListener("click", async () => {
+    const key = document.getElementById("license-key-input").value.trim();
+    const msg = document.getElementById("license-msg");
+    const btn = document.getElementById("license-verify-btn");
+    if (!key) { msg.style.color = "#f87171"; msg.textContent = "Please enter a license key."; return; }
+    btn.textContent = "Verifying…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/verify-license", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ license_key: key }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        localStorage.setItem("mm_license_status", "pro");
+        localStorage.setItem("mm_license_key", key);
+        msg.style.color = "#4ade80";
+        msg.textContent = "✅ License verified! Pro unlocked.";
+        refreshProUI();
+        setTimeout(() => { document.getElementById("upgrade-modal").style.display = "none"; }, 1500);
+      } else {
+        msg.style.color = "#f87171";
+        msg.textContent = "❌ " + (data.error || "Invalid key.");
+      }
+    } catch(e) {
+      msg.style.color = "#f87171";
+      msg.textContent = "❌ Network error. Try again.";
+    }
+    btn.textContent = "Verify"; btn.disabled = false;
+  });
+
   // ── localStorage history helpers ───────────────────────────
   function loadHistoryFromStorage() {
     try { return JSON.parse(localStorage.getItem("mm_history") || "[]"); }
@@ -1156,6 +1280,9 @@
 
   // ── Attendees ──────────────────────────────────────────────
   function addAttendee() {
+    if (!isPro() && attendees.length >= FREE_ATTENDEE_LIMIT) {
+      showUpgradeModal(); return;
+    }
     const id = Date.now().toString();
     attendees.push({ id, name: "", role: "Mid-level", customSalary: 0 });
     renderAttendees();
@@ -1525,6 +1652,7 @@
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
+    if (!isPro()) { showUpgradeModal(); return; }
     // Use savedDuration if timer has been reset, otherwise current elapsed
     const exportSecs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
     if (exportSecs === 0 && attendees.length === 0) {
@@ -1670,7 +1798,10 @@
     }
   }
 
-  document.getElementById("integrations-btn").addEventListener("click", openIntegrations);
+  document.getElementById("integrations-btn").addEventListener("click", () => {
+    if (!isPro()) { showUpgradeModal(); return; }
+    openIntegrations();
+  });
 
   document.getElementById("integrations-cancel").addEventListener("click", () => {
     document.getElementById("integrations-modal").style.display = "none";
@@ -1791,6 +1922,7 @@
 
   // ── Calendar import modal ──────────────────────────────────
   document.getElementById("cal-import-btn").addEventListener("click", async () => {
+    if (!isPro()) { showUpgradeModal(); return; }
     const cfg = loadIntegrations();
     if (!cfg.gcal_ics_url) {
       openIntegrations();
@@ -1866,6 +1998,7 @@
   // ── Init ───────────────────────────────────────────────────
   addAttendee(); // start with one blank attendee
   loadHistory();
+  refreshProUI();
 </script>
 </body>
 </html>

@@ -6,8 +6,9 @@
     { "src": "api/*.py",          "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/api/slack-notify",    "dest": "/api/slack-notify.py" },
-    { "src": "/api/calendar-events", "dest": "/api/calendar-events.py" },
+    { "src": "/api/slack-notify",     "dest": "/api/slack-notify.py" },
+    { "src": "/api/calendar-events",  "dest": "/api/calendar-events.py" },
+    { "src": "/api/verify-license",   "dest": "/api/verify-license.py" },
     { "src": "/staging",             "dest": "/meetingmeter.html" },
     { "src": "/",                    "dest": "/meetingmeter.html" }
   ],
