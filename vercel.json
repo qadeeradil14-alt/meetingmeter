@@ -10,8 +10,9 @@
     { "src": "/api/calendar-events",  "dest": "/api/calendar-events.py" },
     { "src": "/api/verify-license",      "dest": "/api/verify-license.py" },
     { "src": "/api/verify-subscription", "dest": "/api/verify-subscription.py" },
+    { "src": "/app",                 "dest": "/meetingmeter.html" },
     { "src": "/staging",             "dest": "/meetingmeter.html" },
-    { "src": "/",                    "dest": "/meetingmeter.html" }
+    { "src": "/",                    "dest": "/index.html" }
   ],
   "headers": [
     {

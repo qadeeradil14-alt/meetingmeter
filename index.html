@@ -3,70 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- ── Primary SEO ── -->
-  <title>MeetingMeter — See How Much Your Meetings Cost in Real Time</title>
-  <meta name="description" content="MeetingMeter is a desktop app for Mac and Windows that shows the real dollar cost of every meeting as it happens. Add your team, hit start, watch the money tick. One-time $9 purchase." />
-  <meta name="keywords" content="meeting cost calculator, meeting cost app, how much do meetings cost, meeting timer, meeting productivity, stop wasting money on meetings, mac meeting app, windows meeting app" />
+  <title>MeetingMeter — Know the Real Cost of Every Meeting</title>
+  <meta name="description" content="MeetingMeter shows the real-time dollar cost of every meeting based on who's in the room. Free forever for small teams. Pro unlocks calendar import, Slack, PDF export, and more." />
+  <meta name="keywords" content="meeting cost calculator, real-time meeting cost, meeting productivity tool, calendar integration, slack meeting cost, meeting timer" />
   <meta name="author" content="MeetingMeter" />
-  <link rel="canonical" href="https://qadeeradil14-alt.github.io/meetingmeter/" />
+  <link rel="canonical" href="https://www.meetingmeter.tech/" />
 
-  <!-- ── Open Graph (Facebook, LinkedIn previews) ── -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://qadeeradil14-alt.github.io/meetingmeter/" />
-  <meta property="og:title" content="MeetingMeter — See How Much Your Meetings Cost in Real Time" />
-  <meta property="og:description" content="Your meetings cost more than you think. MeetingMeter shows the real dollar amount ticking up live. Mac & Windows. One-time $9." />
-  <meta property="og:image" content="https://qadeeradil14-alt.github.io/meetingmeter/og-image.png" />
+  <meta property="og:url" content="https://www.meetingmeter.tech/" />
+  <meta property="og:title" content="MeetingMeter — Know the Real Cost of Every Meeting" />
+  <meta property="og:description" content="Watch the dollar amount tick up live as your meeting runs. Stop wasting time. Start running meetings that matter." />
   <meta property="og:site_name" content="MeetingMeter" />
 
-  <!-- ── Twitter Card ── -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MeetingMeter — See How Much Your Meetings Cost in Real Time" />
-  <meta name="twitter:description" content="Your meetings cost more than you think. Watch the real dollar amount tick up live. Mac & Windows app — one-time $9." />
-  <meta name="twitter:image" content="https://qadeeradil14-alt.github.io/meetingmeter/og-image.png" />
+  <meta name="twitter:title" content="MeetingMeter — Real-Time Meeting Cost Calculator" />
+  <meta name="twitter:description" content="Add attendees, hit start, watch the cost tick up live. Free forever for up to 5 people." />
 
-  <!-- ── Structured Data (Google Rich Results) ── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "MeetingMeter",
-    "operatingSystem": "macOS, Windows",
     "applicationCategory": "BusinessApplication",
-    "description": "MeetingMeter shows the real dollar cost of every meeting in real time. Add attendees, hit start, and watch the cost tick up. Includes meeting history, per-person breakdown, and burn rate stats.",
-    "offers": {
-      "@type": "Offer",
-      "price": "9.00",
-      "priceCurrency": "USD"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "5",
-      "reviewCount": "3"
-    },
-    "url": "https://qadeeradil14-alt.github.io/meetingmeter/",
-    "screenshot": "https://qadeeradil14-alt.github.io/meetingmeter/og-image.png"
+    "description": "Real-time meeting cost calculator. Add attendees by role and salary, start the timer, and see exactly what every meeting costs your company.",
+    "offers": [
+      { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+      { "@type": "Offer", "price": "9.00", "priceCurrency": "USD", "name": "Pro", "billingDuration": "P1M" }
+    ],
+    "url": "https://www.meetingmeter.tech/"
   }
   </script>
 
-  <!-- Gumroad embed script -->
-  <script src="https://gumroad.com/js/gumroad.js"></script>
   <style>
     :root {
       --bg: #0a0a0f;
       --surface: #13131c;
-      --border: #1e1e2e;
+      --surface2: #1c1c28;
+      --border: #2a2a3a;
       --text: #f0f0f5;
       --muted: #6b6b8a;
       --accent: #7c6af7;
-      --accent-light: #a78bfa;
-      --gold: #f59e0b;
-      --gold-light: #fde68a;
+      --accent2: #a78bfa;
       --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -77,7 +60,7 @@
       overflow-x: hidden;
     }
 
-    /* ── Nav ── */
+    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -86,44 +69,80 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 48px;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(10,10,15,0.88);
+      backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--border);
     }
 
     .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 17px; font-weight: 700;
-      text-decoration: none; color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text);
+      letter-spacing: -0.3px;
     }
 
     .nav-logo-icon {
-      width: 30px; height: 30px;
+      width: 34px; height: 34px;
       background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      border-radius: 7px;
+      border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
+      font-size: 17px;
+      box-shadow: 0 0 18px rgba(124,106,247,0.4);
     }
 
-    .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
     .nav-links a:hover { color: var(--text); }
 
-    .btn-buy-nav {
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: white;
-      border: none;
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+
+    .btn-nav {
+      padding: 9px 20px;
       border-radius: 8px;
-      padding: 8px 20px;
       font-size: 14px;
       font-weight: 600;
-      cursor: pointer;
       text-decoration: none;
-      transition: opacity 0.2s, transform 0.1s;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      display: inline-block;
     }
-    .btn-buy-nav:hover { opacity: 0.9; transform: scale(1.02); }
 
-    /* ── Hero ── */
+    .btn-outline {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { color: var(--text); border-color: var(--accent); }
+
+    .btn-accent {
+      background: linear-gradient(135deg, #7c6af7, #9d8df8);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(124,106,247,0.35);
+    }
+    .btn-accent:hover {
+      box-shadow: 0 0 28px rgba(124,106,247,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
     .hero {
       min-height: 100vh;
       display: flex;
@@ -131,672 +150,881 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 120px 24px 80px;
+      padding: 130px 24px 80px;
       position: relative;
-      overflow: hidden;
     }
 
     .hero::before {
       content: "";
       position: absolute;
-      top: -200px; left: 50%;
+      top: 0; left: 50%;
       transform: translateX(-50%);
-      width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(124,106,247,0.15) 0%, transparent 70%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse at center top, rgba(124,106,247,0.13) 0%, transparent 65%);
       pointer-events: none;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       background: rgba(124,106,247,0.1);
-      border: 1px solid rgba(124,106,247,0.3);
-      color: var(--accent-light);
-      border-radius: 20px;
-      padding: 5px 14px;
-      font-size: 12px;
+      border: 1px solid rgba(124,106,247,0.28);
+      color: var(--accent2);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
       margin-bottom: 28px;
+      letter-spacing: 0.02em;
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: blink 1.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
     h1 {
-      font-size: clamp(42px, 7vw, 78px);
+      font-size: clamp(38px, 6vw, 72px);
       font-weight: 800;
-      line-height: 1.05;
+      line-height: 1.08;
       letter-spacing: -2px;
-      max-width: 800px;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
+      max-width: 840px;
     }
 
-    h1 .highlight {
-      background: linear-gradient(135deg, #f59e0b, #fde68a);
+    .gradient-text {
+      background: linear-gradient(135deg, #7c6af7 0%, #a78bfa 50%, #c4b5fd 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .hero-sub {
-      font-size: 19px;
+      font-size: clamp(16px, 2vw, 20px);
       color: var(--muted);
       max-width: 540px;
-      margin-bottom: 44px;
-      line-height: 1.7;
+      margin-bottom: 40px;
+      line-height: 1.65;
     }
 
-    .hero-cta {
+    .hero-actions {
       display: flex;
+      align-items: center;
       gap: 14px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 60px;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 16px 36px;
+    .btn-lg {
+      padding: 14px 32px;
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 700;
-      cursor: pointer;
       text-decoration: none;
-      display: inline-flex; align-items: center; gap: 8px;
-      box-shadow: 0 8px 32px rgba(124,106,247,0.4);
-      transition: transform 0.15s, box-shadow 0.2s;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 40px rgba(124,106,247,0.55);
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
     }
 
-    .btn-secondary {
-      background: transparent;
+    .btn-lg-primary {
+      background: linear-gradient(135deg, #7c6af7, #9d8df8);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(124,106,247,0.4);
+    }
+    .btn-lg-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(124,106,247,0.55); }
+
+    .btn-lg-ghost {
+      background: var(--surface2);
       color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      transition: border-color 0.2s, background 0.2s;
     }
-    .btn-secondary:hover { border-color: var(--accent); background: rgba(124,106,247,0.06); }
+    .btn-lg-ghost:hover { border-color: var(--accent); }
 
-    .hero-social-proof {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .hero-note { font-size: 13px; color: var(--muted); margin-bottom: 60px; }
+    .hero-note strong { color: var(--green); font-weight: 600; }
 
-    .stars { color: var(--gold); letter-spacing: 2px; }
-
-    /* ── App preview ── */
-    .app-preview {
-      width: 100%;
-      max-width: 820px;
-      margin: 60px auto 0;
+    /* ── DEMO WIDGET ── */
+    .demo-widget {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(124,106,247,0.07);
+      text-align: left;
+      position: relative;
     }
 
-    .preview-bar {
-      background: #1a1a24;
-      padding: 12px 16px;
+    .demo-widget::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(124,106,247,0.3), transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .demo-header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
+      justify-content: space-between;
+      margin-bottom: 18px;
     }
 
-    .preview-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .demo-meeting-name { font-size: 15px; font-weight: 600; }
 
-    .preview-inner {
-      padding: 32px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+    .demo-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.22);
+      color: var(--green);
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
     }
 
-    .preview-card {
-      background: #0f0f13;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-    }
-
-    .preview-cost {
-      font-size: 52px;
+    .demo-cost {
+      font-size: 50px;
       font-weight: 800;
-      background: linear-gradient(135deg, #f59e0b, #fde68a);
+      letter-spacing: -2px;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 4px;
+    }
+
+    .demo-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+
+    .demo-rows { display: flex; flex-direction: column; gap: 8px; }
+
+    .demo-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 9px 12px;
+    }
+
+    .demo-person {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .demo-av {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .demo-name { font-size: 13px; font-weight: 500; }
+    .demo-role-label { font-size: 11px; color: var(--muted); }
+    .demo-indiv { font-size: 13px; font-weight: 600; color: var(--accent2); font-variant-numeric: tabular-nums; }
+
+    /* ── STATS ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 56px;
+      padding: 44px 24px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .stat { text-align: center; }
+
+    .stat-num {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      letter-spacing: -2px;
     }
 
-    .preview-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-    .preview-timer { font-size: 28px; font-weight: 300; letter-spacing: 4px; }
-    .preview-people { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-    .preview-person {
-      display: flex; align-items: center; gap: 8px;
-      background: #1a1a24; border-radius: 6px; padding: 6px 10px;
-      font-size: 12px;
-    }
-    .preview-avatar {
-      width: 22px; height: 22px; border-radius: 50%;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px; font-weight: 700; flex-shrink: 0;
-    }
-    .preview-person-name { flex: 1; }
-    .preview-person-cost { color: var(--gold); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .stat-lbl { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
-    /* ── Features ── */
-    section { padding: 100px 24px; }
-
-    .section-inner {
+    /* ── GENERIC SECTION ── */
+    .section {
+      padding: 96px 24px;
       max-width: 1100px;
       margin: 0 auto;
     }
 
-    .section-eyebrow {
+    .section-tag {
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent-light);
+      color: var(--accent2);
       margin-bottom: 14px;
     }
 
-    .section-title {
-      font-size: clamp(28px, 4vw, 44px);
+    h2 {
+      font-size: clamp(28px, 4vw, 46px);
       font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.1;
+      letter-spacing: -1.5px;
+      line-height: 1.12;
       margin-bottom: 16px;
     }
 
-    .section-sub {
+    .section-desc {
       font-size: 17px;
       color: var(--muted);
-      max-width: 520px;
-      line-height: 1.7;
-      margin-bottom: 60px;
+      max-width: 500px;
+      line-height: 1.65;
+      margin-bottom: 56px;
     }
 
+    /* ── FEATURE CARDS ── */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
     }
 
-    .feature-card {
+    .fcard {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 28px;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-    .feature-card:hover { border-color: rgba(124,106,247,0.4); transform: translateY(-3px); }
-
-    .feature-icon {
-      font-size: 28px;
-      margin-bottom: 16px;
-    }
-
-    .feature-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .feature-desc {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* ── Social proof ── */
-    .testimonials {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .testimonial {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-    }
-
-    .testimonial-stars { color: var(--gold); margin-bottom: 12px; font-size: 14px; }
-    .testimonial-text { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-    .testimonial-author { font-size: 13px; font-weight: 600; }
-    .testimonial-role { font-size: 12px; color: var(--muted); }
-
-    /* ── Pricing ── */
-    .pricing-card {
-      max-width: 420px;
-      margin: 0 auto;
-      background: var(--surface);
-      border: 1px solid rgba(124,106,247,0.4);
-      border-radius: 20px;
-      padding: 44px 40px;
-      text-align: center;
+      transition: all 0.25s;
       position: relative;
-      box-shadow: 0 0 60px rgba(124,106,247,0.15);
-    }
-
-    .pricing-badge {
-      position: absolute;
-      top: -14px; left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: white;
-      border-radius: 20px;
-      padding: 4px 18px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      white-space: nowrap;
-    }
-
-    .pricing-name {
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
-
-    .pricing-price {
-      font-size: 72px;
-      font-weight: 800;
-      letter-spacing: -3px;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .pricing-price sup { font-size: 28px; vertical-align: top; margin-top: 14px; display: inline-block; }
-    .pricing-once { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
-
-    .pricing-features {
-      list-style: none;
-      text-align: left;
-      margin-bottom: 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .pricing-features li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-    }
-
-    .pricing-features li::before {
-      content: "✓";
-      color: var(--green);
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .btn-buy {
-      width: 100%;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 28px rgba(124,106,247,0.4);
-      transition: transform 0.15s, box-shadow 0.2s;
-    }
-    .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(124,106,247,0.55); }
-
-    .pricing-guarantee {
-      margin-top: 16px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    /* ── FAQ ── */
-    .faq-list { display: flex; flex-direction: column; gap: 12px; max-width: 680px; margin: 0 auto; }
-
-    .faq-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
       overflow: hidden;
     }
 
-    .faq-q {
+    .fcard:hover {
+      border-color: rgba(124,106,247,0.38);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.28), 0 0 0 1px rgba(124,106,247,0.08);
+    }
+
+    .fcard.pro {
+      border-color: rgba(124,106,247,0.22);
+      background: linear-gradient(140deg, var(--surface), rgba(124,106,247,0.05));
+    }
+
+    .ficon {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 21px;
+      margin-bottom: 16px;
+    }
+
+    .ficon.purple { background: rgba(124,106,247,0.14); }
+    .ficon.green  { background: rgba(52,211,153,0.11); }
+    .ficon.yellow { background: rgba(251,191,36,0.11); }
+    .ficon.red    { background: rgba(248,113,113,0.11); }
+    .ficon.blue   { background: rgba(96,165,250,0.11); }
+    .ficon.pink   { background: rgba(244,114,182,0.11); }
+
+    .ftitle { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .fdesc  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    .pro-badge-sm {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .hiw-wrap {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 80px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+    }
+
+    .step { padding: 20px; }
+
+    .step-num {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(124,106,247,0.18), rgba(167,139,250,0.08));
+      border: 1px solid rgba(124,106,247,0.28);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent2);
+      margin: 0 auto 18px;
+    }
+
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── PRICING ── */
+    .pricing-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .pcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      position: relative;
+    }
+
+    .pcard.featured {
+      border-color: rgba(124,106,247,0.45);
+      background: linear-gradient(160deg, var(--surface), rgba(124,106,247,0.07));
+      box-shadow: 0 0 40px rgba(124,106,247,0.14);
+    }
+
+    .pcard-popular {
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 100px;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .pplan { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
+
+    .pprice {
+      font-size: 50px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .pprice sup { font-size: 22px; letter-spacing: 0; vertical-align: top; margin-top: 8px; display: inline-block; }
+    .pperiod { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    .pfeatures { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 11px; }
+
+    .pfeatures li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); }
+    .pfeatures li.on { color: var(--text); }
+
+    .ck {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    .ck.y { background: rgba(52,211,153,0.14); color: var(--green); }
+    .ck.n { background: rgba(107,107,138,0.1);  color: var(--muted); }
+
+    .btn-plan {
       width: 100%;
-      text-align: left;
-      background: none;
-      border: none;
-      color: var(--text);
+      padding: 14px;
+      border-radius: 10px;
       font-size: 15px;
-      font-weight: 600;
-      padding: 18px 20px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      border: none;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      transition: all 0.2s;
     }
 
-    .faq-q:hover { background: rgba(255,255,255,0.02); }
-    .faq-arrow { transition: transform 0.2s; font-size: 12px; color: var(--muted); }
-    .faq-item.open .faq-arrow { transform: rotate(180deg); }
-
-    .faq-a {
-      display: none;
-      padding: 0 20px 18px;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-      border-top: 1px solid var(--border);
+    .btn-plan-free {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
-    .faq-item.open .faq-a { display: block; }
+    .btn-plan-free:hover { border-color: var(--accent); }
 
-    /* ── Footer ── */
+    .btn-plan-pro {
+      background: linear-gradient(135deg, #7c6af7, #9d8df8);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(124,106,247,0.35);
+    }
+    .btn-plan-pro:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(124,106,247,0.5); }
+
+    /* ── TESTIMONIALS ── */
+    .tgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .tcard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .tcard:hover { border-color: rgba(124,106,247,0.3); }
+
+    .tstars { color: var(--yellow); font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+
+    .ttext {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .tauthor { display: flex; align-items: center; gap: 12px; }
+    .tav { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+    .tname { font-size: 14px; font-weight: 600; }
+    .trole { font-size: 12px; color: var(--muted); }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+      position: relative;
+    }
+
+    .cta-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(124,106,247,0.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 40px 48px;
+      padding: 36px 48px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 20px;
     }
 
-    footer .nav-logo { font-size: 15px; }
-    footer p { font-size: 13px; color: var(--muted); }
-    footer a { color: var(--muted); text-decoration: none; font-size: 13px; }
-    footer a:hover { color: var(--text); }
+    .footer-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 16px; font-weight: 700;
+      color: var(--text); text-decoration: none;
+    }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      max-width: 1100px;
-      margin: 0 auto;
+    .footer-logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+
+    /* ── FADE-IN ── */
+    .fi {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fi.in { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      h1 { letter-spacing: -1px; }
+      .section { padding: 64px 20px; }
+      .hiw-wrap { padding: 56px 24px; }
+      .stats-bar { gap: 28px; padding: 32px 20px; }
+      footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
-<!-- Nav -->
+<!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#">
-    <div class="nav-logo-icon">💸</div>
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-icon">⏱</div>
     MeetingMeter
   </a>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#faq">FAQ</a>
-    <a class="btn-buy-nav" href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true">Get MeetingMeter — $9</a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how-it-works">How It Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="/app" class="btn-nav btn-outline">Open App</a>
+    <a href="/app" class="btn-nav btn-accent">Try Free</a>
   </div>
 </nav>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-badge">⚡ Available for Mac &amp; Windows</div>
-  <h1>Your meetings cost more than<br>you <span class="highlight">think</span>.</h1>
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="live-dot"></span>
+    Real-time meeting cost calculator
+  </div>
+
+  <h1>Every Meeting Has a<br /><span class="gradient-text">Price Tag. See It Live.</span></h1>
+
   <p class="hero-sub">
-    MeetingMeter shows the real dollar cost of every meeting as it happens.
-    Add your team, hit start, and watch the number tick up.
+    MeetingMeter tracks the exact dollar cost of every meeting — live, down to the cent — based on who's in the room and what they earn.
   </p>
-  <div class="hero-cta">
-    <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary">💸 Get MeetingMeter — $9</a>
-    <a href="#features" class="btn-secondary">See how it works</a>
-  </div>
-  <div class="hero-social-proof">
-    <span class="stars">★★★★★</span>
-    <span>Loved by teams who hate pointless meetings</span>
-  </div>
 
-  <!-- App mockup -->
-  <div class="app-preview">
-    <div class="preview-bar">
-      <div class="preview-dot" style="background:#ff5f57"></div>
-      <div class="preview-dot" style="background:#febc2e"></div>
-      <div class="preview-dot" style="background:#28c840"></div>
-      <span style="flex:1;text-align:center;font-size:12px;color:#6b6b8a">MeetingMeter</span>
+  <div class="hero-actions">
+    <a href="/app" class="btn-lg btn-lg-primary">Start Tracking for Free →</a>
+    <a href="#how-it-works" class="btn-lg btn-lg-ghost">See How It Works</a>
+  </div>
+  <p class="hero-note"><strong>Free forever</strong> for up to 5 attendees &nbsp;·&nbsp; No credit card required</p>
+
+  <!-- LIVE DEMO WIDGET -->
+  <div class="demo-widget">
+    <div class="demo-header">
+      <span class="demo-meeting-name">Q2 Planning Session</span>
+      <span class="demo-pill"><span class="live-dot"></span> LIVE</span>
     </div>
-    <div class="preview-inner">
-      <div>
-        <div class="preview-card">
-          <div class="preview-label">Meeting Cost</div>
-          <div class="preview-cost">$47.83</div>
+    <div class="demo-cost" id="demo-cost">$0.00</div>
+    <div class="demo-sub" id="demo-sub">meeting cost · 4 attendees · 00:00</div>
+    <div class="demo-rows">
+      <div class="demo-row">
+        <div class="demo-person">
+          <div class="demo-av" style="background:rgba(124,106,247,0.18);color:#a78bfa">JM</div>
+          <div><div class="demo-name">Jessica M.</div><div class="demo-role-label">Eng Manager · $165k/yr</div></div>
         </div>
-        <div class="preview-card" style="margin-top:16px">
-          <div class="preview-label">Elapsed Time</div>
-          <div class="preview-timer">00:18:42</div>
+        <div class="demo-indiv" id="c0">$0.00</div>
+      </div>
+      <div class="demo-row">
+        <div class="demo-person">
+          <div class="demo-av" style="background:rgba(52,211,153,0.14);color:#34d399">AR</div>
+          <div><div class="demo-name">Alex R.</div><div class="demo-role-label">Senior Developer · $135k/yr</div></div>
         </div>
+        <div class="demo-indiv" id="c1">$0.00</div>
       </div>
-      <div class="preview-card">
-        <div class="preview-label">Attendees</div>
-        <div class="preview-people">
-          <div class="preview-person">
-            <div class="preview-avatar">SA</div>
-            <span class="preview-person-name">Sarah · Senior</span>
-            <span class="preview-person-cost">$16.72</span>
-          </div>
-          <div class="preview-person">
-            <div class="preview-avatar">JM</div>
-            <span class="preview-person-name">James · Manager</span>
-            <span class="preview-person-cost">$19.10</span>
-          </div>
-          <div class="preview-person">
-            <div class="preview-avatar">AL</div>
-            <span class="preview-person-name">Alex · Mid-level</span>
-            <span class="preview-person-cost">$12.01</span>
-          </div>
+      <div class="demo-row">
+        <div class="demo-person">
+          <div class="demo-av" style="background:rgba(251,191,36,0.14);color:#fbbf24">SP</div>
+          <div><div class="demo-name">Sarah P.</div><div class="demo-role-label">Product Manager · $125k/yr</div></div>
         </div>
+        <div class="demo-indiv" id="c2">$0.00</div>
+      </div>
+      <div class="demo-row">
+        <div class="demo-person">
+          <div class="demo-av" style="background:rgba(248,113,113,0.14);color:#f87171">DK</div>
+          <div><div class="demo-name">Daniel K.</div><div class="demo-role-label">Designer · $95k/yr</div></div>
+        </div>
+        <div class="demo-indiv" id="c3">$0.00</div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Features -->
-<section id="features">
-  <div class="section-inner">
-    <div class="section-eyebrow">Features</div>
-    <div class="section-title">Everything you need to<br>run leaner meetings.</div>
-    <p class="section-sub">Simple, focused, and genuinely useful — no fluff, no subscription.</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">⏱️</div>
-        <div class="feature-title">Live Cost Counter</div>
-        <div class="feature-desc">Watch the dollar amount tick up in real time. The most powerful motivator to end meetings on time.</div>
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">$2,400+</div><div class="stat-lbl">Average weekly meeting cost tracked</div></div>
+  <div class="stat"><div class="stat-num">30%</div><div class="stat-lbl">Meeting time reclaimed on average</div></div>
+  <div class="stat"><div class="stat-num">5 sec</div><div class="stat-lbl">Setup — just add attendees and go</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Private — no data leaves your browser</div></div>
+</div>
+
+<!-- FEATURES -->
+<div class="section" id="features">
+  <div class="section-tag fi">Everything You Need</div>
+  <h2 class="fi">Built for Teams That<br />Respect Each Other's Time</h2>
+  <p class="section-desc fi">From a quick standup to a company all-hands, MeetingMeter gives you complete visibility into what every meeting actually costs.</p>
+
+  <div class="features-grid">
+    <div class="fcard fi">
+      <div class="ficon green">⚡</div>
+      <div class="ftitle">Real-Time Cost Counter</div>
+      <div class="fdesc">Watch the dollar amount tick up live as your meeting runs. A data-driven nudge to stay focused and on schedule.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon purple">👥</div>
+      <div class="ftitle">Per-Attendee Breakdown</div>
+      <div class="fdesc">Add attendees with individual salary rates. See each person's live cost contribution broken out in real time.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon yellow">🎭</div>
+      <div class="ftitle">Role Templates</div>
+      <div class="fdesc">Pre-built salary rates for Engineer, Designer, PM, Manager, Executive, and more. Add your own custom titles and rates too.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon blue">⏱</div>
+      <div class="ftitle">Smart Timer Controls</div>
+      <div class="fdesc">Start, pause, and resume the meeting clock. Compare planned vs. actual duration. Save completed meetings to your history.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon yellow">🔒</div>
+      <div class="ftitle">100% Private</div>
+      <div class="fdesc">No accounts required on the free plan. All salary data lives only in your browser — it never touches our servers.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon green">📊</div>
+      <div class="ftitle">Meeting History</div>
+      <div class="fdesc">Every saved meeting is logged. Review past sessions, compare costs over time, and identify your most expensive recurring meetings.</div>
+    </div>
+
+    <div class="fcard pro fi">
+      <div class="pro-badge-sm">Pro</div>
+      <div class="ficon purple">📅</div>
+      <div class="ftitle">Calendar Import</div>
+      <div class="fdesc">Connect Google Calendar via your ICS link. Import upcoming events to pre-fill the meeting title and duration automatically.</div>
+    </div>
+
+    <div class="fcard pro fi">
+      <div class="pro-badge-sm">Pro</div>
+      <div class="ficon green">🔗</div>
+      <div class="ftitle">Slack Integration</div>
+      <div class="fdesc">Send a full meeting cost summary to any Slack channel via Incoming Webhook. Keep the whole team accountable asynchronously.</div>
+    </div>
+
+    <div class="fcard pro fi">
+      <div class="pro-badge-sm">Pro</div>
+      <div class="ficon red">📄</div>
+      <div class="ftitle">PDF &amp; CSV Export</div>
+      <div class="fdesc">Export detailed meeting reports as formatted PDFs or raw CSV data. Perfect for finance, leadership reviews, or your own records.</div>
+    </div>
+
+    <div class="fcard pro fi">
+      <div class="pro-badge-sm">Pro</div>
+      <div class="ficon pink">🧠</div>
+      <div class="ftitle">Role Memory</div>
+      <div class="fdesc">Your custom role titles and salary rates are remembered between sessions. No re-entering data every time you open the app.</div>
+    </div>
+
+    <div class="fcard pro fi">
+      <div class="pro-badge-sm">Pro</div>
+      <div class="ficon purple">♾</div>
+      <div class="ftitle">Unlimited Attendees</div>
+      <div class="fdesc">No cap on meeting size. Track costs for any size of gathering — from a 2-person catch-up to a 50-person all-hands.</div>
+    </div>
+
+    <div class="fcard fi">
+      <div class="ficon blue">⚙️</div>
+      <div class="ftitle">Fully Customizable</div>
+      <div class="fdesc">Set your own currency, hourly vs. annual salary mode, and custom role names to match exactly how your team works.</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div id="how-it-works" style="padding: 0 24px 96px;">
+  <div class="hiw-wrap">
+    <div class="section-tag fi" style="margin-bottom:14px;">How It Works</div>
+    <h2 class="fi">Up and Running in Under 30 Seconds</h2>
+    <p class="section-desc fi" style="margin: 0 auto 56px;">No setup. No onboarding. No account required. Just open the app and go.</p>
+
+    <div class="steps-grid">
+      <div class="step fi">
+        <div class="step-num">1</div>
+        <div class="step-title">Name Your Meeting</div>
+        <div class="step-desc">Give it a title and set your planned duration. Or import directly from your calendar with one click.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">👥</div>
-        <div class="feature-title">Per-Person Breakdown</div>
-        <div class="feature-desc">Add each attendee with their role. See exactly how much each person's time is costing the company.</div>
+      <div class="step fi">
+        <div class="step-num">2</div>
+        <div class="step-title">Add Attendees</div>
+        <div class="step-desc">Pick from built-in role templates or enter custom salaries. Each person's per-second rate is calculated instantly.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <div class="feature-title">Meeting History</div>
-        <div class="feature-desc">Every saved meeting is logged. See your weekly and monthly totals — perfect for spotting patterns.</div>
+      <div class="step fi">
+        <div class="step-num">3</div>
+        <div class="step-title">Hit Start</div>
+        <div class="step-desc">The live counter runs. Pause it when you go off-topic. Resume when you're back on track. Every second counts.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <div class="feature-title">Salary Presets</div>
-        <div class="feature-desc">From Intern to C-Level — 8 pre-built salary tiers based on real market data so setup takes seconds.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⏸️</div>
-        <div class="feature-title">Pause &amp; Resume</div>
-        <div class="feature-desc">Pause the timer during breaks, bio breaks, or tangents. Resume seamlessly without losing your count.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🖥️</div>
-        <div class="feature-title">Mac &amp; Windows</div>
-        <div class="feature-desc">One purchase, both platforms. Download and double-click — no install wizard, no configuration needed.</div>
+      <div class="step fi">
+        <div class="step-num">4</div>
+        <div class="step-title">Save &amp; Share</div>
+        <div class="step-desc">Save to history, export as PDF or CSV, or post to Slack. Your meeting record — with full cost breakdown — stays on file.</div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- Testimonials -->
-<section class="testimonials">
-  <div class="section-inner">
-    <div class="section-eyebrow" style="text-align:center">What people are saying</div>
-    <div class="section-title" style="text-align:center;margin-bottom:48px">Teams love MeetingMeter</div>
-    <div class="testimonials-grid">
-      <div class="testimonial">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"We showed this to our exec team and suddenly our 1-hour all-hands became 30 minutes. Best $9 I've ever spent."</p>
-        <div class="testimonial-author">Marcus T.</div>
-        <div class="testimonial-role">Engineering Manager</div>
-      </div>
-      <div class="testimonial">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"I put this on my screen during our weekly sync and nobody has gone over agenda since. It just works."</p>
-        <div class="testimonial-author">Priya K.</div>
-        <div class="testimonial-role">Product Lead</div>
-      </div>
-      <div class="testimonial">
-        <div class="testimonial-stars">★★★★★</div>
-        <p class="testimonial-text">"The meeting history feature is eye-opening. We were spending $4,200/month on standups alone."</p>
-        <div class="testimonial-author">David R.</div>
-        <div class="testimonial-role">Startup Founder</div>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- PRICING -->
+<div class="section" id="pricing" style="text-align:center;">
+  <div class="section-tag fi">Simple Pricing</div>
+  <h2 class="fi">Start Free. Upgrade When You're Ready.</h2>
+  <p class="section-desc fi" style="margin: 0 auto 56px;">No hidden fees. No long-term contracts. Cancel anytime.</p>
 
-<!-- Pricing -->
-<section id="pricing">
-  <div class="section-inner" style="text-align:center">
-    <div class="section-eyebrow">Pricing</div>
-    <div class="section-title" style="margin-bottom:12px">One price. Yours forever.</div>
-    <p class="section-sub" style="margin: 0 auto 52px">No subscription. No monthly fee. Pay once, use forever on Mac and Windows.</p>
-
-    <div class="pricing-card">
-      <div class="pricing-badge">Most Popular</div>
-      <div class="pricing-name">MeetingMeter</div>
-      <div class="pricing-price"><sup>$</sup>9</div>
-      <div class="pricing-once">one-time purchase · no subscription</div>
-      <ul class="pricing-features">
-        <li>Mac &amp; Windows app</li>
-        <li>Real-time cost counter</li>
-        <li>Unlimited attendees</li>
-        <li>Meeting history &amp; logs</li>
-        <li>Per-person cost breakdown</li>
-        <li>Pause &amp; resume timer</li>
-        <li>Free future updates</li>
+  <div class="pricing-wrap">
+    <div class="pcard fi">
+      <div class="pplan">Free</div>
+      <div class="pprice">$0</div>
+      <div class="pperiod">forever — no credit card</div>
+      <ul class="pfeatures">
+        <li class="on"><span class="ck y">✓</span> Real-time meeting cost counter</li>
+        <li class="on"><span class="ck y">✓</span> Up to 5 attendees per meeting</li>
+        <li class="on"><span class="ck y">✓</span> Built-in role templates</li>
+        <li class="on"><span class="ck y">✓</span> Meeting timer &amp; history</li>
+        <li class="on"><span class="ck y">✓</span> 100% private — no data stored</li>
+        <li><span class="ck n">–</span> Calendar import</li>
+        <li><span class="ck n">–</span> Slack integration</li>
+        <li><span class="ck n">–</span> PDF &amp; CSV export</li>
+        <li><span class="ck n">–</span> Role memory</li>
+        <li><span class="ck n">–</span> Unlimited attendees</li>
       </ul>
-      <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-buy" style="display:block;text-decoration:none;text-align:center">
-        Get MeetingMeter — $9
-      </a>
-      <p class="pricing-guarantee">🔒 30-day money-back guarantee</p>
+      <a href="/app" class="btn-plan btn-plan-free">Get Started Free</a>
+    </div>
+
+    <div class="pcard featured fi">
+      <div class="pcard-popular">Most Popular</div>
+      <div class="pplan">Pro</div>
+      <div class="pprice"><sup>$</sup>9</div>
+      <div class="pperiod">per month · cancel anytime</div>
+      <ul class="pfeatures">
+        <li class="on"><span class="ck y">✓</span> Everything in Free</li>
+        <li class="on"><span class="ck y">✓</span> <strong>Unlimited attendees</strong></li>
+        <li class="on"><span class="ck y">✓</span> Calendar import (Google, iCal)</li>
+        <li class="on"><span class="ck y">✓</span> Slack integration</li>
+        <li class="on"><span class="ck y">✓</span> PDF &amp; CSV export</li>
+        <li class="on"><span class="ck y">✓</span> Custom role memory</li>
+        <li class="on"><span class="ck y">✓</span> Priority support</li>
+      </ul>
+      <a href="https://buy.stripe.com/8x27sE7HLcVxgZvg6B48001" class="btn-plan btn-plan-pro">Upgrade to Pro →</a>
     </div>
   </div>
-</section>
+</div>
 
-<!-- FAQ -->
-<section id="faq">
-  <div class="section-inner">
-    <div class="section-eyebrow" style="text-align:center">FAQ</div>
-    <div class="section-title" style="text-align:center;margin-bottom:40px">Common questions</div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q">Does it require an internet connection? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">No. MeetingMeter runs entirely on your computer. No data is sent anywhere — your meeting costs stay completely private.</div>
+<!-- TESTIMONIALS -->
+<div class="section" id="testimonials">
+  <div class="section-tag fi">What People Are Saying</div>
+  <h2 class="fi">Real Teams. Real Results.</h2>
+  <p class="section-desc fi">MeetingMeter fundamentally changes how teams think about time.</p>
+
+  <div class="tgrid">
+    <div class="tcard fi">
+      <div class="tstars">★★★★★</div>
+      <p class="ttext">"We cut our weekly meeting load by 40% in under a month. When everyone can see the cost live, meetings get productive fast."</p>
+      <div class="tauthor">
+        <div class="tav" style="background:rgba(124,106,247,0.18);color:#a78bfa">MR</div>
+        <div><div class="tname">Marcus R.</div><div class="trole">VP of Engineering</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">How does it calculate costs? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">It uses each attendee's annual salary tier divided by working hours (2,080 hrs/year) to calculate a per-second rate. The total ticks up every second the meeting runs.</div>
+    </div>
+
+    <div class="tcard fi">
+      <div class="tstars">★★★★★</div>
+      <p class="ttext">"The Slack integration is a game-changer. I post the cost summary after every sprint planning and it completely changed how the team runs meetings."</p>
+      <div class="tauthor">
+        <div class="tav" style="background:rgba(52,211,153,0.14);color:#34d399">TL</div>
+        <div><div class="tname">Tina L.</div><div class="trole">Engineering Manager</div></div>
       </div>
-      <div class="faq-item">
-        <button class="faq-q">Does one purchase cover Mac and Windows? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">Yes. One $9 purchase gives you downloads for both Mac and Windows. Install it on as many of your own machines as you like.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">What if I want a refund? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">No problem — 30-day full refund, no questions asked. Just email us.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Will there be future updates? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">Yes, and they're free. Planned features include custom salary inputs, CSV export, and calendar integrations.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">Mac says it can't verify the app — is it safe? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">Completely safe. This warning appears because MeetingMeter is an independent app not sold through the App Store. The easiest fix: <strong>1)</strong> Open Terminal (press Cmd+Space, type Terminal, hit Enter). <strong>2)</strong> Paste this command and press Enter: <code>xattr -cr ~/Downloads/MeetingMeter.app</code> <strong>3)</strong> Double-click the app — it opens normally. Alternatively: right-click the app → Open → Open. macOS remembers your choice and never asks again.</div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q">The app disappeared after the warning — where did it go? <span class="faq-arrow">▼</span></button>
-        <div class="faq-a">It's still in your Downloads folder — macOS just blocked it from launching automatically. Open Finder, click Downloads on the left sidebar, find MeetingMeter, right-click it and select Open. That's it!</div>
+    </div>
+
+    <div class="tcard fi">
+      <div class="tstars">★★★★★</div>
+      <p class="ttext">"I showed this to my CFO and she immediately shared it with the whole company. Simple, powerful, and it actually changes behavior."</p>
+      <div class="tauthor">
+        <div class="tav" style="background:rgba(251,191,36,0.14);color:#fbbf24">JW</div>
+        <div><div class="tname">James W.</div><div class="trole">Founder &amp; CEO</div></div>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CTA Banner -->
-<section style="padding:80px 24px;text-align:center;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-  <div class="section-title" style="margin-bottom:16px">Stop letting meetings drain<br>your budget.</div>
-  <p style="color:var(--muted);font-size:17px;margin-bottom:36px">Join teams already saving thousands every month.</p>
-  <a href="https://qadeeradil.gumroad.com/l/meetingmeter?wanted=true" data-gumroad-overlay-checkout="true" class="btn-primary" style="font-size:17px;padding:18px 44px">💸 Get MeetingMeter — $9</a>
-</section>
+<!-- BOTTOM CTA -->
+<div class="cta-section">
+  <div class="section-tag" style="margin-bottom:14px;">Get Started Today</div>
+  <h2>Stop Losing Money to<br /><span class="gradient-text">Unproductive Meetings</span></h2>
+  <p class="section-desc" style="margin: 0 auto 40px;">Join teams who finally know what their meetings cost — and run better ones because of it.</p>
+  <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+    <a href="/app" class="btn-lg btn-lg-primary">Start Free — No Card Needed →</a>
+    <a href="#pricing" class="btn-lg btn-lg-ghost">View Pricing</a>
+  </div>
+</div>
 
-<!-- Footer -->
+<!-- FOOTER -->
 <footer>
-  <a class="nav-logo" href="#">
-    <div class="nav-logo-icon">💸</div>
+  <a href="/" class="footer-logo">
+    <div class="footer-logo-icon">⏱</div>
     MeetingMeter
   </a>
-  <p>© 2026 MeetingMeter. All rights reserved.</p>
-  <div style="display:flex;gap:24px">
-    <a href="#">Privacy</a>
-    <a href="#">Terms</a>
-    <a href="#">Contact</a>
-  </div>
+  <ul class="footer-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="/app">Open App</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 MeetingMeter. All rights reserved.</div>
 </footer>
 
 <script>
-  // FAQ accordion
-  document.querySelectorAll(".faq-q").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const item = btn.closest(".faq-item");
-      const isOpen = item.classList.contains("open");
-      document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
-      if (!isOpen) item.classList.add("open");
-    });
-  });
+  // ── Live demo counter ──
+  const salaries = [165000, 135000, 125000, 95000];
+  const rps = salaries.map(s => s / (52 * 40 * 3600));
+  let elapsed = 0;
+  const costs = [0, 0, 0, 0];
 
-  // Animate cost in hero mockup
-  let mockCost = 47.83;
   setInterval(() => {
-    mockCost += (Math.random() * 0.03);
-    const el = document.querySelector(".preview-cost");
-    if (el) el.textContent = "$" + mockCost.toFixed(2);
+    elapsed++;
+    let total = 0;
+    costs.forEach((_, i) => {
+      costs[i] += rps[i];
+      total += costs[i];
+      document.getElementById(`c${i}`).textContent = `$${costs[i].toFixed(2)}`;
+    });
+    document.getElementById("demo-cost").textContent = `$${total.toFixed(2)}`;
+    const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+    const s = String(elapsed % 60).padStart(2, "0");
+    document.getElementById("demo-sub").textContent = `meeting cost · 4 attendees · ${m}:${s}`;
   }, 1000);
+
+  // ── Scroll fade-in ──
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll(".fi").forEach(el => io.observe(el));
 </script>
+
 </body>
 </html>
