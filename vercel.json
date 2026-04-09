@@ -8,7 +8,8 @@
   "routes": [
     { "src": "/api/slack-notify",     "dest": "/api/slack-notify.py" },
     { "src": "/api/calendar-events",  "dest": "/api/calendar-events.py" },
-    { "src": "/api/verify-license",   "dest": "/api/verify-license.py" },
+    { "src": "/api/verify-license",      "dest": "/api/verify-license.py" },
+    { "src": "/api/verify-subscription", "dest": "/api/verify-subscription.py" },
     { "src": "/staging",             "dest": "/meetingmeter.html" },
     { "src": "/",                    "dest": "/meetingmeter.html" }
   ],

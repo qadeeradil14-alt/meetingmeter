@@ -1006,12 +1006,12 @@
       <li>PDF &amp; CSV export</li>
       <li>Role memory across meetings</li>
     </ul>
-    <a class="btn-gumroad" href="https://qadeeradil.gumroad.com/l/meetingmeter" target="_blank">
-      Get Pro — One-time purchase →
+    <a class="btn-gumroad" href="https://buy.stripe.com/test_fZubIUd20cBSdl55KD4AU00" target="_blank">
+      Get Pro — $9/month →
     </a>
-    <div class="divider-text">Already have a license key?</div>
+    <div class="divider-text">Already subscribed? Restore access with your email</div>
     <div class="license-input-row">
-      <input type="text" id="license-key-input" placeholder="Paste your license key…"
+      <input type="email" id="license-key-input" placeholder="Your payment email…"
         style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
                color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
       <button class="btn btn-primary" id="license-verify-btn">Verify</button>
@@ -1024,7 +1024,7 @@
 <script>
   // ── Pro / Paywall ──────────────────────────────────────────
   const FREE_ATTENDEE_LIMIT = 5;
-  const GUMROAD_URL = "https://qadeeradil.gumroad.com/l/meetingmeter";
+  const STRIPE_PAYMENT_URL = "https://buy.stripe.com/test_fZubIUd20cBSdl55KD4AU00";
 
   function isPro() {
     return localStorage.getItem("mm_license_status") === "pro";
@@ -1052,36 +1052,49 @@
     document.getElementById("upgrade-modal").style.display = "none";
   });
 
-  document.getElementById("license-verify-btn").addEventListener("click", async () => {
-    const key = document.getElementById("license-key-input").value.trim();
-    const msg = document.getElementById("license-msg");
-    const btn = document.getElementById("license-verify-btn");
-    if (!key) { msg.style.color = "#f87171"; msg.textContent = "Please enter a license key."; return; }
+  async function activatePro(payload, msg, btn) {
     btn.textContent = "Verifying…"; btn.disabled = true;
     try {
-      const res = await fetch("/api/verify-license", {
+      const res = await fetch("/api/verify-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ license_key: key }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.ok) {
         localStorage.setItem("mm_license_status", "pro");
-        localStorage.setItem("mm_license_key", key);
-        msg.style.color = "#4ade80";
-        msg.textContent = "✅ License verified! Pro unlocked.";
+        if (data.email) localStorage.setItem("mm_license_email", data.email);
+        if (msg) { msg.style.color = "#4ade80"; msg.textContent = "✅ Pro unlocked!"; }
         refreshProUI();
-        setTimeout(() => { document.getElementById("upgrade-modal").style.display = "none"; }, 1500);
+        setTimeout(() => { document.getElementById("upgrade-modal").style.display = "none"; }, 1200);
       } else {
-        msg.style.color = "#f87171";
-        msg.textContent = "❌ " + (data.error || "Invalid key.");
+        if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ " + (data.error || "Not verified."); }
       }
     } catch(e) {
-      msg.style.color = "#f87171";
-      msg.textContent = "❌ Network error. Try again.";
+      if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ Network error. Try again."; }
     }
     btn.textContent = "Verify"; btn.disabled = false;
+  }
+
+  document.getElementById("license-verify-btn").addEventListener("click", () => {
+    const email = document.getElementById("license-key-input").value.trim();
+    const msg   = document.getElementById("license-msg");
+    if (!email) { msg.style.color = "#f87171"; msg.textContent = "Please enter your payment email."; return; }
+    activatePro({ email }, msg, document.getElementById("license-verify-btn"));
   });
+
+  // Auto-detect Stripe redirect (stripe_session in URL)
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("stripe_session");
+    if (sid && !isPro()) {
+      const dummyBtn = { textContent: "", disabled: false };
+      await activatePro({ session_id: sid }, null, dummyBtn);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      if (isPro()) showToast("🎉 Pro unlocked! Welcome to MeetingMeter Pro.", "#16a34a");
+    }
+  })();
 
   // ── localStorage history helpers ───────────────────────────
   function loadHistoryFromStorage() {
