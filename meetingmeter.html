@@ -1420,6 +1420,10 @@
   });
 
   function resetAfterSave() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    running = false;
+    paused = false;
     elapsedSeconds = 0;
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
