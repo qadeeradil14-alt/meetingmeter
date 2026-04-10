@@ -1126,9 +1126,19 @@
           </div>
           <span style="background:linear-gradient(135deg,#7c6af7,#a78bfa);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px">PRO</span>
         </div>
-        <button id="settings-manage-btn" style="width:100%;padding:9px;border-radius:8px;background:var(--surface);
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          Click below to open the <strong style="color:var(--text)">Stripe billing portal</strong> where you can:<br>
+          · Update your payment method &nbsp;·&nbsp; View invoices &nbsp;·&nbsp; Cancel your subscription
+        </div>
+        <div id="settings-portal-email-row" style="display:none;margin-bottom:8px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Enter the email you used to subscribe:</div>
+          <input id="settings-portal-email-input" type="email" placeholder="your@email.com"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+            color:var(--text);font-size:13px;padding:8px 12px;outline:none;margin-bottom:8px" />
+        </div>
+        <button id="settings-manage-btn" style="width:100%;padding:10px;border-radius:8px;background:var(--surface);
           border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">
-          Manage or Cancel Subscription →
+          Open Billing Portal →
         </button>
       </div>
       <div id="settings-free-block" style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
@@ -1175,9 +1185,9 @@
     <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px">
       <div style="font-size:14px;font-weight:600;margin-bottom:6px">Need help?</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:10px">We typically respond within 24 hours.</div>
-      <a href="mailto:support@meetingmeter.tech" style="display:inline-flex;align-items:center;gap:6px;
+      <a href="mailto:qadeeradil14@gmail.com" style="display:inline-flex;align-items:center;gap:6px;
         color:var(--accent2);font-size:13px;font-weight:600;text-decoration:none;">
-        ✉️ support@meetingmeter.tech
+        ✉️ qadeeradil14@gmail.com
       </a>
     </div>
 
@@ -1286,10 +1296,19 @@
 
   // Manage subscription from settings
   document.getElementById("settings-manage-btn").addEventListener("click", async () => {
-    const email = localStorage.getItem("mm_pro_email") || prompt("Enter your subscription email:");
-    if (!email) return;
     const btn = document.getElementById("settings-manage-btn");
-    btn.textContent = "Loading…"; btn.disabled = true;
+    const emailRow = document.getElementById("settings-portal-email-row");
+    const emailInput = document.getElementById("settings-portal-email-input");
+
+    // Use stored email or show inline input
+    let email = localStorage.getItem("mm_pro_email") || emailInput.value.trim();
+    if (!email) {
+      emailRow.style.display = "block";
+      emailInput.focus();
+      return;
+    }
+
+    btn.textContent = "Opening portal…"; btn.disabled = true;
     try {
       const res = await fetch("/api/customer-portal", {
         method: "POST",
@@ -1300,12 +1319,14 @@
       if (data.ok) {
         window.location.href = data.url;
       } else {
-        alert(data.error || "Could not open portal. Contact support.");
+        emailRow.style.display = "block";
+        emailInput.style.borderColor = "var(--red)";
+        emailInput.placeholder = "Email not found — try again";
       }
     } catch {
       alert("Something went wrong. Please try again.");
     } finally {
-      btn.textContent = "Manage or Cancel Subscription →"; btn.disabled = false;
+      btn.textContent = "Open Billing Portal →"; btn.disabled = false;
     }
   });
 
