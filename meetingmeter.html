@@ -941,8 +941,8 @@
   </div>
 </div>
 
-<!-- Settings modal -->
-<div class="modal-overlay" id="settings-modal">
+<!-- Salary Presets modal -->
+<div class="modal-overlay" id="salary-modal">
   <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
     <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
@@ -1470,7 +1470,7 @@
     };
     grid.appendChild(addBtn);
 
-    document.getElementById("settings-modal").style.display = "flex";
+    document.getElementById("salary-modal").style.display = "flex";
   }
 
   // Helper: append one custom-role row (name input + salary input + delete btn)
@@ -1516,7 +1516,7 @@
 
     saveUserRoleNames(newUserRoleNames);
     saveRoles(ROLES);
-    document.getElementById("settings-modal").style.display = "none";
+    document.getElementById("salary-modal").style.display = "none";
     renderAttendees();
     updateStats();
   }
@@ -2106,10 +2106,10 @@
     });
   });
 
-  // Close settings modal on overlay click
-  document.getElementById("settings-modal").addEventListener("click", (e) => {
-    if (e.target === document.getElementById("settings-modal"))
-      document.getElementById("settings-modal").style.display = "none";
+  // Close salary modal on overlay click
+  document.getElementById("salary-modal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("salary-modal"))
+      document.getElementById("salary-modal").style.display = "none";
   });
 
   // "Connect Slack" link in save modal opens integrations
