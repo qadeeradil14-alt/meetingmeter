@@ -779,6 +779,51 @@
     .slack-setup-hint { font-size: 12px; color: var(--muted); }
     .slack-setup-hint a { color: var(--accent); text-decoration: none; cursor: pointer; }
     .slack-setup-hint a:hover { text-decoration: underline; }
+
+    /* ── Integration tabs ── */
+    .integ-tab {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .integ-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+    .integ-tab:hover { color: var(--text); }
+
+    /* ── FAQ ── */
+    .faq-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .faq-q::after { content: "›"; font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(90deg); }
+    .faq-a {
+      display: none;
+      padding: 0 14px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-a { display: block; }
   </style>
 </head>
 <body>
@@ -791,9 +836,9 @@
   <span class="tagline">Know the real cost of every meeting</span>
   <div style="display:flex;gap:8px;align-items:center">
     <span id="pro-badge" class="pro-badge" style="display:none;cursor:pointer" title="Manage your subscription" id="pro-badge">PRO</span>
-    <button id="manage-sub-btn" style="display:none;background:transparent;border:1px solid var(--border);
-      color:var(--muted);border-radius:6px;font-size:11px;padding:4px 10px;cursor:pointer;"
-      title="Manage or cancel subscription">⚙ Manage</button>
+    <button id="settings-open-btn" style="background:transparent;border:1px solid var(--border);
+      color:var(--muted);border-radius:6px;font-size:13px;padding:4px 10px;cursor:pointer;"
+      title="Settings">⚙️</button>
     <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
       <option value="USD">🇺🇸 USD $</option>
@@ -937,47 +982,214 @@
 
 <!-- Integrations modal -->
 <div class="modal-overlay" id="integrations-modal">
-  <div class="modal" style="width:440px;max-height:90vh;overflow-y:auto;gap:20px">
-    <h2>🔗 Integrations</h2>
+  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto;gap:0">
 
-    <!-- Slack -->
-    <div class="integration-block">
-      <div class="integration-block-title">
-        <span>💬 Slack</span>
+    <!-- Tab bar -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
+      <button class="integ-tab active" data-tab="slack">💬 Slack</button>
+      <button class="integ-tab" data-tab="calendar">📅 Calendar</button>
+    </div>
+
+    <!-- SLACK TAB -->
+    <div id="integ-tab-slack">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Slack</h2>
         <span class="integration-status not-connected" id="slack-status-badge">Not connected</span>
       </div>
-      <p class="integration-desc">Share a meeting cost summary to any Slack channel via an Incoming Webhook.</p>
-      <div class="integration-row">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        After saving a meeting, MeetingMeter can automatically post a cost summary to your Slack channel. Follow these 4 easy steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Slack in your browser</div>
+            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">api.slack.com/apps</strong> and sign in with your Slack account.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Create a new app</div>
+            <div style="font-size:13px;color:var(--muted)">Click <strong style="color:var(--text)">"Create New App"</strong> → choose <strong style="color:var(--text)">"From scratch"</strong> → name it anything (e.g. "MeetingMeter") → select your workspace → click Create.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Enable Incoming Webhooks</div>
+            <div style="font-size:13px;color:var(--muted)">On the left sidebar click <strong style="color:var(--text)">"Incoming Webhooks"</strong> → toggle it <strong style="color:var(--green)">ON</strong> → scroll down and click <strong style="color:var(--text)">"Add New Webhook to Workspace"</strong> → pick a channel → click Allow.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Copy &amp; paste the webhook URL below</div>
+            <div style="font-size:13px;color:var(--muted)">You'll see a URL starting with <strong style="color:var(--text)">https://hooks.slack.com/services/…</strong> — copy it and paste it in the box below.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
         <input class="integration-input" id="slack-webhook-input"
           type="password" placeholder="https://hooks.slack.com/services/…" autocomplete="off" />
         <button class="btn-sm btn-sm-ghost" id="slack-test-btn">Test</button>
       </div>
-      <div style="font-size:11px;color:var(--muted)">
-        <a href="https://api.slack.com/messaging/webhooks" target="_blank"
-          style="color:var(--accent);text-decoration:none">How to create a webhook →</a>
-      </div>
+      <p style="font-size:12px;color:var(--muted)">Once connected, every saved meeting will offer to post a summary to your Slack channel automatically.</p>
     </div>
 
-    <!-- Google Calendar -->
-    <div class="integration-block">
-      <div class="integration-block-title">
-        <span>📅 Google Calendar</span>
+    <!-- CALENDAR TAB -->
+    <div id="integ-tab-calendar" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Google Calendar</h2>
         <span class="integration-status not-connected" id="gcal-status-badge">Not connected</span>
       </div>
-      <p class="integration-desc">Import upcoming events to pre-fill meeting title and duration. Uses your calendar's public ICS link.</p>
-      <div class="integration-row">
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        Once connected, you can import upcoming events from your calendar to pre-fill the meeting title and duration with one click. Follow these 4 steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Google Calendar</div>
+            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">calendar.google.com</strong> in your browser and sign in.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Settings</div>
+            <div style="font-size:13px;color:var(--muted)">Click the <strong style="color:var(--text)">⚙️ gear icon</strong> (top right) → click <strong style="color:var(--text)">"Settings"</strong>.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Find your calendar's secret link</div>
+            <div style="font-size:13px;color:var(--muted)">On the left sidebar, click your calendar name under <strong style="color:var(--text)">"Settings for my calendars"</strong> → scroll down to find <strong style="color:var(--text)">"Secret address in iCal format"</strong> → click the copy button next to it.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Paste the link below</div>
+            <div style="font-size:13px;color:var(--muted)">The link starts with <strong style="color:var(--text)">https://calendar.google.com/calendar/ical/…</strong> — paste it below and click Test to confirm it works.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
         <input class="integration-input" id="gcal-ics-input"
           type="text" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" />
         <button class="btn-sm btn-sm-ghost" id="gcal-test-btn">Test</button>
       </div>
-      <div style="font-size:11px;color:var(--muted)">
-        In Google Calendar → Settings → your calendar → "Secret address in iCal format"
+      <p style="font-size:12px;color:var(--muted)">Your calendar link is private — it's stored only in your browser and never shared with anyone.</p>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" id="integrations-cancel">Cancel</button>
+      <button class="btn btn-primary" id="integrations-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto;gap:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 style="font-size:18px">⚙️ Settings</h2>
+      <button id="settings-close-btn" style="background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer">×</button>
+    </div>
+
+    <!-- Account section (Pro only) -->
+    <div id="settings-account-section">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Account</div>
+      <div id="settings-pro-block" style="display:none;background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:14px;font-weight:600">MeetingMeter Pro</div>
+            <div id="settings-pro-email" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+          </div>
+          <span style="background:linear-gradient(135deg,#7c6af7,#a78bfa);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px">PRO</span>
+        </div>
+        <button id="settings-manage-btn" style="width:100%;padding:9px;border-radius:8px;background:var(--surface);
+          border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">
+          Manage or Cancel Subscription →
+        </button>
+      </div>
+      <div id="settings-free-block" style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Free Plan</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px">Up to 5 attendees. Upgrade to Pro for unlimited access.</div>
+        <a href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" style="display:block;text-align:center;padding:9px;border-radius:8px;
+          background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;font-size:13px;font-weight:700;text-decoration:none;">
+          Upgrade to Pro — $4.99/month →
+        </a>
       </div>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;gap:8px">
-      <button class="btn btn-ghost" id="integrations-cancel">Cancel</button>
-      <button class="btn btn-primary" id="integrations-save">Save</button>
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- FAQ -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px">FAQ</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+      <div class="faq-item">
+        <div class="faq-q">How do I cancel my subscription?</div>
+        <div class="faq-a">Click "Manage or Cancel Subscription" above. You'll be taken to the Stripe portal where you can cancel in one click. You keep Pro access until the end of your billing period.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">I switched devices — how do I restore Pro?</div>
+        <div class="faq-a">In the app, click "Upgrade to Pro" and use the "Restore with email" option at the bottom. Enter the email you paid with and your Pro access will be restored instantly.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my salary data stored anywhere?</div>
+        <div class="faq-a">No. All data lives only in your browser's local storage. Nothing is sent to our servers — not names, salaries, or meeting details.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I use MeetingMeter on multiple devices?</div>
+        <div class="faq-a">Yes. Use the email restore feature on any device to unlock Pro. Your meeting history stays per-browser since nothing is synced to a server.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What payment methods are accepted?</div>
+        <div class="faq-a">All major credit and debit cards via Stripe. Payments are secure and encrypted — we never see your card details.</div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- Contact -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Contact & Support</div>
+    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Need help?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">We typically respond within 24 hours.</div>
+      <a href="mailto:support@meetingmeter.tech" style="display:inline-flex;align-items:center;gap:6px;
+        color:var(--accent2);font-size:13px;font-weight:600;text-decoration:none;">
+        ✉️ support@meetingmeter.tech
+      </a>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- About -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">About</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:16px">
+      <span>MeetingMeter v1.0</span>
+      <a href="/" style="color:var(--accent2);text-decoration:none;font-size:13px;">meetingmeter.tech ↗</a>
     </div>
   </div>
 </div>
@@ -1046,23 +1258,39 @@
   function refreshProUI() {
     const pro = isPro();
     document.getElementById("pro-badge").style.display = pro ? "inline-block" : "none";
-    document.getElementById("manage-sub-btn").style.display = pro ? "inline-block" : "none";
     document.getElementById("cal-import-btn").innerHTML =
       pro ? "📅 Import from Calendar" : "📅 Import from Calendar 🔒";
     document.getElementById("integrations-btn").innerHTML =
       pro ? "🔗 Integrations" : "🔗 Integrations 🔒";
     document.getElementById("export-btn").innerHTML =
       pro ? "📄 Export" : "📄 Export 🔒";
+    // Settings panel account blocks
+    const proBlock  = document.getElementById("settings-pro-block");
+    const freeBlock = document.getElementById("settings-free-block");
+    if (proBlock)  proBlock.style.display  = pro ? "block" : "none";
+    if (freeBlock) freeBlock.style.display = pro ? "none"  : "block";
+    const emailEl = document.getElementById("settings-pro-email");
+    if (emailEl) emailEl.textContent = localStorage.getItem("mm_pro_email") || "";
   }
 
   document.getElementById("upgrade-modal-close").addEventListener("click", () => {
     document.getElementById("upgrade-modal").style.display = "none";
   });
 
-  document.getElementById("manage-sub-btn").addEventListener("click", async () => {
+  // ── Settings modal ──
+  document.getElementById("settings-open-btn").addEventListener("click", () => {
+    refreshProUI();
+    document.getElementById("settings-modal").style.display = "flex";
+  });
+  document.getElementById("settings-close-btn").addEventListener("click", () => {
+    document.getElementById("settings-modal").style.display = "none";
+  });
+
+  // Manage subscription from settings
+  document.getElementById("settings-manage-btn").addEventListener("click", async () => {
     const email = localStorage.getItem("mm_pro_email") || prompt("Enter your subscription email:");
     if (!email) return;
-    const btn = document.getElementById("manage-sub-btn");
+    const btn = document.getElementById("settings-manage-btn");
     btn.textContent = "Loading…"; btn.disabled = true;
     try {
       const res = await fetch("/api/customer-portal", {
@@ -1079,7 +1307,7 @@
     } catch {
       alert("Something went wrong. Please try again.");
     } finally {
-      btn.textContent = "⚙ Manage"; btn.disabled = false;
+      btn.textContent = "Manage or Cancel Subscription →"; btn.disabled = false;
     }
   });
 
@@ -1857,6 +2085,33 @@
     cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
     saveIntegrations(cfg);
     document.getElementById("integrations-modal").style.display = "none";
+  });
+
+  // ── Integration tabs ──
+  document.querySelectorAll(".integ-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".integ-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const target = tab.dataset.tab;
+      document.getElementById("integ-tab-slack").style.display    = target === "slack"    ? "block" : "none";
+      document.getElementById("integ-tab-calendar").style.display = target === "calendar" ? "block" : "none";
+    });
+  });
+
+  // ── FAQ accordion ──
+  document.querySelectorAll(".faq-q").forEach(q => {
+    q.addEventListener("click", () => {
+      const item = q.closest(".faq-item");
+      const wasOpen = item.classList.contains("open");
+      document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+      if (!wasOpen) item.classList.add("open");
+    });
+  });
+
+  // Close settings modal on overlay click
+  document.getElementById("settings-modal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("settings-modal"))
+      document.getElementById("settings-modal").style.display = "none";
   });
 
   // "Connect Slack" link in save modal opens integrations
