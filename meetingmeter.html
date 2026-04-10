@@ -790,7 +790,10 @@
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
   <div style="display:flex;gap:8px;align-items:center">
-    <span id="pro-badge" class="pro-badge" style="display:none">PRO</span>
+    <span id="pro-badge" class="pro-badge" style="display:none;cursor:pointer" title="Manage your subscription" id="pro-badge">PRO</span>
+    <button id="manage-sub-btn" style="display:none;background:transparent;border:1px solid var(--border);
+      color:var(--muted);border-radius:6px;font-size:11px;padding:4px 10px;cursor:pointer;"
+      title="Manage or cancel subscription">⚙ Manage</button>
     <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
       <option value="USD">🇺🇸 USD $</option>
@@ -1043,7 +1046,7 @@
   function refreshProUI() {
     const pro = isPro();
     document.getElementById("pro-badge").style.display = pro ? "inline-block" : "none";
-    // Lock icons on gated buttons
+    document.getElementById("manage-sub-btn").style.display = pro ? "inline-block" : "none";
     document.getElementById("cal-import-btn").innerHTML =
       pro ? "📅 Import from Calendar" : "📅 Import from Calendar 🔒";
     document.getElementById("integrations-btn").innerHTML =
@@ -1054,6 +1057,30 @@
 
   document.getElementById("upgrade-modal-close").addEventListener("click", () => {
     document.getElementById("upgrade-modal").style.display = "none";
+  });
+
+  document.getElementById("manage-sub-btn").addEventListener("click", async () => {
+    const email = localStorage.getItem("mm_pro_email") || prompt("Enter your subscription email:");
+    if (!email) return;
+    const btn = document.getElementById("manage-sub-btn");
+    btn.textContent = "Loading…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/customer-portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || "Could not open portal. Contact support.");
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      btn.textContent = "⚙ Manage"; btn.disabled = false;
+    }
   });
 
   async function activatePro(payload, msg, btn) {
