@@ -985,7 +985,9 @@
     <!-- Tab bar -->
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
       <button class="integ-tab active" data-tab="slack">💬 Slack</button>
-      <button class="integ-tab" data-tab="calendar">📅 Calendar</button>
+      <button class="integ-tab" data-tab="teams">🟦 Teams</button>
+      <button class="integ-tab" data-tab="calendar">📅 Google Cal</button>
+      <button class="integ-tab" data-tab="apple">🍎 Apple Cal</button>
     </div>
 
     <!-- SLACK TAB -->
@@ -1098,6 +1100,118 @@
         <button class="btn-sm btn-sm-ghost" id="gcal-test-btn">Test</button>
       </div>
       <p style="font-size:12px;color:var(--muted)">Your calendar link is private — it's stored only in your browser and never shared with anyone.</p>
+    </div>
+
+    <!-- TEAMS TAB -->
+    <div id="integ-tab-teams" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Microsoft Teams</h2>
+        <span class="integration-status not-connected" id="teams-status-badge">Not connected</span>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        After saving a meeting, MeetingMeter can post a cost summary to any Teams channel. Follow these 4 steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Microsoft Teams</div>
+            <div style="font-size:13px;color:var(--muted)">Open the Teams app or go to <strong style="color:var(--text)">teams.microsoft.com</strong> and sign in.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Go to the channel you want to post to</div>
+            <div style="font-size:13px;color:var(--muted)">Click on the channel (e.g. <strong style="color:var(--text)">#general</strong> or <strong style="color:var(--text)">#engineering</strong>) → click the <strong style="color:var(--text)">⋯ More options</strong> button next to the channel name → select <strong style="color:var(--text)">"Connectors"</strong>.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Add an Incoming Webhook</div>
+            <div style="font-size:13px;color:var(--muted)">Search for <strong style="color:var(--text)">"Incoming Webhook"</strong> → click <strong style="color:var(--text)">Configure</strong> → give it a name like "MeetingMeter" → optionally upload an icon → click <strong style="color:var(--text)">Create</strong>.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Copy the webhook URL and paste it below</div>
+            <div style="font-size:13px;color:var(--muted)">Teams will show you a URL — copy it and paste it below. It starts with <strong style="color:var(--text)">https://…webhook.office.com/…</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
+        <input class="integration-input" id="teams-webhook-input"
+          type="password" placeholder="https://…webhook.office.com/webhookb2/…" autocomplete="off" />
+        <button class="btn-sm btn-sm-ghost" id="teams-test-btn">Test</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Once connected, every saved meeting will offer to post a summary to your Teams channel.</p>
+    </div>
+
+    <!-- APPLE CALENDAR TAB -->
+    <div id="integ-tab-apple" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Apple Calendar</h2>
+        <span class="integration-status not-connected" id="apple-cal-status-badge">Not connected</span>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        Import upcoming events from Apple Calendar to pre-fill your meeting title and duration. Follow these 4 steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Apple Calendar on your Mac</div>
+            <div style="font-size:13px;color:var(--muted)">Open the <strong style="color:var(--text)">Calendar</strong> app from your Dock or Applications folder.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Find the calendar you want to share</div>
+            <div style="font-size:13px;color:var(--muted)">In the left sidebar, find the calendar (e.g. <strong style="color:var(--text)">Work</strong> or <strong style="color:var(--text)">Personal</strong>) → right-click on it (or hold Control and click) → select <strong style="color:var(--text)">"Get Info"</strong>.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Enable "Public Calendar" and copy the link</div>
+            <div style="font-size:13px;color:var(--muted)">Check the box next to <strong style="color:var(--text)">"Publish as public calendar"</strong> → click <strong style="color:var(--text)">OK</strong> → right-click the calendar again → click <strong style="color:var(--text)">"Send link to calendar…"</strong> — the URL shown is your ICS link.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Paste the link below</div>
+            <div style="font-size:13px;color:var(--muted)">The link looks like <strong style="color:var(--text)">webcal://p…-caldav.icloud.com/…</strong> — paste it below. MeetingMeter will convert it automatically.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
+        <input class="integration-input" id="apple-cal-input"
+          type="text" placeholder="webcal://p…-caldav.icloud.com/…" />
+        <button class="btn-sm btn-sm-ghost" id="apple-cal-test-btn">Test</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Your calendar link is stored only in your browser — never sent to our servers.</p>
     </div>
 
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
@@ -2062,31 +2176,26 @@
   // ── Integrations modal ────────────────────────────────────
   function openIntegrations() {
     const cfg = loadIntegrations();
-    const webhookInput = document.getElementById("slack-webhook-input");
-    const icsInput     = document.getElementById("gcal-ics-input");
-    webhookInput.value = cfg.slack_webhook || "";
-    icsInput.value     = cfg.gcal_ics_url  || "";
+    document.getElementById("slack-webhook-input").value  = cfg.slack_webhook   || "";
+    document.getElementById("gcal-ics-input").value       = cfg.gcal_ics_url    || "";
+    document.getElementById("teams-webhook-input").value  = cfg.teams_webhook   || "";
+    document.getElementById("apple-cal-input").value      = cfg.apple_ics_url   || "";
     _refreshIntegrationBadges(cfg);
     document.getElementById("integrations-modal").style.display = "flex";
   }
 
+  function _setBadge(id, connected) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = connected ? "Connected" : "Not connected";
+    el.className = "integration-status " + (connected ? "connected" : "not-connected");
+  }
+
   function _refreshIntegrationBadges(cfg) {
-    const slackBadge = document.getElementById("slack-status-badge");
-    const gcalBadge  = document.getElementById("gcal-status-badge");
-    if (cfg.slack_webhook) {
-      slackBadge.textContent = "Connected";
-      slackBadge.className = "integration-status connected";
-    } else {
-      slackBadge.textContent = "Not connected";
-      slackBadge.className = "integration-status not-connected";
-    }
-    if (cfg.gcal_ics_url) {
-      gcalBadge.textContent = "Connected";
-      gcalBadge.className = "integration-status connected";
-    } else {
-      gcalBadge.textContent = "Not connected";
-      gcalBadge.className = "integration-status not-connected";
-    }
+    _setBadge("slack-status-badge",    !!cfg.slack_webhook);
+    _setBadge("gcal-status-badge",     !!cfg.gcal_ics_url);
+    _setBadge("teams-status-badge",    !!cfg.teams_webhook);
+    _setBadge("apple-cal-status-badge",!!cfg.apple_ics_url);
   }
 
   document.getElementById("integrations-btn").addEventListener("click", () => {
@@ -2102,18 +2211,26 @@
     const cfg = loadIntegrations();
     cfg.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
     cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
+    cfg.teams_webhook = document.getElementById("teams-webhook-input").value.trim();
+    // Normalize webcal:// → https:// for Apple Calendar
+    let appleUrl = document.getElementById("apple-cal-input").value.trim();
+    if (appleUrl.startsWith("webcal://")) appleUrl = "https://" + appleUrl.slice(9);
+    cfg.apple_ics_url = appleUrl;
     saveIntegrations(cfg);
     document.getElementById("integrations-modal").style.display = "none";
   });
 
   // ── Integration tabs ──
+  const integTabs = ["slack", "teams", "calendar", "apple"];
   document.querySelectorAll(".integ-tab").forEach(tab => {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".integ-tab").forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
       const target = tab.dataset.tab;
-      document.getElementById("integ-tab-slack").style.display    = target === "slack"    ? "block" : "none";
-      document.getElementById("integ-tab-calendar").style.display = target === "calendar" ? "block" : "none";
+      integTabs.forEach(t => {
+        const el = document.getElementById(`integ-tab-${t}`);
+        if (el) el.style.display = t === target ? "block" : "none";
+      });
     });
   });
 
@@ -2164,6 +2281,45 @@
     } catch(e) {
       btn.textContent = "✗ Error";
       alert("Could not reach /api/slack-notify: " + e.message);
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+  // ── Teams test ─────────────────────────────────────────────
+  document.getElementById("teams-test-btn").addEventListener("click", async () => {
+    const url = document.getElementById("teams-webhook-input").value.trim();
+    if (!url) { alert("Paste a Teams webhook URL first."); return; }
+    const btn = document.getElementById("teams-test-btn");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: "✅ MeetingMeter is connected to this Teams channel!" }),
+      });
+      btn.textContent = res.ok ? "✓ Sent!" : "✗ Failed";
+      if (!res.ok) alert("Teams returned an error. Check the webhook URL and try again.");
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not send to Teams. Check the URL and try again.");
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+  // ── Apple Calendar test ────────────────────────────────────
+  document.getElementById("apple-cal-test-btn").addEventListener("click", async () => {
+    let url = document.getElementById("apple-cal-input").value.trim();
+    if (!url) { alert("Paste your Apple Calendar ICS link first."); return; }
+    if (url.startsWith("webcal://")) url = "https://" + url.slice(9);
+    const btn = document.getElementById("apple-cal-test-btn");
+    btn.textContent = "Testing…"; btn.disabled = true;
+    try {
+      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(url));
+      const data = await res.json();
+      btn.textContent = data.events?.length >= 0 ? "✓ Connected!" : "✗ Failed";
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not read calendar. Make sure the link is correct.");
     }
     setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
   });
