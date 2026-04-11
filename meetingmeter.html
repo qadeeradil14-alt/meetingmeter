@@ -1078,7 +1078,6 @@
     <!-- Tab bar -->
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
       <button class="integ-tab active" data-tab="slack">💬 Slack</button>
-      <button class="integ-tab" data-tab="teams">🟦 Teams</button>
       <button class="integ-tab" data-tab="calendar">📅 Google Cal</button>
     </div>
 
@@ -1195,61 +1194,6 @@
     </div>
 
     <!-- TEAMS TAB -->
-    <div id="integ-tab-teams" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <h2 style="font-size:18px">Connect Microsoft Teams</h2>
-        <span class="integration-status not-connected" id="teams-status-badge">Not connected</span>
-      </div>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
-        After saving a meeting, MeetingMeter can post a cost summary to any Teams channel. Follow these 4 steps:
-      </p>
-
-      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Microsoft Teams</div>
-            <div style="font-size:13px;color:var(--muted)">Open the Teams app or go to <strong style="color:var(--text)">teams.microsoft.com</strong> and sign in.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Go to the channel you want to post to</div>
-            <div style="font-size:13px;color:var(--muted)">Click on the channel (e.g. <strong style="color:var(--text)">#general</strong> or <strong style="color:var(--text)">#engineering</strong>) → click the <strong style="color:var(--text)">⋯ More options</strong> button next to the channel name → select <strong style="color:var(--text)">"Connectors"</strong>.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Add an Incoming Webhook</div>
-            <div style="font-size:13px;color:var(--muted)">Search for <strong style="color:var(--text)">"Incoming Webhook"</strong> → click <strong style="color:var(--text)">Configure</strong> → give it a name like "MeetingMeter" → optionally upload an icon → click <strong style="color:var(--text)">Create</strong>.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Copy the webhook URL and paste it below</div>
-            <div style="font-size:13px;color:var(--muted)">Teams will show you a URL — copy it and paste it below. It starts with <strong style="color:var(--text)">https://…webhook.office.com/…</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="integration-row" style="margin-bottom:8px">
-        <input class="integration-input" id="teams-webhook-input"
-          type="password" placeholder="https://…webhook.office.com/webhookb2/…" autocomplete="off" />
-        <button class="btn-sm btn-sm-ghost" id="teams-test-btn">Test</button>
-      </div>
-      <p style="font-size:12px;color:var(--muted)">Once connected, every saved meeting will offer to post a summary to your Teams channel.</p>
-    </div>
-
     <!-- APPLE CALENDAR TAB -->
 
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
@@ -2299,7 +2243,6 @@
     const cfg = loadIntegrations();
     document.getElementById("slack-webhook-input").value  = cfg.slack_webhook   || "";
     document.getElementById("gcal-ics-input").value       = cfg.gcal_ics_url    || "";
-    document.getElementById("teams-webhook-input").value  = cfg.teams_webhook   || "";
     _refreshIntegrationBadges(cfg);
     document.getElementById("integrations-modal").style.display = "flex";
   }
@@ -2314,7 +2257,6 @@
   function _refreshIntegrationBadges(cfg) {
     _setBadge("slack-status-badge",    !!cfg.slack_webhook);
     _setBadge("gcal-status-badge",     !!cfg.gcal_ics_url);
-    _setBadge("teams-status-badge",    !!cfg.teams_webhook);
   }
 
   document.getElementById("integrations-btn").addEventListener("click", () => {
@@ -2330,13 +2272,12 @@
     const cfg = loadIntegrations();
     cfg.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
     cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
-    cfg.teams_webhook = document.getElementById("teams-webhook-input").value.trim();
     saveIntegrations(cfg);
     document.getElementById("integrations-modal").style.display = "none";
   });
 
   // ── Integration tabs ──
-  const integTabs = ["slack", "teams", "calendar"];
+  const integTabs = ["slack", "calendar"];
   document.querySelectorAll(".integ-tab").forEach(tab => {
     tab.addEventListener("click", () => {
       document.querySelectorAll(".integ-tab").forEach(t => t.classList.remove("active"));
@@ -2400,26 +2341,6 @@
     setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
   });
 
-  // ── Teams test ─────────────────────────────────────────────
-  document.getElementById("teams-test-btn").addEventListener("click", async () => {
-    const url = document.getElementById("teams-webhook-input").value.trim();
-    if (!url) { alert("Paste a Teams webhook URL first."); return; }
-    const btn = document.getElementById("teams-test-btn");
-    btn.textContent = "Sending…"; btn.disabled = true;
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: "✅ MeetingMeter is connected to this Teams channel!" }),
-      });
-      btn.textContent = res.ok ? "✓ Sent!" : "✗ Failed";
-      if (!res.ok) alert("Teams returned an error. Check the webhook URL and try again.");
-    } catch(e) {
-      btn.textContent = "✗ Error";
-      alert("Could not send to Teams. Check the URL and try again.");
-    }
-    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
-  });
 
 
   // ── Toast helper ───────────────────────────────────────────
