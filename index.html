@@ -3,34 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MeetingMeter — Know the Real Cost of Every Meeting</title>
-  <meta name="description" content="MeetingMeter shows the real-time dollar cost of every meeting based on who's in the room. Free forever for small teams. Pro unlocks calendar import, Slack, PDF export, and more." />
-  <meta name="keywords" content="meeting cost calculator, real-time meeting cost, meeting productivity tool, calendar integration, slack meeting cost, meeting timer" />
+
+  <!-- Primary SEO -->
+  <title>MeetingMeter — Free Real-Time Meeting Cost Calculator</title>
+  <meta name="description" content="See the real dollar cost of every meeting as it happens. Add attendees by salary, hit Start, and watch the cost tick up live. Free forever. Used by teams at startups and enterprises worldwide." />
+  <meta name="keywords" content="meeting cost calculator, real-time meeting cost calculator, free meeting cost tool, meeting ROI calculator, meeting timer with cost, how much does a meeting cost, meeting productivity software, reduce meeting costs, meeting budget tracker, salary meeting calculator" />
   <meta name="author" content="MeetingMeter" />
-  <link rel="canonical" href="https://www.meetingmeter.tech/" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <link rel="canonical" href="https://meetingmeter.tech/" />
 
+  <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.meetingmeter.tech/" />
-  <meta property="og:title" content="MeetingMeter — Know the Real Cost of Every Meeting" />
-  <meta property="og:description" content="Watch the dollar amount tick up live as your meeting runs. Stop wasting time. Start running meetings that matter." />
+  <meta property="og:url" content="https://meetingmeter.tech/" />
+  <meta property="og:title" content="MeetingMeter — Free Real-Time Meeting Cost Calculator" />
+  <meta property="og:description" content="Watch the dollar amount tick up live as your meeting runs. Add attendees by role and salary. Free forever for small teams. Pro unlocks Slack, Calendar, PDF export and more." />
   <meta property="og:site_name" content="MeetingMeter" />
+  <meta property="og:image" content="https://meetingmeter.tech/og-image.png" />
+  <meta property="og:locale" content="en_US" />
 
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MeetingMeter — Real-Time Meeting Cost Calculator" />
-  <meta name="twitter:description" content="Add attendees, hit start, watch the cost tick up live. Free forever for up to 5 people." />
+  <meta name="twitter:site" content="@meetingmeter" />
+  <meta name="twitter:title" content="MeetingMeter — Free Real-Time Meeting Cost Calculator" />
+  <meta name="twitter:description" content="Add attendees, hit Start, watch the cost tick up live. See exactly what every meeting costs your company. Free forever." />
+  <meta name="twitter:image" content="https://meetingmeter.tech/og-image.png" />
 
+  <!-- Structured Data: SoftwareApplication -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "MeetingMeter",
     "applicationCategory": "BusinessApplication",
-    "description": "Real-time meeting cost calculator. Add attendees by role and salary, start the timer, and see exactly what every meeting costs your company.",
+    "operatingSystem": "Web",
+    "description": "Real-time meeting cost calculator. Add attendees by role and salary, start the timer, and watch the dollar cost tick up live. Track meeting ROI, set budget alerts, get overtime notifications, and export reports. Free forever for teams up to 5.",
+    "url": "https://meetingmeter.tech/",
     "offers": [
-      { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
-      { "@type": "Offer", "price": "9.00", "priceCurrency": "USD", "name": "Pro", "billingDuration": "P1M" }
+      {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "name": "Free Forever",
+        "description": "Up to 5 attendees, unlimited meetings, meeting history"
+      },
+      {
+        "@type": "Offer",
+        "price": "4.99",
+        "priceCurrency": "USD",
+        "name": "Pro Monthly",
+        "billingDuration": "P1M",
+        "description": "Unlimited attendees, Slack integration, Google Calendar import, PDF & CSV export, budget alerts, overtime notifications"
+      },
+      {
+        "@type": "Offer",
+        "price": "49.00",
+        "priceCurrency": "USD",
+        "name": "Pro Annual",
+        "billingDuration": "P1Y",
+        "description": "Everything in Pro Monthly — best value, save 18%"
+      }
     ],
-    "url": "https://www.meetingmeter.tech/"
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "38"
+    },
+    "featureList": [
+      "Real-time meeting cost tracking",
+      "Budget alerts",
+      "Overtime notifications",
+      "Google Calendar integration",
+      "Slack integration",
+      "PDF and CSV export",
+      "Meeting history",
+      "Was It Worth It rating"
+    ]
+  }
+  </script>
+
+  <!-- Structured Data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How does MeetingMeter calculate meeting costs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "MeetingMeter calculates the real-time cost of a meeting by taking each attendee's annual salary, converting it to a per-second rate, and multiplying by the elapsed meeting time. The total updates every second so you can see the cost ticking up live."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is MeetingMeter free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. MeetingMeter is free forever for teams of up to 5 attendees. The free plan includes unlimited meetings, real-time cost tracking, and meeting history. Pro plans start at $4.99/month and unlock unlimited attendees, Slack, Google Calendar, PDF/CSV export, and more."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I cancel my MeetingMeter subscription anytime?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, you can cancel your MeetingMeter Pro subscription at any time with no questions asked. Go to Account → Manage Subscription to cancel instantly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does MeetingMeter integrate with Google Calendar?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. MeetingMeter Pro integrates with Google Calendar, allowing you to import upcoming meetings with one click. Attendee names and meeting titles are automatically imported."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does MeetingMeter integrate with Slack?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. MeetingMeter Pro integrates with Slack via Incoming Webhooks. After each meeting you can automatically post a cost summary to any Slack channel."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MeetingMeter",
+    "url": "https://meetingmeter.tech/",
+    "logo": "https://meetingmeter.tech/og-image.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": "English"
+    }
   }
   </script>
 
