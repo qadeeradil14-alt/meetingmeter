@@ -525,6 +525,38 @@
     }
     .settings-btn:hover { color: var(--text); border-color: var(--accent); }
 
+    /* ── Pro badge ── */
+    .pro-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .lock-icon { font-size: 12px; opacity: 0.6; margin-left: 4px; }
+
+    /* ── Upgrade modal ── */
+    .upgrade-modal { max-width: 420px; text-align: center; gap: 16px; }
+    .upgrade-modal h2 { font-size: 22px; margin: 0; }
+    .upgrade-modal p  { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.5; }
+    .upgrade-features { list-style: none; padding: 0; margin: 0; text-align: left; }
+    .upgrade-features li { font-size: 13px; padding: 5px 0; color: var(--text); }
+    .upgrade-features li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
+    .license-input-row { display: flex; gap: 8px; width: 100%; }
+    .license-input-row input { flex: 1; }
+    .divider-text { color: var(--muted); font-size: 12px; }
+    .btn-gumroad {
+      display: block; width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #000; font-weight: 700; font-size: 15px;
+      border: none; border-radius: 10px; cursor: pointer; text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-gumroad:hover { opacity: 0.9; }
+
     .settings-grid {
       display: flex;
       flex-direction: column;
@@ -646,6 +678,207 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Integrations modal ── */
+    .integration-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .integration-block-title {
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .integration-status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: auto;
+    }
+    .integration-status.connected {
+      background: rgba(52,211,153,0.15);
+      color: var(--green);
+      border: 1px solid rgba(52,211,153,0.3);
+    }
+    .integration-status.not-connected {
+      background: rgba(122,122,154,0.1);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .integration-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .integration-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 12px;
+      padding: 8px 10px;
+      outline: none;
+      width: 100%;
+      font-family: monospace;
+    }
+    .integration-input:focus { border-color: var(--accent); }
+    .integration-input::placeholder { color: var(--muted); font-family: inherit; }
+    .integration-row { display: flex; gap: 6px; align-items: center; }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 7px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-sm-primary { background: var(--accent); color: white; }
+    .btn-sm-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+    .btn-sm-ghost:hover:not(:disabled) { background: var(--border); }
+
+    /* ── Calendar modal ── */
+    .cal-event-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cal-event-card:hover { border-color: var(--accent); background: rgba(124,106,247,0.06); }
+    .cal-event-title { font-size: 13px; font-weight: 600; }
+    .cal-event-meta  { font-size: 11px; color: var(--muted); }
+
+    /* ── Slack checkbox in save modal ── */
+    .slack-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(52,211,153,0.06);
+      border: 1px solid rgba(52,211,153,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+    .slack-row input[type=checkbox] { accent-color: var(--green); width: 16px; height: 16px; cursor: pointer; }
+    .slack-row label { cursor: pointer; flex: 1; }
+    .slack-setup-hint { font-size: 12px; color: var(--muted); }
+    .slack-setup-hint a { color: var(--accent); text-decoration: none; cursor: pointer; }
+    .slack-setup-hint a:hover { text-decoration: underline; }
+
+    /* ── Worth it rating ── */
+    .worth-it-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 4px 0 8px;
+    }
+    .worth-it-label { font-size: 13px; color: var(--muted); }
+    .worth-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .worth-btn:hover { transform: scale(1.15); }
+    .worth-btn.selected-yes { border-color: var(--green); background: rgba(52,211,153,0.12); }
+    .worth-btn.selected-no  { border-color: var(--red);   background: rgba(248,113,113,0.12); }
+
+    /* ── Budget alert bar ── */
+    .budget-bar-wrap {
+      width: 100%;
+      background: var(--surface2);
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .budget-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: var(--green);
+      transition: width 0.5s ease, background 0.3s ease;
+    }
+
+    /* ── Overtime banner ── */
+    .overtime-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      width: 100%;
+    }
+
+    /* ── Integration tabs ── */
+    .integ-tab {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .integ-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--accent);
+    }
+    .integ-tab:hover { color: var(--text); }
+
+    /* ── FAQ ── */
+    .faq-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .faq-q::after { content: "›"; font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(90deg); }
+    .faq-a {
+      display: none;
+      padding: 0 14px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-a { display: block; }
   </style>
 </head>
 <body>
@@ -657,6 +890,8 @@
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
   <div style="display:flex;gap:8px;align-items:center">
+    <span id="pro-badge" class="pro-badge" style="display:none;cursor:pointer" title="Manage your subscription" id="pro-badge">PRO</span>
+    <button id="settings-open-btn" class="settings-btn" title="Account & Settings">👤 Account</button>
     <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
       <option value="USD">🇺🇸 USD $</option>
@@ -668,6 +903,7 @@
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
     <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
+    <button class="settings-btn" id="integrations-btn" title="Slack & Calendar integrations">🔗 Integrations</button>
     <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
   </div>
 </header>
@@ -680,6 +916,9 @@
     <div>
       <div class="section-label">Meeting Title</div>
       <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
+      <button class="add-btn" id="cal-import-btn" style="margin-top:8px;border-style:solid;border-color:rgba(124,106,247,0.35);color:var(--accent)">
+        📅 Import from Calendar
+      </button>
     </div>
 
     <div>
@@ -695,6 +934,31 @@
       <div style="font-size:13px;color:var(--muted)" id="rate-summary">Add attendees to see rate</div>
     </div>
 
+    <div>
+      <div class="section-label">Planned Duration (optional)</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="planned-duration-input" type="number" min="1" max="480" placeholder="e.g. 30"
+          style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
+        <span style="font-size:13px;color:var(--muted)">minutes</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when meeting runs over</div>
+    </div>
+
+    <div>
+      <div class="section-label">Meeting Budget (optional)</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:13px;color:var(--muted)">$</span>
+        <input id="budget-input" type="number" min="1" placeholder="e.g. 500"
+          style="width:100px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
+      </div>
+      <div id="budget-bar-wrap" class="budget-bar-wrap" style="display:none">
+        <div id="budget-bar-fill" class="budget-bar-fill" style="width:0%"></div>
+      </div>
+      <div id="budget-status" style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when cost approaches budget</div>
+    </div>
+
   </div>
 
   <!-- RIGHT: Timer + Cost -->
@@ -702,6 +966,9 @@
 
     <div id="running-indicator" class="running-pill hidden">
       <div class="running-dot"></div> Meeting in progress
+    </div>
+    <div id="overtime-banner" class="overtime-banner">
+      ⏰ Running over time — consider wrapping up!
     </div>
 
     <div class="cost-hero">
@@ -757,8 +1024,8 @@
   </div>
 </div>
 
-<!-- Settings modal -->
-<div class="modal-overlay" id="settings-modal">
+<!-- Salary Presets modal -->
+<div class="modal-overlay" id="salary-modal">
   <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
     <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
@@ -780,6 +1047,23 @@
       <span id="modal-duration">–</span>
       <strong id="modal-cost">$0.00</strong>
     </div>
+    <!-- Worth it rating -->
+    <div style="margin:4px 0 8px">
+      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px">Was this meeting worth it?</div>
+      <div class="worth-it-row">
+        <button class="worth-btn" id="worth-yes" title="Yes, worth it">👍</button>
+        <span class="worth-it-label">or</span>
+        <button class="worth-btn" id="worth-no" title="Not worth it">👎</button>
+      </div>
+    </div>
+
+    <div id="slack-share-row" class="slack-row hidden">
+      <input type="checkbox" id="slack-share-chk" checked />
+      <label for="slack-share-chk">Share summary to Slack</label>
+    </div>
+    <div id="slack-setup-hint" class="slack-setup-hint hidden">
+      <a id="slack-setup-link">+ Connect Slack</a> to share this meeting to a channel
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="modal-discard">Discard</button>
       <button class="btn btn-primary" id="modal-save">Save</button>
@@ -787,8 +1071,473 @@
   </div>
 </div>
 
+<!-- Integrations modal -->
+<div class="modal-overlay" id="integrations-modal">
+  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto;gap:0">
+
+    <!-- Tab bar -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
+      <button class="integ-tab active" data-tab="slack">💬 Slack</button>
+      <button class="integ-tab" data-tab="calendar">📅 Google Cal</button>
+    </div>
+
+    <!-- SLACK TAB -->
+    <div id="integ-tab-slack">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Slack</h2>
+        <span class="integration-status not-connected" id="slack-status-badge">Not connected</span>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        After saving a meeting, MeetingMeter can automatically post a cost summary to your Slack channel. Follow these 4 easy steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Slack in your browser</div>
+            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">api.slack.com/apps</strong> and sign in with your Slack account.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Create a new app</div>
+            <div style="font-size:13px;color:var(--muted)">Click <strong style="color:var(--text)">"Create New App"</strong> → choose <strong style="color:var(--text)">"From scratch"</strong> → name it anything (e.g. "MeetingMeter") → select your workspace → click Create.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Enable Incoming Webhooks</div>
+            <div style="font-size:13px;color:var(--muted)">On the left sidebar click <strong style="color:var(--text)">"Incoming Webhooks"</strong> → toggle it <strong style="color:var(--green)">ON</strong> → scroll down and click <strong style="color:var(--text)">"Add New Webhook to Workspace"</strong> → pick a channel → click Allow.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Copy &amp; paste the webhook URL below</div>
+            <div style="font-size:13px;color:var(--muted)">You'll see a URL starting with <strong style="color:var(--text)">https://hooks.slack.com/services/…</strong> — copy it and paste it in the box below.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
+        <input class="integration-input" id="slack-webhook-input"
+          type="password" placeholder="https://hooks.slack.com/services/…" autocomplete="off" />
+        <button class="btn-sm btn-sm-ghost" id="slack-test-btn">Test</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Once connected, every saved meeting will offer to post a summary to your Slack channel automatically.</p>
+    </div>
+
+    <!-- CALENDAR TAB -->
+    <div id="integ-tab-calendar" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="font-size:18px">Connect Google Calendar</h2>
+        <span class="integration-status not-connected" id="gcal-status-badge">Not connected</span>
+      </div>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
+        Once connected, you can import upcoming events from your calendar to pre-fill the meeting title and duration with one click. Follow these 4 steps:
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Google Calendar</div>
+            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">calendar.google.com</strong> in your browser and sign in.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Settings</div>
+            <div style="font-size:13px;color:var(--muted)">Click the <strong style="color:var(--text)">⚙️ gear icon</strong> (top right) → click <strong style="color:var(--text)">"Settings"</strong>.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Find your calendar's secret link</div>
+            <div style="font-size:13px;color:var(--muted)">On the left sidebar, click your calendar name under <strong style="color:var(--text)">"Settings for my calendars"</strong> → scroll down to find <strong style="color:var(--text)">"Secret address in iCal format"</strong> → click the copy button next to it.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Paste the link below</div>
+            <div style="font-size:13px;color:var(--muted)">The link starts with <strong style="color:var(--text)">https://calendar.google.com/calendar/ical/…</strong> — paste it below and click Test to confirm it works.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-row" style="margin-bottom:8px">
+        <input class="integration-input" id="gcal-ics-input"
+          type="text" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" />
+        <button class="btn-sm btn-sm-ghost" id="gcal-test-btn">Test</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">Your calendar link is private — it's stored only in your browser and never shared with anyone.</p>
+    </div>
+
+    <!-- TEAMS TAB -->
+    <!-- APPLE CALENDAR TAB -->
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" id="integrations-cancel">Cancel</button>
+      <button class="btn btn-primary" id="integrations-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto;gap:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 style="font-size:18px">⚙️ Settings</h2>
+      <button id="settings-close-btn" style="background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer">×</button>
+    </div>
+
+    <!-- Account section (Pro only) -->
+    <div id="settings-account-section">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Account</div>
+      <div id="settings-pro-block" style="display:none;background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:14px;font-weight:600">MeetingMeter Pro</div>
+            <div id="settings-pro-email" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+          </div>
+          <span style="background:linear-gradient(135deg,#7c6af7,#a78bfa);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px">PRO</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+          Click below to open the <strong style="color:var(--text)">Stripe billing portal</strong> where you can:<br>
+          · Update your payment method &nbsp;·&nbsp; View invoices &nbsp;·&nbsp; Cancel your subscription
+        </div>
+        <div id="settings-portal-email-row" style="display:none;margin-bottom:8px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Enter the email you used to subscribe:</div>
+          <input id="settings-portal-email-input" type="email" placeholder="your@email.com"
+            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+            color:var(--text);font-size:13px;padding:8px 12px;outline:none;margin-bottom:8px" />
+        </div>
+        <button id="settings-manage-btn" style="width:100%;padding:10px;border-radius:8px;background:var(--surface);
+          border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">
+          Open Billing Portal →
+        </button>
+      </div>
+      <div id="settings-free-block" style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Free Plan</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:12px">Up to 5 attendees. Upgrade to Pro for unlimited access.</div>
+        <a href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" style="display:block;text-align:center;padding:9px;border-radius:8px;
+          background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;font-size:13px;font-weight:700;text-decoration:none;">
+          Upgrade to Pro — $4.99/month →
+        </a>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- FAQ -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px">FAQ</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+      <div class="faq-item">
+        <div class="faq-q">How do I cancel my subscription?</div>
+        <div class="faq-a">Click "Manage or Cancel Subscription" above. You'll be taken to the Stripe portal where you can cancel in one click. You keep Pro access until the end of your billing period.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">I switched devices — how do I restore Pro?</div>
+        <div class="faq-a">In the app, click "Upgrade to Pro" and use the "Restore with email" option at the bottom. Enter the email you paid with and your Pro access will be restored instantly.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my salary data stored anywhere?</div>
+        <div class="faq-a">No. All data lives only in your browser's local storage. Nothing is sent to our servers — not names, salaries, or meeting details.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I use MeetingMeter on multiple devices?</div>
+        <div class="faq-a">Yes. Use the email restore feature on any device to unlock Pro. Your meeting history stays per-browser since nothing is synced to a server.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What payment methods are accepted?</div>
+        <div class="faq-a">All major credit and debit cards via Stripe. Payments are secure and encrypted — we never see your card details.</div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- Contact -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Contact & Support</div>
+    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Need help?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">We typically respond within 24 hours.</div>
+      <form id="contact-form" action="https://formspree.io/f/xwvwrzvy" method="POST"
+        style="display:flex;flex-direction:column;gap:10px">
+        <input type="email" name="email" required placeholder="Your email"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
+        <textarea name="message" required placeholder="How can we help you?" rows="3"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%;resize:none"></textarea>
+        <button type="submit" id="contact-submit-btn"
+          style="background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;border:none;
+          border-radius:8px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;">
+          Send Message →
+        </button>
+        <div id="contact-form-msg" style="font-size:12px;text-align:center;min-height:16px"></div>
+      </form>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+    <!-- About -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">About</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:16px">
+      <span>MeetingMeter v1.0</span>
+      <a href="/" style="color:var(--accent2);text-decoration:none;font-size:13px;">meetingmeter.tech ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Calendar import modal -->
+<div class="modal-overlay" id="cal-modal">
+  <div class="modal" style="width:440px;max-height:90vh;overflow-y:auto;">
+    <h2>📅 Import from Calendar</h2>
+    <p>Select an upcoming event to pre-fill the meeting title and duration.</p>
+    <div id="cal-events-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:4px">
+      <button class="btn btn-ghost" id="cal-modal-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade modal -->
+<div class="modal-overlay" id="upgrade-modal">
+  <div class="modal upgrade-modal">
+    <div>
+      <div style="font-size:36px;margin-bottom:4px">🚀</div>
+      <h2>Unlock MeetingMeter Pro</h2>
+      <p>Everything you need to run smarter, more accountable meetings.</p>
+    </div>
+    <ul class="upgrade-features">
+      <li>Unlimited attendees (free = 5 max)</li>
+      <li>Google Calendar import</li>
+      <li>Slack integration</li>
+      <li>PDF &amp; CSV export</li>
+      <li>Role memory across meetings</li>
+    </ul>
+    <a class="btn-gumroad" href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" target="_blank">
+      Get Pro — $4.99/month →
+    </a>
+    <a class="btn-gumroad" href="https://buy.stripe.com/aFaeV60fj3kX9x3cUp48003" target="_blank"
+       style="background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 0 16px rgba(52,211,153,0.3);margin-top:6px;">
+      Get Pro Annual — $49/yr (Best Value) →
+    </a>
+    <div class="divider-text">Already subscribed? Restore access with your email</div>
+    <div class="license-input-row">
+      <input type="email" id="license-key-input" placeholder="Your payment email…"
+        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+               color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
+      <button class="btn btn-primary" id="license-verify-btn">Verify</button>
+    </div>
+    <div id="license-msg" style="font-size:12px;min-height:16px;text-align:center"></div>
+    <button class="btn btn-ghost" id="upgrade-modal-close">Maybe later</button>
+  </div>
+</div>
+
 <script>
-  const API = "http://localhost:8766";
+  // ── Pro / Paywall ──────────────────────────────────────────
+  const FREE_ATTENDEE_LIMIT = 5;
+  const STRIPE_PAYMENT_URL = "https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002";
+
+  function isPro() {
+    return localStorage.getItem("mm_license_status") === "pro";
+  }
+
+  function showUpgradeModal() {
+    document.getElementById("upgrade-modal").style.display = "flex";
+    document.getElementById("license-msg").textContent = "";
+    document.getElementById("license-key-input").value = "";
+  }
+
+  function refreshProUI() {
+    const pro = isPro();
+    document.getElementById("pro-badge").style.display = pro ? "inline-block" : "none";
+    document.getElementById("cal-import-btn").innerHTML =
+      pro ? "📅 Import from Calendar" : "📅 Import from Calendar 🔒";
+    document.getElementById("integrations-btn").innerHTML =
+      pro ? "🔗 Integrations" : "🔗 Integrations 🔒";
+    document.getElementById("export-btn").innerHTML =
+      pro ? "📄 Export" : "📄 Export 🔒";
+    // Settings panel account blocks
+    const proBlock  = document.getElementById("settings-pro-block");
+    const freeBlock = document.getElementById("settings-free-block");
+    if (proBlock)  proBlock.style.display  = pro ? "block" : "none";
+    if (freeBlock) freeBlock.style.display = pro ? "none"  : "block";
+    const emailEl = document.getElementById("settings-pro-email");
+    if (emailEl) emailEl.textContent = localStorage.getItem("mm_pro_email") || "";
+  }
+
+  document.getElementById("upgrade-modal-close").addEventListener("click", () => {
+    document.getElementById("upgrade-modal").style.display = "none";
+  });
+
+  // ── Settings modal ──
+  document.getElementById("settings-open-btn").addEventListener("click", () => {
+    refreshProUI();
+    document.getElementById("settings-modal").style.display = "flex";
+  });
+  document.getElementById("settings-close-btn").addEventListener("click", () => {
+    document.getElementById("settings-modal").style.display = "none";
+  });
+
+  // ── Contact form ──
+  document.getElementById("contact-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("contact-submit-btn");
+    const msg = document.getElementById("contact-form-msg");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch("https://formspree.io/f/xwvwrzvy", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: new FormData(e.target)
+      });
+      if (res.ok) {
+        msg.style.color = "var(--green)";
+        msg.textContent = "✅ Message sent! We'll get back to you within 24 hours.";
+        e.target.reset();
+      } else {
+        msg.style.color = "var(--red)";
+        msg.textContent = "Something went wrong. Please try again.";
+      }
+    } catch {
+      msg.style.color = "var(--red)";
+      msg.textContent = "Could not send. Check your connection and try again.";
+    } finally {
+      btn.textContent = "Send Message →"; btn.disabled = false;
+    }
+  });
+
+  // Manage subscription from settings
+  document.getElementById("settings-manage-btn").addEventListener("click", async () => {
+    const btn = document.getElementById("settings-manage-btn");
+    const emailRow = document.getElementById("settings-portal-email-row");
+    const emailInput = document.getElementById("settings-portal-email-input");
+
+    // Use stored email or show inline input
+    let email = localStorage.getItem("mm_pro_email") || emailInput.value.trim();
+    if (!email) {
+      emailRow.style.display = "block";
+      emailInput.focus();
+      return;
+    }
+
+    btn.textContent = "Opening portal…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/customer-portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = data.url;
+      } else {
+        emailRow.style.display = "block";
+        emailInput.style.borderColor = "var(--red)";
+        emailInput.placeholder = "Email not found — try again";
+      }
+    } catch {
+      alert("Something went wrong. Please try again.");
+    } finally {
+      btn.textContent = "Open Billing Portal →"; btn.disabled = false;
+    }
+  });
+
+  async function activatePro(payload, msg, btn) {
+    btn.textContent = "Verifying…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/verify-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        localStorage.setItem("mm_license_status", "pro");
+        if (data.email) localStorage.setItem("mm_license_email", data.email);
+        if (msg) { msg.style.color = "#4ade80"; msg.textContent = "✅ Pro unlocked!"; }
+        refreshProUI();
+        setTimeout(() => { document.getElementById("upgrade-modal").style.display = "none"; }, 1200);
+      } else {
+        if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ " + (data.error || "Not verified."); }
+      }
+    } catch(e) {
+      if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ Network error. Try again."; }
+    }
+    btn.textContent = "Verify"; btn.disabled = false;
+  }
+
+  document.getElementById("license-verify-btn").addEventListener("click", () => {
+    const email = document.getElementById("license-key-input").value.trim();
+    const msg   = document.getElementById("license-msg");
+    if (!email) { msg.style.color = "#f87171"; msg.textContent = "Please enter your payment email."; return; }
+    activatePro({ email }, msg, document.getElementById("license-verify-btn"));
+  });
+
+  // Auto-detect Stripe redirect (stripe_session in URL)
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("stripe_session");
+    if (sid && !isPro()) {
+      const dummyBtn = { textContent: "", disabled: false };
+      await activatePro({ session_id: sid }, null, dummyBtn);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+      if (isPro()) showToast("🎉 Pro unlocked! Welcome to MeetingMeter Pro.", "#16a34a");
+    }
+  })();
+
+  // ── localStorage history helpers ───────────────────────────
+  function loadHistoryFromStorage() {
+    try { return JSON.parse(localStorage.getItem("mm_history") || "[]"); }
+    catch(e) { return []; }
+  }
+  function saveHistoryToStorage(h) {
+    localStorage.setItem("mm_history", JSON.stringify(h));
+  }
+
+  // ── Integration config helpers ─────────────────────────────
+  function loadIntegrations() {
+    try { return JSON.parse(localStorage.getItem("mm_integrations") || "{}"); }
+    catch(e) { return {}; }
+  }
+  function saveIntegrations(cfg) {
+    localStorage.setItem("mm_integrations", JSON.stringify(cfg));
+  }
+
+  // ── People role memory (name → {role, customSalary}) ───────
+  function loadPeopleRoles() {
+    try { return JSON.parse(localStorage.getItem("mm_people_roles") || "{}"); }
+    catch(e) { return {}; }
+  }
+  function savePeopleRole(name, role, customSalary) {
+    if (!name || name === "Unnamed") return;
+    const pr = loadPeopleRoles();
+    pr[name.trim()] = { role, customSalary: customSalary || 0 };
+    localStorage.setItem("mm_people_roles", JSON.stringify(pr));
+  }
 
   // ── Salary presets (annual → per-second) ──────────────────
   const DEFAULT_ROLES = {
@@ -877,7 +1626,7 @@
     };
     grid.appendChild(addBtn);
 
-    document.getElementById("settings-modal").style.display = "flex";
+    document.getElementById("salary-modal").style.display = "flex";
   }
 
   // Helper: append one custom-role row (name input + salary input + delete btn)
@@ -923,7 +1672,7 @@
 
     saveUserRoleNames(newUserRoleNames);
     saveRoles(ROLES);
-    document.getElementById("settings-modal").style.display = "none";
+    document.getElementById("salary-modal").style.display = "none";
     renderAttendees();
     updateStats();
   }
@@ -954,10 +1703,12 @@
   let elapsedSeconds = 0;
   let running = false;
   let paused = false;
-  let lastCompletedMeeting = null; // snapshot for exporting after save/discard
 
   // ── Attendees ──────────────────────────────────────────────
   function addAttendee() {
+    if (!isPro() && attendees.length >= FREE_ATTENDEE_LIMIT) {
+      showUpgradeModal(); return;
+    }
     const id = Date.now().toString();
     attendees.push({ id, name: "", role: "Mid-level", customSalary: 0 });
     renderAttendees();
@@ -1002,16 +1753,27 @@
         a.name = e.target.value;
         row.querySelector(".attendee-avatar").textContent =
           a.name ? a.name.slice(0,2).toUpperCase() : "?";
+        // Look up remembered role for this person
+        const pr = loadPeopleRoles();
+        if (pr[a.name.trim()]) {
+          const mem = pr[a.name.trim()];
+          a.role = mem.role;
+          a.customSalary = mem.customSalary || 0;
+          renderAttendees();
+          return;
+        }
         updateStats();
       });
       row.querySelector(".role-select").addEventListener("change", e => {
         a.role = e.target.value;
         const salInput = row.querySelector(".salary-input");
         salInput.style.display = a.role === "Custom" ? "block" : "none";
+        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
       row.querySelector(".salary-input").addEventListener("input", e => {
         a.customSalary = parseFloat(e.target.value) || 0;
+        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
       row.querySelector(".remove-btn").addEventListener("click", () => removeAttendee(a.id));
@@ -1090,12 +1852,79 @@
     });
   }
 
+  // ── Alert state flags ──
+  let budgetAlert80Fired = false;
+  let budgetAlert100Fired = false;
+  let overtimeFired = false;
+  let worthItRating = null; // null | "yes" | "no"
+
+  function resetAlertFlags() {
+    budgetAlert80Fired = false;
+    budgetAlert100Fired = false;
+    overtimeFired = false;
+    worthItRating = null;
+    document.getElementById("worth-yes").classList.remove("selected-yes");
+    document.getElementById("worth-no").classList.remove("selected-no");
+    document.getElementById("overtime-banner").style.display = "none";
+    document.getElementById("budget-bar-wrap").style.display = "none";
+    document.getElementById("budget-status").textContent = "Get alerted when cost approaches budget";
+    document.getElementById("budget-status").style.color = "var(--muted)";
+  }
+
+  function checkBudgetAlert(costUSD) {
+    const budget = parseFloat(document.getElementById("budget-input").value);
+    if (!budget || budget <= 0) return;
+    const pct = costUSD / budget;
+    const bar = document.getElementById("budget-bar-fill");
+    const wrap = document.getElementById("budget-bar-wrap");
+    const status = document.getElementById("budget-status");
+    wrap.style.display = "block";
+    const fillPct = Math.min(pct * 100, 100).toFixed(1);
+    bar.style.width = fillPct + "%";
+    if (pct >= 1) {
+      bar.style.background = "var(--red)";
+      status.style.color = "var(--red)";
+      status.textContent = `⚠️ Budget exceeded! ($${costUSD.toFixed(0)} of $${budget})`;
+      if (!budgetAlert100Fired) {
+        budgetAlert100Fired = true;
+        showToast(`🚨 Budget exceeded! Meeting cost has passed $${budget}`, "#dc2626");
+      }
+    } else if (pct >= 0.8) {
+      bar.style.background = "var(--yellow)";
+      status.style.color = "var(--yellow)";
+      status.textContent = `⚠️ Approaching budget (${Math.round(pct*100)}% of $${budget})`;
+      if (!budgetAlert80Fired) {
+        budgetAlert80Fired = true;
+        showToast(`⚠️ 80% of meeting budget reached — $${(budget - costUSD).toFixed(0)} remaining`, "#d97706");
+      }
+    } else {
+      bar.style.background = "var(--green)";
+      status.style.color = "var(--muted)";
+      status.textContent = `Budget: $${costUSD.toFixed(0)} of $${budget} used (${Math.round(pct*100)}%)`;
+    }
+  }
+
+  function checkOvertimeAlert() {
+    const planned = parseFloat(document.getElementById("planned-duration-input").value);
+    if (!planned || planned <= 0) return;
+    const plannedSeconds = planned * 60;
+    if (elapsedSeconds >= plannedSeconds && !overtimeFired) {
+      overtimeFired = true;
+      document.getElementById("overtime-banner").style.display = "flex";
+      showToast(`⏰ Meeting is running over the planned ${planned} minutes!`, "#dc2626");
+    }
+  }
+
   function startTimer() {
     timerInterval = setInterval(() => {
       elapsedSeconds++;
       document.getElementById("timer-display").textContent = fmtTime(elapsedSeconds);
       updateCostDisplay();
       updateBreakdown();
+      // ── Live alerts ──
+      const currentCostUSD = attendees.reduce((s, a) => s + attendeePerSecond(a) * elapsedSeconds, 0);
+      checkBudgetAlert(currentCostUSD);
+      checkOvertimeAlert();
     }, 1000);
   }
 
@@ -1130,10 +1959,25 @@
     running = false;
     document.getElementById("running-indicator").classList.add("hidden");
 
+    // Capture duration and cost at this moment
+    savedDuration = elapsedSeconds;
+    savedCostUSD = totalPerSecond() * elapsedSeconds;
+
     // Show save modal
-    const costUSD = totalPerSecond() * elapsedSeconds;
-    document.getElementById("modal-duration").textContent = fmtTime(elapsedSeconds);
-    document.getElementById("modal-cost").textContent = fmtMoneyPlain(costUSD);
+    document.getElementById("modal-duration").textContent = fmtTime(savedDuration);
+    document.getElementById("modal-cost").textContent = fmtMoneyPlain(savedCostUSD);
+
+    // Show Slack row if configured, hint if not
+    const cfg = loadIntegrations();
+    const slackRow  = document.getElementById("slack-share-row");
+    const slackHint = document.getElementById("slack-setup-hint");
+    if (cfg.slack_webhook) {
+      slackRow.classList.remove("hidden");
+      slackHint.classList.add("hidden");
+    } else {
+      slackRow.classList.add("hidden");
+      slackHint.classList.remove("hidden");
+    }
     document.getElementById("save-modal").style.display = "flex";
   });
 
@@ -1154,44 +1998,67 @@
   document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
 
   // ── Save modal ─────────────────────────────────────────────
-  async function saveMeeting() {
+  let savedDuration = 0;  // Capture duration when Stop is clicked
+  let savedCostUSD = 0;   // Capture cost when Stop is clicked
+
+  // Worth it button handlers
+  document.getElementById("worth-yes").addEventListener("click", () => {
+    worthItRating = "yes";
+    document.getElementById("worth-yes").classList.add("selected-yes");
+    document.getElementById("worth-no").classList.remove("selected-no");
+  });
+  document.getElementById("worth-no").addEventListener("click", () => {
+    worthItRating = "no";
+    document.getElementById("worth-no").classList.add("selected-no");
+    document.getElementById("worth-yes").classList.remove("selected-yes");
+  });
+
+  function saveMeeting() {
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = totalPerSecond() * elapsedSeconds;
-    try {
-      await fetch(`${API}/api/history`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          duration_seconds: elapsedSeconds,
-          total_cost: parseFloat(cost.toFixed(2)),
-          attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role })),
-        }),
-      });
-      await loadHistory();
-    } catch (e) {
-      console.error("Failed to save meeting", e);
-    }
+    const entry = {
+      id: Date.now().toString(),
+      timestamp: Date.now() / 1000,
+      title,
+      duration_seconds: savedDuration,
+      total_cost: parseFloat(savedCostUSD.toFixed(2)),
+      worth_it: worthItRating,
+      attendees: attendees.map(a => ({
+        name: a.name || "Unnamed",
+        role: a.role,
+        cost_usd: parseFloat((attendeePerSecond(a) * savedDuration).toFixed(2)),
+      })),
+    };
+    const history = loadHistoryFromStorage();
+    history.unshift(entry);
+    saveHistoryToStorage(history);
+    renderHistory(history);
+    return entry;
   }
 
   document.getElementById("modal-save").addEventListener("click", async () => {
     document.getElementById("save-modal").style.display = "none";
-    await saveMeeting();
+    let entry;
+    try { entry = saveMeeting(); } catch(e) { console.error("saveMeeting failed", e); resetAfterSave(); return; }
+    // Share to Slack if checked
+    const chk = document.getElementById("slack-share-chk");
+    if (chk && !chk.closest(".hidden") && chk.checked) {
+      slackNotify(entry); // fire-and-forget — don't block reset on network call
+    }
+    resetAlertFlags();
     resetAfterSave();
   });
 
   document.getElementById("modal-discard").addEventListener("click", () => {
     document.getElementById("save-modal").style.display = "none";
+    resetAlertFlags();
     resetAfterSave();
   });
 
   function resetAfterSave() {
-    // Snapshot before wiping so Export still works after save
-    lastCompletedMeeting = {
-      title: document.getElementById("meeting-title").value || "Untitled Meeting",
-      seconds: elapsedSeconds,
-      attendees: attendees.map(a => ({ ...a })),
-    };
+    clearInterval(timerInterval);
+    timerInterval = null;
+    running = false;
+    paused = false;
     elapsedSeconds = 0;
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
@@ -1203,28 +2070,9 @@
     updateBreakdown();
   }
 
-  // Returns data for export — uses live state during a meeting,
-  // falls back to last completed meeting snapshot after save/reset
-  function getExportData() {
-    if (elapsedSeconds > 0) {
-      return {
-        title: document.getElementById("meeting-title").value || "Untitled Meeting",
-        seconds: elapsedSeconds,
-        attendees: attendees,
-      };
-    }
-    return lastCompletedMeeting;
-  }
-
   // ── History ────────────────────────────────────────────────
-  async function loadHistory() {
-    try {
-      const res = await fetch(`${API}/api/history`);
-      const data = await res.json();
-      renderHistory(data);
-    } catch (e) {
-      // server not available yet
-    }
+  function loadHistory() {
+    renderHistory(loadHistoryFromStorage());
   }
 
   function renderHistory(items) {
@@ -1240,28 +2088,30 @@
       const date = new Date(item.timestamp * 1000);
       const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      const ratingEmoji = item.worth_it === "yes" ? " 👍" : item.worth_it === "no" ? " 👎" : "";
       card.innerHTML = `
         <div class="history-icon">📋</div>
         <div class="history-info">
-          <div class="history-title">${item.title}</div>
+          <div class="history-title">${item.title}${ratingEmoji}</div>
           <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
         </div>
         <div class="history-cost">$${item.total_cost.toFixed(2)}</div>
         <button class="history-del" data-id="${item.id}" title="Delete">×</button>
       `;
-      card.querySelector(".history-del").addEventListener("click", async (e) => {
+      card.querySelector(".history-del").addEventListener("click", (e) => {
         const id = e.target.dataset.id;
-        await fetch(`${API}/api/history/${id}`, { method: "DELETE" });
-        await loadHistory();
+        const updated = loadHistoryFromStorage().filter(h => h.id !== id);
+        saveHistoryToStorage(updated);
+        loadHistory();
       });
       list.appendChild(card);
     });
   }
 
-  document.getElementById("clear-history-btn").addEventListener("click", async () => {
+  document.getElementById("clear-history-btn").addEventListener("click", () => {
     if (confirm("Clear all meeting history?")) {
-      await fetch(`${API}/api/history`, { method: "DELETE" });
-      await loadHistory();
+      saveHistoryToStorage([]);
+      loadHistory();
     }
   });
 
@@ -1311,8 +2161,11 @@
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
-    if (!getExportData()) {
-      alert("Start a meeting first, then export the report.");
+    if (!isPro()) { showUpgradeModal(); return; }
+    // Use savedDuration if timer has been reset, otherwise current elapsed
+    const exportSecs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
+    if (exportSecs === 0 && attendees.length === 0) {
+      alert("Run a meeting first, then export the report.");
       return;
     }
     showExportMenu();
@@ -1339,133 +2192,77 @@
     setTimeout(() => document.addEventListener("click", () => menu.remove(), { once: true }), 50);
   }
 
-  // ── Toast notification ─────────────────────────────────────
-  function showToast(msg, duration = 3500) {
-    let t = document.getElementById("mm-toast");
-    if (!t) {
-      t = document.createElement("div");
-      t.id = "mm-toast";
-      t.style.cssText = [
-        "position:fixed","bottom:28px","left:50%","transform:translateX(-50%)",
-        "background:#1e1e2e","color:#f0f0f5","padding:10px 22px",
-        "border-radius:10px","font-size:13px","font-weight:500",
-        "box-shadow:0 4px 20px rgba(0,0,0,.5)","z-index:9999",
-        "opacity:0","transition:opacity .25s","pointer-events:none",
-      ].join(";");
-      document.body.appendChild(t);
-    }
-    t.textContent = msg;
-    t.style.opacity = "1";
-    clearTimeout(t._to);
-    t._to = setTimeout(() => { t.style.opacity = "0"; }, duration);
-  }
-
   function exportCSV() {
-    const data = getExportData();
-    if (!data) return;
-    const { title, seconds, attendees: snap } = data;
-    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
+    // Use savedDuration/savedCostUSD if timer has already been reset
+    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
     const sym = currencySymbol();
     const cur = currentCurrency;
-    const filename = title.replace(/\s+/g, "-") + "-cost-report.csv";
-
-    if (window.pywebview && window.pywebview.api) {
-      const rows = snap.map(a => {
-        const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
-        return {
-          name: a.name || "Unnamed",
-          role: a.role,
-          salary: sym + Math.round(toCurrentCurrency(salary)),
-          cost: sym + personCost.toFixed(2),
-        };
-      });
-      window.pywebview.api.save_csv({
-        title,
-        duration: fmtTime(seconds),
-        total_cost: sym + cost.toFixed(2) + " " + cur,
-        currency: cur,
-        attendees: rows,
-      }, filename).then(res => {
-        if (res && res.ok) showToast("✅ CSV saved to " + res.path.split("/").pop());
-        else if (res && res.error) showToast("⚠️ " + res.error);
-      });
-    } else {
-      let csv = "Meeting Report\n";
-      csv += "Title," + title + "\n";
-      csv += "Duration," + fmtTime(seconds) + "\n";
-      csv += "Total Cost," + sym + cost.toFixed(2) + " " + cur + "\n";
-      csv += "Currency," + cur + "\n\n";
-      csv += `Name,Role,Salary (Annual ${cur}),Cost This Meeting (${cur})\n`;
-      snap.forEach(a => {
-        const salaryUSD = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
-        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(toCurrentCurrency(salaryUSD)) + "," + sym + personCost.toFixed(2) + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = filename;
-      a.click(); URL.revokeObjectURL(url);
-    }
+    let csv = `Meeting Report\n`;
+    csv += `Title,${title}\n`;
+    csv += `Duration,${fmtTime(secs)}\n`;
+    csv += `Total Cost,${sym}${cost.toFixed(2)} ${cur}\n`;
+    csv += `Currency,${cur}\n\n`;
+    csv += `Name,Role,Salary (Annual),Cost This Meeting\n`;
+    attendees.forEach(a => {
+      const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
+      csv += `${a.name || "Unnamed"},${a.role},${sym}${salary},${sym}${personCost.toFixed(2)}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `${title.replace(/\s+/g,"-")}-cost-report.csv`;
+    a.click(); URL.revokeObjectURL(url);
   }
 
   function exportPrint() {
-    const data = getExportData();
-    if (!data) return;
-    const { title, seconds, attendees: snap } = data;
-    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
+    // Use savedDuration/savedCostUSD if timer has already been reset
+    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
     const sym = currencySymbol();
-    const cur = currentCurrency;
-
-    if (window.pywebview && window.pywebview.api) {
-      const attendeeData = snap.map(a => {
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
-        const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
-        return {
-          name: a.name || "Unnamed",
-          role: a.role,
-          rate: `${sym}${rate.toFixed(2)}/min`,
-          cost: `${sym}${personCost.toFixed(2)}`,
-        };
-      });
-      window.pywebview.api.save_pdf({
-        title,
-        duration: fmtTime(seconds),
-        total_cost: `${sym}${cost.toFixed(2)}`,
-        currency: cur,
-        sym,
-        attendees: attendeeData,
-      }).then(res => {
-        if (res && res.ok) showToast("✅ PDF saved to " + res.path.split("/").pop());
-        else if (res && res.error) showToast("⚠️ " + res.error);
-      });
+    const rows = attendees.map(a => {
+      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
+      const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
+      return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
+        <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
+    }).join("");
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title} - Cost Report</title>
+    <style>body{font-family:system-ui;padding:40px;max-width:700px;margin:0 auto}
+    h1{font-size:24px;margin-bottom:4px}
+    .meta{color:#666;font-size:14px;margin-bottom:32px}
+    .total{font-size:48px;font-weight:800;color:#f59e0b;margin:16px 0}
+    table{width:100%;border-collapse:collapse;margin-top:24px}
+    th{text-align:left;padding:8px 12px;background:#f5f5f5;font-size:12px;text-transform:uppercase}
+    td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+    .footer{margin-top:32px;font-size:12px;color:#999}
+    .print-btn{display:inline-block;margin-top:24px;padding:10px 24px;background:#6c63ff;color:#fff;
+      border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:system-ui}
+    .print-btn:hover{background:#5a52d5}
+    @media print{.print-btn{display:none}}
+    </style></head><body>
+    <h1>💸 Meeting Cost Report</h1>
+    <div class="meta">${title} &mdash; Duration: ${fmtTime(secs)}</div>
+    <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${currentCurrency}</span></div>
+    <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <button class="print-btn" onclick="window.print()">🖨️ Save as PDF / Print</button>
+    <div class="footer">Generated by MeetingMeter &mdash; ${new Date().toLocaleString()}</div>
+    <scr\ipt>window.onafterprint = function(){ window.close(); };<\/script>
+    </body></html>`;
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.open("text/html", "replace");
+      w.document.write(html);
+      w.document.close();
     } else {
-      const rows = snap.map(a => {
-        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
-        const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
-        return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
-          <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
-      }).join("");
-      const html = `<!DOCTYPE html><html><head><title>${title} — Cost Report</title>
-      <style>body{font-family:system-ui;padding:40px;max-width:700px;margin:0 auto}
-      h1{font-size:24px;margin-bottom:4px}.meta{color:#666;font-size:14px;margin-bottom:32px}
-      .total{font-size:48px;font-weight:800;color:#f59e0b;margin:16px 0}
-      table{width:100%;border-collapse:collapse;margin-top:24px}
-      th{text-align:left;padding:8px 12px;background:#f5f5f5;font-size:12px;text-transform:uppercase}
-      td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
-      .footer{margin-top:32px;font-size:12px;color:#999}
-      </style></head><body>
-      <h1>💸 Meeting Cost Report</h1>
-      <div class="meta">${title} · Duration: ${fmtTime(seconds)}</div>
-      <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${cur}</span></div>
-      <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
-      <tbody>${rows}</tbody></table>
-      <div class="footer">Generated by MeetingMeter · ${new Date().toLocaleString()}</div>
-      </body></html>`;
-      const w = window.open("", "_blank");
-      w.document.write(html); w.document.close();
-      setTimeout(() => w.print(), 500);
+      // Fallback if popup blocked
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url  = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
     }
   }
 
@@ -1480,9 +2277,260 @@
     if (e.code === "KeyR" && !running) document.getElementById("reset-btn").click();
   });
 
+  // ── Integrations modal ────────────────────────────────────
+  function openIntegrations() {
+    const cfg = loadIntegrations();
+    document.getElementById("slack-webhook-input").value  = cfg.slack_webhook   || "";
+    document.getElementById("gcal-ics-input").value       = cfg.gcal_ics_url    || "";
+    _refreshIntegrationBadges(cfg);
+    document.getElementById("integrations-modal").style.display = "flex";
+  }
+
+  function _setBadge(id, connected) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = connected ? "Connected" : "Not connected";
+    el.className = "integration-status " + (connected ? "connected" : "not-connected");
+  }
+
+  function _refreshIntegrationBadges(cfg) {
+    _setBadge("slack-status-badge",    !!cfg.slack_webhook);
+    _setBadge("gcal-status-badge",     !!cfg.gcal_ics_url);
+  }
+
+  document.getElementById("integrations-btn").addEventListener("click", () => {
+    if (!isPro()) { showUpgradeModal(); return; }
+    openIntegrations();
+  });
+
+  document.getElementById("integrations-cancel").addEventListener("click", () => {
+    document.getElementById("integrations-modal").style.display = "none";
+  });
+
+  document.getElementById("integrations-save").addEventListener("click", () => {
+    const cfg = loadIntegrations();
+    cfg.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
+    cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
+    saveIntegrations(cfg);
+    document.getElementById("integrations-modal").style.display = "none";
+  });
+
+  // ── Integration tabs ──
+  const integTabs = ["slack", "calendar"];
+  document.querySelectorAll(".integ-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".integ-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      const target = tab.dataset.tab;
+      integTabs.forEach(t => {
+        const el = document.getElementById(`integ-tab-${t}`);
+        if (el) el.style.display = t === target ? "block" : "none";
+      });
+    });
+  });
+
+  // ── FAQ accordion ──
+  document.querySelectorAll(".faq-q").forEach(q => {
+    q.addEventListener("click", () => {
+      const item = q.closest(".faq-item");
+      const wasOpen = item.classList.contains("open");
+      document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
+      if (!wasOpen) item.classList.add("open");
+    });
+  });
+
+  // Close salary modal on overlay click
+  document.getElementById("salary-modal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("salary-modal"))
+      document.getElementById("salary-modal").style.display = "none";
+  });
+
+  // "Connect Slack" link in save modal opens integrations
+  document.getElementById("slack-setup-link").addEventListener("click", () => {
+    document.getElementById("save-modal").style.display = "none";
+    openIntegrations();
+  });
+
+  // ── Slack test ─────────────────────────────────────────────
+  document.getElementById("slack-test-btn").addEventListener("click", async () => {
+    const url = document.getElementById("slack-webhook-input").value.trim();
+    if (!url) { alert("Paste a Slack webhook URL first."); return; }
+    const btn = document.getElementById("slack-test-btn");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch("/api/slack-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          webhook_url: url,
+          title: "MeetingMeter Test",
+          duration: "00:05:00",
+          total_cost: "$42.00",
+          currency: "USD",
+          attendees: [{ name: "You", role: "Senior", cost: "$42.00" }],
+        }),
+      });
+      const data = await res.json();
+      btn.textContent = data.ok ? "✓ Sent!" : "✗ Failed";
+      if (!data.ok) alert("Slack error: " + (data.error || "unknown"));
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not reach /api/slack-notify: " + e.message);
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+
+
+  // ── Toast helper ───────────────────────────────────────────
+  function showToast(msg, color) {
+    const t = document.createElement("div");
+    t.textContent = msg;
+    t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:${color||"#1e1e2e"};color:#fff;padding:10px 20px;border-radius:8px;
+      font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.4);pointer-events:none;
+      opacity:1;transition:opacity 0.5s ease`;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 500); }, 3000);
+  }
+
+  // ── Slack notify on save ───────────────────────────────────
+  async function slackNotify(entry) {
+    const cfg = loadIntegrations();
+    if (!cfg.slack_webhook) return;
+    const sym = currencySymbol();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    try {
+      const res = await fetch("/api/slack-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          webhook_url: cfg.slack_webhook,
+          title:       entry.title,
+          duration:    fmtTime(entry.duration_seconds),
+          total_cost:  sym + toCurrentCurrency(entry.total_cost).toFixed(2),
+          currency:    currentCurrency,
+          attendees:   entry.attendees.map(a => ({
+            name: a.name, role: a.role,
+            cost: sym + toCurrentCurrency(a.cost_usd || 0).toFixed(2),
+          })),
+        }),
+      });
+      clearTimeout(timeout);
+      const data = await res.json();
+      if (data.ok) showToast("✅ Sent to Slack", "#16a34a");
+      else showToast("⚠️ Slack error: " + (data.error || "unknown"), "#dc2626");
+    } catch(e) {
+      clearTimeout(timeout);
+      if (e.name === "AbortError") showToast("⚠️ Slack timed out", "#dc2626");
+      else showToast("⚠️ Slack failed: " + e.message, "#dc2626");
+      console.warn("Slack notify failed:", e);
+    }
+  }
+
+  // ── Calendar test ──────────────────────────────────────────
+  document.getElementById("gcal-test-btn").addEventListener("click", async () => {
+    const url = document.getElementById("gcal-ics-input").value.trim();
+    if (!url) { alert("Paste a Google Calendar ICS URL first."); return; }
+    const btn = document.getElementById("gcal-test-btn");
+    btn.textContent = "Fetching…"; btn.disabled = true;
+    try {
+      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(url));
+      const data = await res.json();
+      if (data.ok) {
+        btn.textContent = `✓ ${data.events.length} events`;
+      } else {
+        btn.textContent = "✗ Failed";
+        alert("Calendar error: " + data.error);
+      }
+    } catch(e) {
+      btn.textContent = "✗ Error";
+      alert("Could not reach /api/calendar-events: " + e.message);
+    }
+    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
+  });
+
+  // ── Calendar import modal ──────────────────────────────────
+  document.getElementById("cal-import-btn").addEventListener("click", async () => {
+    if (!isPro()) { showUpgradeModal(); return; }
+    const cfg = loadIntegrations();
+    if (!cfg.gcal_ics_url) {
+      openIntegrations();
+      return;
+    }
+    const btn = document.getElementById("cal-import-btn");
+    btn.textContent = "⏳ Loading…"; btn.disabled = true;
+
+    try {
+      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(cfg.gcal_ics_url));
+      const data = await res.json();
+      const list = document.getElementById("cal-events-list");
+      list.innerHTML = "";
+
+      if (!data.ok || data.events.length === 0) {
+        list.innerHTML = `<div class="empty-state">${data.ok ? "No upcoming events in the next 7 days." : data.error}</div>`;
+      } else {
+        const pr = loadPeopleRoles();
+        data.events.forEach(ev => {
+          const card = document.createElement("div");
+          card.className = "cal-event-card";
+          const hrs  = Math.floor(ev.duration_min / 60);
+          const mins = ev.duration_min % 60;
+          const dur  = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
+          const evAttendees = ev.attendees || [];
+          const attendeePreview = evAttendees.length
+            ? evAttendees.map(n => {
+                const known = pr[n.trim()];
+                return `<span style="background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.25);
+                  border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent-light)">
+                  ${n}${known ? " · " + known.role : " · ?"}
+                </span>`;
+              }).join(" ")
+            : "";
+          card.innerHTML = `
+            <div class="cal-event-title">${ev.summary}</div>
+            <div class="cal-event-meta">${ev.start} · ${dur}${ev.location ? " · 📍 " + ev.location : ""}</div>
+            ${attendeePreview ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${attendeePreview}</div>` : ""}
+          `;
+          card.addEventListener("click", () => {
+            // Fill title
+            document.getElementById("meeting-title").value = ev.summary;
+            // Add attendees if any
+            if (evAttendees.length > 0) {
+              attendees = [];
+              evAttendees.forEach(name => {
+                const mem = pr[name.trim()];
+                attendees.push({
+                  id: Date.now().toString() + Math.random(),
+                  name: name.trim(),
+                  role: mem ? mem.role : "Mid-level",
+                  customSalary: mem ? (mem.customSalary || 0) : 0,
+                });
+              });
+              renderAttendees();
+            }
+            document.getElementById("cal-modal").style.display = "none";
+          });
+          list.appendChild(card);
+        });
+      }
+      document.getElementById("cal-modal").style.display = "flex";
+    } catch(e) {
+      alert("Could not load calendar: " + e.message);
+    }
+    btn.textContent = "📅 Import from Calendar"; btn.disabled = false;
+  });
+
+  document.getElementById("cal-modal-close").addEventListener("click", () => {
+    document.getElementById("cal-modal").style.display = "none";
+  });
+
   // ── Init ───────────────────────────────────────────────────
   addAttendee(); // start with one blank attendee
   loadHistory();
+  refreshProUI();
 </script>
 </body>
 </html>
