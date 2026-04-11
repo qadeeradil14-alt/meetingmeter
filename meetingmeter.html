@@ -1279,12 +1279,23 @@
     <!-- Contact -->
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Contact & Support</div>
     <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px">
-      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Need help?</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">We typically respond within 24 hours.</div>
-      <a href="mailto:qadeeradil14@gmail.com" style="display:inline-flex;align-items:center;gap:6px;
-        color:var(--accent2);font-size:13px;font-weight:600;text-decoration:none;">
-        ✉️ qadeeradil14@gmail.com
-      </a>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Need help?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">We typically respond within 24 hours.</div>
+      <form id="contact-form" action="https://formspree.io/f/xwvwrzvy" method="POST"
+        style="display:flex;flex-direction:column;gap:10px">
+        <input type="email" name="email" required placeholder="Your email"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
+        <textarea name="message" required placeholder="How can we help you?" rows="3"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%;resize:none"></textarea>
+        <button type="submit" id="contact-submit-btn"
+          style="background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;border:none;
+          border-radius:8px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;">
+          Send Message →
+        </button>
+        <div id="contact-form-msg" style="font-size:12px;text-align:center;min-height:16px"></div>
+      </form>
     </div>
 
     <div style="height:1px;background:var(--border);margin:16px 0"></div>
@@ -1388,6 +1399,34 @@
   });
   document.getElementById("settings-close-btn").addEventListener("click", () => {
     document.getElementById("settings-modal").style.display = "none";
+  });
+
+  // ── Contact form ──
+  document.getElementById("contact-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("contact-submit-btn");
+    const msg = document.getElementById("contact-form-msg");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch("https://formspree.io/f/xwvwrzvy", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: new FormData(e.target)
+      });
+      if (res.ok) {
+        msg.style.color = "var(--green)";
+        msg.textContent = "✅ Message sent! We'll get back to you within 24 hours.";
+        e.target.reset();
+      } else {
+        msg.style.color = "var(--red)";
+        msg.textContent = "Something went wrong. Please try again.";
+      }
+    } catch {
+      msg.style.color = "var(--red)";
+      msg.textContent = "Could not send. Check your connection and try again.";
+    } finally {
+      btn.textContent = "Send Message →"; btn.disabled = false;
+    }
   });
 
   // Manage subscription from settings
