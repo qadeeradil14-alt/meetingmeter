@@ -780,6 +780,61 @@
     .slack-setup-hint a { color: var(--accent); text-decoration: none; cursor: pointer; }
     .slack-setup-hint a:hover { text-decoration: underline; }
 
+    /* ── Worth it rating ── */
+    .worth-it-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 4px 0 8px;
+    }
+    .worth-it-label { font-size: 13px; color: var(--muted); }
+    .worth-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .worth-btn:hover { transform: scale(1.15); }
+    .worth-btn.selected-yes { border-color: var(--green); background: rgba(52,211,153,0.12); }
+    .worth-btn.selected-no  { border-color: var(--red);   background: rgba(248,113,113,0.12); }
+
+    /* ── Budget alert bar ── */
+    .budget-bar-wrap {
+      width: 100%;
+      background: var(--surface2);
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .budget-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: var(--green);
+      transition: width 0.5s ease, background 0.3s ease;
+    }
+
+    /* ── Overtime banner ── */
+    .overtime-banner {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--red);
+      width: 100%;
+    }
+
     /* ── Integration tabs ── */
     .integ-tab {
       padding: 10px 18px;
@@ -879,6 +934,31 @@
       <div style="font-size:13px;color:var(--muted)" id="rate-summary">Add attendees to see rate</div>
     </div>
 
+    <div>
+      <div class="section-label">Planned Duration (optional)</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="planned-duration-input" type="number" min="1" max="480" placeholder="e.g. 30"
+          style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
+        <span style="font-size:13px;color:var(--muted)">minutes</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when meeting runs over</div>
+    </div>
+
+    <div>
+      <div class="section-label">Meeting Budget (optional)</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:13px;color:var(--muted)">$</span>
+        <input id="budget-input" type="number" min="1" placeholder="e.g. 500"
+          style="width:100px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
+      </div>
+      <div id="budget-bar-wrap" class="budget-bar-wrap" style="display:none">
+        <div id="budget-bar-fill" class="budget-bar-fill" style="width:0%"></div>
+      </div>
+      <div id="budget-status" style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when cost approaches budget</div>
+    </div>
+
   </div>
 
   <!-- RIGHT: Timer + Cost -->
@@ -886,6 +966,9 @@
 
     <div id="running-indicator" class="running-pill hidden">
       <div class="running-dot"></div> Meeting in progress
+    </div>
+    <div id="overtime-banner" class="overtime-banner">
+      ⏰ Running over time — consider wrapping up!
     </div>
 
     <div class="cost-hero">
@@ -964,6 +1047,16 @@
       <span id="modal-duration">–</span>
       <strong id="modal-cost">$0.00</strong>
     </div>
+    <!-- Worth it rating -->
+    <div style="margin:4px 0 8px">
+      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px">Was this meeting worth it?</div>
+      <div class="worth-it-row">
+        <button class="worth-btn" id="worth-yes" title="Yes, worth it">👍</button>
+        <span class="worth-it-label">or</span>
+        <button class="worth-btn" id="worth-no" title="Not worth it">👎</button>
+      </div>
+    </div>
+
     <div id="slack-share-row" class="slack-row hidden">
       <input type="checkbox" id="slack-share-chk" checked />
       <label for="slack-share-chk">Share summary to Slack</label>
@@ -1831,12 +1924,79 @@
     });
   }
 
+  // ── Alert state flags ──
+  let budgetAlert80Fired = false;
+  let budgetAlert100Fired = false;
+  let overtimeFired = false;
+  let worthItRating = null; // null | "yes" | "no"
+
+  function resetAlertFlags() {
+    budgetAlert80Fired = false;
+    budgetAlert100Fired = false;
+    overtimeFired = false;
+    worthItRating = null;
+    document.getElementById("worth-yes").classList.remove("selected-yes");
+    document.getElementById("worth-no").classList.remove("selected-no");
+    document.getElementById("overtime-banner").style.display = "none";
+    document.getElementById("budget-bar-wrap").style.display = "none";
+    document.getElementById("budget-status").textContent = "Get alerted when cost approaches budget";
+    document.getElementById("budget-status").style.color = "var(--muted)";
+  }
+
+  function checkBudgetAlert(costUSD) {
+    const budget = parseFloat(document.getElementById("budget-input").value);
+    if (!budget || budget <= 0) return;
+    const pct = costUSD / budget;
+    const bar = document.getElementById("budget-bar-fill");
+    const wrap = document.getElementById("budget-bar-wrap");
+    const status = document.getElementById("budget-status");
+    wrap.style.display = "block";
+    const fillPct = Math.min(pct * 100, 100).toFixed(1);
+    bar.style.width = fillPct + "%";
+    if (pct >= 1) {
+      bar.style.background = "var(--red)";
+      status.style.color = "var(--red)";
+      status.textContent = `⚠️ Budget exceeded! ($${costUSD.toFixed(0)} of $${budget})`;
+      if (!budgetAlert100Fired) {
+        budgetAlert100Fired = true;
+        showToast(`🚨 Budget exceeded! Meeting cost has passed $${budget}`, "#dc2626");
+      }
+    } else if (pct >= 0.8) {
+      bar.style.background = "var(--yellow)";
+      status.style.color = "var(--yellow)";
+      status.textContent = `⚠️ Approaching budget (${Math.round(pct*100)}% of $${budget})`;
+      if (!budgetAlert80Fired) {
+        budgetAlert80Fired = true;
+        showToast(`⚠️ 80% of meeting budget reached — $${(budget - costUSD).toFixed(0)} remaining`, "#d97706");
+      }
+    } else {
+      bar.style.background = "var(--green)";
+      status.style.color = "var(--muted)";
+      status.textContent = `Budget: $${costUSD.toFixed(0)} of $${budget} used (${Math.round(pct*100)}%)`;
+    }
+  }
+
+  function checkOvertimeAlert() {
+    const planned = parseFloat(document.getElementById("planned-duration-input").value);
+    if (!planned || planned <= 0) return;
+    const plannedSeconds = planned * 60;
+    if (elapsedSeconds >= plannedSeconds && !overtimeFired) {
+      overtimeFired = true;
+      document.getElementById("overtime-banner").style.display = "flex";
+      showToast(`⏰ Meeting is running over the planned ${planned} minutes!`, "#dc2626");
+    }
+  }
+
   function startTimer() {
     timerInterval = setInterval(() => {
       elapsedSeconds++;
       document.getElementById("timer-display").textContent = fmtTime(elapsedSeconds);
       updateCostDisplay();
       updateBreakdown();
+      // ── Live alerts ──
+      const currentCostUSD = attendees.reduce((s, a) => s + attendeePerSecond(a) * elapsedSeconds, 0);
+      checkBudgetAlert(currentCostUSD);
+      checkOvertimeAlert();
     }, 1000);
   }
 
@@ -1913,6 +2073,18 @@
   let savedDuration = 0;  // Capture duration when Stop is clicked
   let savedCostUSD = 0;   // Capture cost when Stop is clicked
 
+  // Worth it button handlers
+  document.getElementById("worth-yes").addEventListener("click", () => {
+    worthItRating = "yes";
+    document.getElementById("worth-yes").classList.add("selected-yes");
+    document.getElementById("worth-no").classList.remove("selected-no");
+  });
+  document.getElementById("worth-no").addEventListener("click", () => {
+    worthItRating = "no";
+    document.getElementById("worth-no").classList.add("selected-no");
+    document.getElementById("worth-yes").classList.remove("selected-yes");
+  });
+
   function saveMeeting() {
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
     const entry = {
@@ -1921,6 +2093,7 @@
       title,
       duration_seconds: savedDuration,
       total_cost: parseFloat(savedCostUSD.toFixed(2)),
+      worth_it: worthItRating,
       attendees: attendees.map(a => ({
         name: a.name || "Unnamed",
         role: a.role,
@@ -1943,11 +2116,13 @@
     if (chk && !chk.closest(".hidden") && chk.checked) {
       slackNotify(entry); // fire-and-forget — don't block reset on network call
     }
+    resetAlertFlags();
     resetAfterSave();
   });
 
   document.getElementById("modal-discard").addEventListener("click", () => {
     document.getElementById("save-modal").style.display = "none";
+    resetAlertFlags();
     resetAfterSave();
   });
 
@@ -1985,10 +2160,11 @@
       const date = new Date(item.timestamp * 1000);
       const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      const ratingEmoji = item.worth_it === "yes" ? " 👍" : item.worth_it === "no" ? " 👎" : "";
       card.innerHTML = `
         <div class="history-icon">📋</div>
         <div class="history-info">
-          <div class="history-title">${item.title}</div>
+          <div class="history-title">${item.title}${ratingEmoji}</div>
           <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
         </div>
         <div class="history-cost">$${item.total_cost.toFixed(2)}</div>
