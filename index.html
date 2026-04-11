@@ -1024,6 +1024,37 @@
   </div>
 </div>
 
+<!-- CONTACT -->
+<div class="section" id="contact" style="text-align:center;">
+  <div class="section-tag fi">Get In Touch</div>
+  <h2 class="fi">We're Here to Help</h2>
+  <p class="section-desc fi" style="margin: 0 auto 48px;">Have a question, feedback, or need support? Send us a message and we'll get back to you within 24 hours.</p>
+
+  <div style="max-width:520px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;" class="fi">
+    <form id="landing-contact-form" action="https://formspree.io/f/xwvwrzvy" method="POST"
+      style="display:flex;flex-direction:column;gap:14px;text-align:left">
+      <div>
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">Your Email</label>
+        <input type="email" name="email" required placeholder="you@company.com"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:14px;padding:10px 14px;outline:none;" />
+      </div>
+      <div>
+        <label style="font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px">Message</label>
+        <textarea name="message" required placeholder="How can we help you?" rows="4"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+          color:var(--text);font-size:14px;padding:10px 14px;outline:none;resize:none"></textarea>
+      </div>
+      <button type="submit" id="landing-contact-btn"
+        style="background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;border:none;border-radius:10px;
+        padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;">
+        Send Message →
+      </button>
+      <div id="landing-contact-msg" style="font-size:13px;text-align:center;min-height:18px"></div>
+    </form>
+  </div>
+</div>
+
 <!-- BOTTOM CTA -->
 <div class="cta-section">
   <div class="section-tag" style="margin-bottom:14px;">Get Started Today</div>
@@ -1078,6 +1109,34 @@
   }, { threshold: 0.1 });
 
   document.querySelectorAll(".fi").forEach(el => io.observe(el));
+
+  // Landing page contact form — async Formspree submission
+  document.getElementById("landing-contact-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("landing-contact-btn");
+    const msg = document.getElementById("landing-contact-msg");
+    btn.textContent = "Sending…"; btn.disabled = true;
+    try {
+      const res = await fetch("https://formspree.io/f/xwvwrzvy", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: new FormData(e.target)
+      });
+      if (res.ok) {
+        msg.style.color = "#34d399";
+        msg.textContent = "✅ Message sent! We'll get back to you within 24 hours.";
+        e.target.reset();
+      } else {
+        msg.style.color = "#f87171";
+        msg.textContent = "Something went wrong. Please try again.";
+      }
+    } catch {
+      msg.style.color = "#f87171";
+      msg.textContent = "Could not send. Check your connection and try again.";
+    } finally {
+      btn.textContent = "Send Message →"; btn.disabled = false;
+    }
+  });
 </script>
 
 </body>
