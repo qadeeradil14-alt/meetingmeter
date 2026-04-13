@@ -21,6 +21,14 @@
     { "src": "/staging",                    "dest": "/meetingmeter.html" },
     { "src": "/",                           "dest": "/index.html" }
   ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.meetingmeter.tech" }],
+      "destination": "https://meetingmeter.tech/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
