@@ -896,6 +896,7 @@
     .history-action-btn:hover { border-color: var(--accent); color: var(--text); }
     .history-action-btn.email-btn:hover { border-color: var(--green); color: var(--green); }
     .history-action-btn.reload-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .history-action-btn.sent { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
     .integration-icon.claude { background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); }
 
     /* ── Cost comparisons ── */
@@ -2527,6 +2528,7 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
           <button class="history-action-btn email-btn" title="${hasEmails ? "Email debrief to attendees" : "Add attendee emails to send debrief"}" style="${!hasEmails ? "opacity:0.5;" : ""}">📧 Email${!hasEmails ? " +" : ""}</button>
           ${hasDebrief ? `<button class="history-action-btn expand-btn" title="View full debrief">📋 View Debrief</button>` : ""}
           ${!d?.aiSummary ? `<button class="history-action-btn ai-btn" title="Generate AI summary">✨ AI Summary</button>` : ""}
+          <button class="history-action-btn slack-card-btn" title="Post to Slack">💬 Slack</button>
           <button class="history-action-btn share-btn" title="Copy shareable link">🔗 Share</button>
           <button class="history-action-btn reload-btn" title="Reload these attendees">🔁 Reuse</button>
         </div>
@@ -2596,6 +2598,51 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
             localStorage.setItem("mm_history", JSON.stringify(stored));
           }
           sendDebriefEmail({ ...item, attendees: updatedAttendees });
+        });
+      }
+
+      // Slack button on history card — post this saved meeting to Slack
+      const slackCardBtn = card.querySelector(".slack-card-btn");
+      if (slackCardBtn) {
+        slackCardBtn.addEventListener("click", async () => {
+          const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
+          const webhookUrl = stored.slack_webhook || integrationsConfig.slack_webhook || "";
+          if (!webhookUrl) {
+            showToast("⚠️ Connect Slack in Integrations first");
+            return;
+          }
+          slackCardBtn.textContent = "⏳ Posting…";
+          slackCardBtn.disabled = true;
+          try {
+            const d = item.debrief || {};
+            const duration = fmtTime(item.duration_seconds);
+            const cost = fmtMoneyPlain(item.total_cost);
+            const ratingText = d.rating ? `\n*Rating:* ${RATING_LABEL[d.rating]}` : "";
+            const summary = d.aiSummary || d.decisions || "";
+            const actions = d.actions && !d.aiSummary ? `\n*Action Items:* ${d.actions}` : "";
+            const attendeeList = item.attendees.map(a => `• ${a.name || "Unnamed"} (${a.role})`).join("\n");
+            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${cost}  |  *Duration:* ${duration}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${summary ? `\n\n*Summary:*\n${summary}` : ""}${actions}`;
+            const res = await fetch("/api/slack-notify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ webhook_url: webhookUrl, message })
+            });
+            if (res.ok) {
+              slackCardBtn.textContent = "✅ Sent!";
+              slackCardBtn.classList.add("sent");
+              setTimeout(() => {
+                slackCardBtn.textContent = "💬 Slack";
+                slackCardBtn.disabled = false;
+                slackCardBtn.classList.remove("sent");
+              }, 3000);
+            } else {
+              throw new Error("Slack post failed");
+            }
+          } catch {
+            showToast("❌ Failed to post to Slack");
+            slackCardBtn.textContent = "💬 Slack";
+            slackCardBtn.disabled = false;
+          }
         });
       }
 
@@ -2967,12 +3014,7 @@ Be concise and direct.`;
   // Auto-enable demo mode when NOT running on localhost (i.e. Vercel staging)
   // Also enable via ?demo query param or localStorage flag
   const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  const ZOOM_ENABLED = location.hostname !== "meetingmeter.tech"; // staging/localhost only until stable
-  if (!ZOOM_ENABLED) {
-    // Hide all Zoom UI on production until integration is fully tested
-    document.getElementById("zoom-integration-block").style.display = "none";
-    document.getElementById("load-zoom-btn").style.display = "none";
-  }
+  const ZOOM_ENABLED = true; // Zoom API is deployed and enabled on all environments
   let DEMO_MODE = !isLocalhost || localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
 
   if (DEMO_MODE) {
