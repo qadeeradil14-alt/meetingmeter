@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MeetingMeter — Real-Time Meeting Cost Calculator</title>
-  <meta name="description" content="Track the real-time dollar cost of every meeting. Add attendees by role and salary, start the timer, and see exactly what every meeting costs your company." />
-  <meta name="robots" content="noindex, follow" />
+  <title>MeetingMeter</title>
   <style>
     :root {
       --bg: #0f0f13;
@@ -178,6 +176,15 @@
     }
 
     .remove-btn:hover { color: var(--red); background: rgba(248,113,113,0.1); }
+
+    .attendee-email {
+      width: 100%; background: none; border: none; border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 11px; outline: none; padding: 5px 10px 2px 46px;
+      margin-top: 4px;
+    }
+    .attendee-email:focus { color: var(--text); }
+    .attendee-email::placeholder { color: rgba(122,122,154,0.5); font-size: 11px; }
+    .attendee-row { flex-wrap: wrap; }
 
     .add-btn {
       display: flex;
@@ -527,38 +534,6 @@
     }
     .settings-btn:hover { color: var(--text); border-color: var(--accent); }
 
-    /* ── Pro badge ── */
-    .pro-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #f59e0b, #f97316);
-      color: #000;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-    }
-    .lock-icon { font-size: 12px; opacity: 0.6; margin-left: 4px; }
-
-    /* ── Upgrade modal ── */
-    .upgrade-modal { max-width: 420px; text-align: center; gap: 16px; }
-    .upgrade-modal h2 { font-size: 22px; margin: 0; }
-    .upgrade-modal p  { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.5; }
-    .upgrade-features { list-style: none; padding: 0; margin: 0; text-align: left; }
-    .upgrade-features li { font-size: 13px; padding: 5px 0; color: var(--text); }
-    .upgrade-features li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
-    .license-input-row { display: flex; gap: 8px; width: 100%; }
-    .license-input-row input { flex: 1; }
-    .divider-text { color: var(--muted); font-size: 12px; }
-    .btn-gumroad {
-      display: block; width: 100%; padding: 12px;
-      background: linear-gradient(135deg, #f59e0b, #f97316);
-      color: #000; font-weight: 700; font-size: 15px;
-      border: none; border-radius: 10px; cursor: pointer; text-decoration: none;
-      transition: opacity 0.15s;
-    }
-    .btn-gumroad:hover { opacity: 0.9; }
-
     .settings-grid {
       display: flex;
       flex-direction: column;
@@ -691,36 +666,41 @@
       flex-direction: column;
       gap: 10px;
     }
-    .integration-block-title {
-      font-size: 13px;
-      font-weight: 700;
+    .integration-block-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
+    .integration-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .integration-icon.slack  { background: rgba(74,21,75,0.5);  border: 1px solid rgba(224,30,90,0.3); }
+    .integration-icon.gcal   { background: rgba(26,115,232,0.15); border: 1px solid rgba(26,115,232,0.3); }
+    .integration-title { font-size: 14px; font-weight: 700; }
+    .integration-subtitle { font-size: 11px; color: var(--muted); margin-top: 1px; }
     .integration-status {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 2px 8px;
-      border-radius: 10px;
       margin-left: auto;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    .integration-status.connected {
-      background: rgba(52,211,153,0.15);
-      color: var(--green);
-      border: 1px solid rgba(52,211,153,0.3);
+    .integration-status.connected    { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+    .integration-status.disconnected { background: var(--surface);        color: var(--muted);  border: 1px solid var(--border); }
+
+    .integration-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
     }
-    .integration-status.not-connected {
-      background: rgba(122,122,154,0.1);
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-    .integration-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-    .integration-input {
+    .integration-input-row input {
+      flex: 1;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -728,159 +708,441 @@
       font-size: 12px;
       padding: 8px 10px;
       outline: none;
-      width: 100%;
       font-family: monospace;
     }
-    .integration-input:focus { border-color: var(--accent); }
-    .integration-input::placeholder { color: var(--muted); font-family: inherit; }
-    .integration-row { display: flex; gap: 6px; align-items: center; }
-    .btn-sm {
-      padding: 6px 12px;
+    .integration-input-row input:focus { border-color: var(--accent); }
+    .integration-input-row input::placeholder { color: var(--muted); font-family: inherit; }
+
+    .btn-test {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
       font-size: 12px;
-      border-radius: 7px;
-      font-weight: 600;
-      border: none;
+      padding: 8px 12px;
       cursor: pointer;
       white-space: nowrap;
-      transition: opacity 0.15s;
+      transition: all 0.15s;
     }
-    .btn-sm:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-sm-primary { background: var(--accent); color: white; }
-    .btn-sm-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
-    .btn-sm-ghost:hover:not(:disabled) { background: var(--border); }
+    .btn-test:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-test.success { border-color: var(--green); color: var(--green); }
+    .btn-test.error   { border-color: var(--red);   color: var(--red); }
 
-    /* ── Calendar modal ── */
-    .cal-event-card {
-      background: var(--surface2);
+    .integration-help {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .integration-help a { color: var(--accent); text-decoration: none; }
+
+    /* ── Calendar picker dropdown ── */
+    .calendar-picker {
+      position: relative;
+    }
+    .calendar-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      z-index: 50;
+      overflow: hidden;
+      display: none;
     }
-    .cal-event-card:hover { border-color: var(--accent); background: rgba(124,106,247,0.06); }
-    .cal-event-title { font-size: 13px; font-weight: 600; }
-    .cal-event-meta  { font-size: 11px; color: var(--muted); }
-
-    /* ── Slack checkbox in save modal ── */
-    .slack-row {
+    .calendar-dropdown.open { display: block; }
+    .calendar-dropdown-header {
+      padding: 10px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .calendar-event-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(52,211,153,0.06);
-      border: 1px solid rgba(52,211,153,0.2);
-      border-radius: 8px;
       padding: 10px 14px;
-      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.12s;
+      border-bottom: 1px solid var(--border);
     }
-    .slack-row input[type=checkbox] { accent-color: var(--green); width: 16px; height: 16px; cursor: pointer; }
-    .slack-row label { cursor: pointer; flex: 1; }
-    .slack-setup-hint { font-size: 12px; color: var(--muted); }
-    .slack-setup-hint a { color: var(--accent); text-decoration: none; cursor: pointer; }
-    .slack-setup-hint a:hover { text-decoration: underline; }
-
-    /* ── Worth it rating ── */
-    .worth-it-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 4px 0 8px;
-    }
-    .worth-it-label { font-size: 13px; color: var(--muted); }
-    .worth-btn {
-      width: 44px; height: 44px;
+    .calendar-event-item:last-child { border-bottom: none; }
+    .calendar-event-item:hover { background: var(--surface2); }
+    .calendar-event-dot {
+      width: 8px; height: 8px;
       border-radius: 50%;
-      border: 2px solid var(--border);
-      background: var(--surface2);
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex; align-items: center; justify-content: center;
+      background: #4285F4;
+      flex-shrink: 0;
     }
-    .worth-btn:hover { transform: scale(1.15); }
-    .worth-btn.selected-yes { border-color: var(--green); background: rgba(52,211,153,0.12); }
-    .worth-btn.selected-no  { border-color: var(--red);   background: rgba(248,113,113,0.12); }
+    .calendar-event-name { font-size: 13px; font-weight: 600; flex: 1; }
+    .calendar-event-meta { font-size: 11px; color: var(--muted); }
+    .calendar-event-dur  { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .calendar-empty { padding: 16px 14px; font-size: 13px; color: var(--muted); text-align: center; }
 
-    /* ── Budget alert bar ── */
-    .budget-bar-wrap {
-      width: 100%;
-      background: var(--surface2);
-      border-radius: 6px;
-      height: 6px;
-      overflow: hidden;
-      margin-top: 6px;
-    }
-    .budget-bar-fill {
-      height: 100%;
-      border-radius: 6px;
-      background: var(--green);
-      transition: width 0.5s ease, background 0.3s ease;
-    }
-
-    /* ── Overtime banner ── */
-    .overtime-banner {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: rgba(248,113,113,0.12);
-      border: 1px solid rgba(248,113,113,0.3);
-      border-radius: 10px;
-      padding: 8px 16px;
+    /* ── Slack notify button ── */
+    .btn-slack {
+      background: rgba(74,21,75,0.3);
+      border: 1px solid rgba(224,30,90,0.35);
+      border-radius: 8px;
+      color: #e01e5a;
       font-size: 13px;
       font-weight: 600;
-      color: var(--red);
-      width: 100%;
-    }
-
-    /* ── Integration tabs ── */
-    .integ-tab {
-      padding: 10px 18px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 600;
+      padding: 9px 16px;
       cursor: pointer;
-      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.15s;
     }
-    .integ-tab.active {
+    .btn-slack:hover { background: rgba(224,30,90,0.15); }
+    .btn-slack:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-slack.sent { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
       color: var(--text);
-      border-bottom-color: var(--accent);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 999;
+      white-space: nowrap;
     }
-    .integ-tab:hover { color: var(--text); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: rgba(52,211,153,0.4); color: var(--green); }
+    .toast.error   { border-color: rgba(248,113,113,0.4); color: var(--red); }
 
-    /* ── FAQ ── */
-    .faq-item {
-      background: var(--surface2);
-      border-radius: 10px;
-      overflow: hidden;
+    /* ── Debrief modal ── */
+    .rating-buttons { display: flex; gap: 8px; margin-top: 8px; }
+    .rating-btn {
+      flex: 1; padding: 8px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--muted); transition: all 0.15s; text-align: center;
     }
-    .faq-q {
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      user-select: none;
+    .rating-btn:hover { border-color: var(--accent); color: var(--text); }
+    .rating-btn.active-productive { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
+    .rating-btn.active-mixed { border-color: var(--yellow); color: var(--yellow); background: rgba(251,191,36,0.1); }
+    .rating-btn.active-wasted { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.1); }
+
+    .debrief-textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 13px; padding: 10px 12px;
+      outline: none; resize: vertical; min-height: 72px; font-family: inherit;
+      line-height: 1.5; margin-top: 8px; display: block;
     }
-    .faq-q::after { content: "›"; font-size: 18px; color: var(--muted); transition: transform 0.2s; }
-    .faq-item.open .faq-q::after { transform: rotate(90deg); }
-    .faq-a {
-      display: none;
-      padding: 0 14px 12px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
+    .debrief-textarea:focus { border-color: var(--accent); }
+    .debrief-textarea::placeholder { color: var(--muted); }
+
+    .ai-summary-box {
+      background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(167,139,250,0.06));
+      border: 1px solid rgba(124,106,247,0.3); border-radius: 10px;
+      padding: 14px; font-size: 13px; line-height: 1.6; color: var(--text);
+      white-space: pre-wrap; margin-top: 8px;
     }
-    .faq-item.open .faq-a { display: block; }
+    .ai-loading {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 13px; padding: 14px 0;
+    }
+    .ai-dot {
+      width: 6px; height: 6px; background: var(--accent);
+      border-radius: 50%; animation: pulse 0.9s infinite;
+    }
+    .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+    .ai-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    .btn-ai {
+      background: linear-gradient(135deg, rgba(124,106,247,0.2), rgba(167,139,250,0.15));
+      border: 1px solid rgba(124,106,247,0.4); border-radius: 8px;
+      color: var(--accent); font-size: 13px; font-weight: 600;
+      padding: 9px 16px; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-ai:hover { background: rgba(124,106,247,0.3); border-color: var(--accent); }
+    .btn-ai:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .history-outcome {
+      margin-top: 8px; padding: 8px 10px;
+      background: rgba(124,106,247,0.06);
+      border: 1px solid rgba(124,106,247,0.15);
+      border-radius: 6px; font-size: 11px; color: var(--muted); line-height: 1.5;
+    }
+    .history-outcome-rating {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .history-outcome-rating.productive { color: var(--green); }
+    .history-outcome-rating.mixed { color: var(--yellow); }
+    .history-outcome-rating.wasted { color: var(--red); }
+
+    .history-actions {
+      display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .history-action-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--muted); font-size: 11px;
+      padding: 4px 10px; cursor: pointer; transition: all 0.15s;
+    }
+    .history-action-btn:hover { border-color: var(--accent); color: var(--text); }
+    .history-action-btn.email-btn:hover { border-color: var(--green); color: var(--green); }
+    .history-action-btn.reload-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .integration-icon.claude { background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); }
+
+    /* ── Cost comparisons ── */
+    .cost-comparisons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .cost-chip {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px; font-size: 12px; color: var(--muted);
+    }
+    .cost-chip span { color: var(--text); font-weight: 600; }
+
+    /* ── Email banner ── */
+    .email-banner {
+      background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08));
+      border: 1px solid rgba(251,191,36,0.3); border-radius: 10px;
+      padding: 12px 16px; font-size: 13px; color: var(--yellow);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── Insights section ── */
+    .insights-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; margin-top: 8px;
+    }
+    .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .insight-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .insight-val { font-size: 20px; font-weight: 700; color: var(--accent); }
+    .insight-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .insight-bar { display: flex; gap: 3px; margin-top: 8px; height: 6px; border-radius: 3px; overflow: hidden; }
+    .insight-bar-seg { height: 100%; border-radius: 3px; }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 768px) {
+      header { padding: 12px 16px; gap: 8px; flex-wrap: wrap; }
+      header .tagline { display: none; }
+      header > div:last-child { gap: 6px; flex-wrap: wrap; }
+      .app { grid-template-columns: 1fr; }
+      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 16px; }
+      .right-panel { padding: 20px 16px; gap: 16px; }
+      .cost-number { font-size: clamp(52px, 14vw, 90px) !important; }
+      .timer-display { font-size: clamp(28px, 9vw, 48px) !important; }
+      .controls { flex-wrap: wrap; gap: 8px; }
+      .controls .btn { flex: 1; min-width: 120px; padding: 12px 10px; font-size: 14px; }
+      .stat-chips { gap: 8px; }
+      .stat-chip { padding: 8px 12px; }
+      .breakdown { width: 100%; }
+      .history-section { margin-top: 8px; }
+      .modal { padding: 24px 18px; }
+      .upgrade-plans { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stat-chips { grid-template-columns: repeat(3, 1fr); display: grid; }
+      header .settings-btn span { display: none; }
+    }
+
+    /* ── Templates dropdown ── */
+    .template-picker { position: relative; }
+    .template-dropdown {
+      display: none; position: absolute; top: calc(100% + 6px); right: 0;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; min-width: 210px; z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden;
+    }
+    .template-dropdown.open { display: block; }
+    .template-dropdown-header {
+      padding: 8px 12px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .template-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px; cursor: pointer; font-size: 13px;
+      transition: background 0.15s;
+    }
+    .template-item:hover { background: rgba(124,106,247,0.1); }
+    .template-item-name { flex: 1; }
+    .template-item-count { font-size: 11px; color: var(--muted); margin-right: 6px; }
+    .template-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
+    .template-del:hover { color: var(--red); }
+    .template-save-row {
+      padding: 8px 12px; border-top: 1px solid var(--border);
+      display: flex; gap: 6px;
+    }
+    .template-save-row input {
+      flex: 1; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px;
+      padding: 5px 8px; outline: none;
+    }
+    .template-save-row input:focus { border-color: var(--accent); }
+    .template-save-row button {
+      background: var(--accent); border: none; border-radius: 6px;
+      color: white; font-size: 11px; font-weight: 700; padding: 5px 10px;
+      cursor: pointer; white-space: nowrap;
+    }
+
+    /* ── Monthly report modal ── */
+    .report-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      align-items: flex-start; justify-content: center;
+      padding: 20px; overflow-y: auto;
+    }
+    .report-overlay.open { display: flex; }
+    .report-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px; width: 100%; max-width: 620px;
+      position: relative; margin: auto;
+    }
+    .report-close {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 20px; cursor: pointer;
+    }
+    .report-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .report-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .report-month { margin-bottom: 20px; }
+    .report-month-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: rgba(124,106,247,0.1);
+      border: 1px solid rgba(124,106,247,0.2); border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .report-month-name { font-size: 15px; font-weight: 700; }
+    .report-month-total { font-size: 20px; font-weight: 800; color: var(--gold); }
+    .report-month-meta { font-size: 12px; color: var(--muted); }
+    .report-meeting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 14px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .report-meeting-row:last-child { border-bottom: none; }
+    .report-meeting-title { flex: 1; color: var(--muted); }
+    .report-meeting-cost { font-weight: 600; color: var(--text); }
+    .report-print-btn {
+      width: 100%; margin-top: 20px;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
+      border: none; border-radius: 10px; padding: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    @media print {
+      /* Hide all app content when printing */
+      body > * { display: none !important; }
+
+      /* Show only the report */
+      .report-overlay { display: block !important; }
+
+      /* Hide UI elements within report */
+      .report-close, .report-print-btn { display: none !important; }
+
+      /* Make the report fill the page */
+      .report-overlay {
+        position: static !important;
+        background: white !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        inset: 0 !important;
+        z-index: auto !important;
+      }
+      .report-overlay .report-box {
+        max-height: none !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        background: white !important;
+        color: #111 !important;
+        padding: 24px !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+      }
+      /* Fix text colors for print */
+      .report-overlay * { color: #111 !important; border-color: #ddd !important; }
+      .report-overlay .report-title { font-size: 22px !important; color: #111 !important; }
+      .report-overlay .report-stat-card { background: #f5f5f5 !important; }
+    }
+
+    /* ── Upgrade modal ── */
+    .upgrade-overlay {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .upgrade-overlay.open { display: flex; }
+    .upgrade-box {
+      background: #13131e; border: 1px solid rgba(124,106,247,0.35);
+      border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 520px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(124,106,247,0.12);
+      position: relative; text-align: center;
+    }
+    .upgrade-lock { font-size: 36px; margin-bottom: 12px; }
+    .upgrade-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .upgrade-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px; }
+    .upgrade-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .upgrade-plan {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 16px; text-align: center; position: relative;
+      transition: border-color 0.2s;
+    }
+    .upgrade-plan.best {
+      border-color: rgba(124,106,247,0.5);
+      background: linear-gradient(135deg, rgba(124,106,247,0.08), var(--surface));
+    }
+    .upgrade-plan-badge {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
+      font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .upgrade-plan-name { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+    .upgrade-plan-price { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+    .upgrade-plan-price sup { font-size: 16px; vertical-align: top; margin-top: 6px; display: inline-block; }
+    .upgrade-plan-cadence { font-size: 11px; color: var(--muted); margin: 4px 0 14px; }
+    .btn-upgrade-buy {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
+      border: none; border-radius: 8px; padding: 10px 0;
+      font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(124,106,247,0.35);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-upgrade-buy:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.5); }
+    .upgrade-restore {
+      font-size: 12px; color: var(--muted);
+    }
+    .upgrade-restore a { color: var(--accent-light, #a78bfa); text-decoration: none; }
+    .upgrade-restore a:hover { text-decoration: underline; }
+    .upgrade-close-btn {
+      position: absolute; top: 14px; right: 16px;
+      background: none; border: none; color: var(--muted); font-size: 20px;
+      cursor: pointer; line-height: 1; transition: color 0.2s;
+    }
+    .upgrade-close-btn:hover { color: var(--text); }
+    /* Free attendee counter pill */
+    .attendee-limit-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 6px; margin-bottom: 2px;
+      font-size: 11px; color: var(--muted);
+    }
+    .attendee-limit-dots { display: flex; gap: 4px; }
+    .limit-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: background 0.2s;
+    }
+    .limit-dot.filled { background: var(--accent); }
+    .limit-dot.locked { background: rgba(124,106,247,0.25); border: 1px dashed rgba(124,106,247,0.4); }
   </style>
 </head>
 <body>
@@ -892,8 +1154,6 @@
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
   <div style="display:flex;gap:8px;align-items:center">
-    <span id="pro-badge" class="pro-badge" style="display:none;cursor:pointer" title="Manage your subscription" id="pro-badge">PRO</span>
-    <button id="settings-open-btn" class="settings-btn" title="Account & Settings">👤 Account</button>
     <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
       <option value="USD">🇺🇸 USD $</option>
@@ -905,7 +1165,7 @@
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
     <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
-    <button class="settings-btn" id="integrations-btn" title="Slack & Calendar integrations">🔗 Integrations</button>
+    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar">🔗 Integrations</button>
     <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
   </div>
 </header>
@@ -916,16 +1176,57 @@
   <div class="left-panel">
 
     <div>
-      <div class="section-label">Meeting Title</div>
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+        Meeting Title
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="settings-btn" id="new-meeting-btn" title="Clear everything and start a new meeting"
+            style="font-size:12px;padding:3px 9px;color:var(--muted);">
+            ↺ New
+          </button>
+          <div class="template-picker" id="template-picker">
+            <button class="settings-btn" id="template-btn" title="Meeting templates"
+              style="font-size:12px;padding:3px 9px;">
+              📋 Templates
+            </button>
+            <div class="template-dropdown" id="template-dropdown">
+              <div class="template-dropdown-header">Quick Start</div>
+              <div id="template-list"></div>
+              <div class="template-save-row">
+                <input type="text" id="template-name-input" placeholder="Save current as…" maxlength="30" />
+                <button id="template-save-btn">Save</button>
+              </div>
+            </div>
+          </div>
+          <div class="calendar-picker" id="calendar-picker-wrap">
+            <button class="settings-btn" id="load-calendar-btn" title="Load from Google Calendar"
+              style="font-size:12px;padding:3px 9px;">
+              📅 From Calendar
+            </button>
+            <div class="calendar-dropdown" id="calendar-dropdown">
+              <div class="calendar-dropdown-header">Upcoming Events (Next 7 Days)</div>
+              <div id="calendar-events-list"><div class="calendar-empty">Loading…</div></div>
+            </div>
+          </div>
+          <button class="settings-btn" id="load-zoom-btn" title="Load from Zoom"
+            style="font-size:12px;padding:3px 9px;display:none;">
+            📹 From Zoom
+          </button>
+          <button class="settings-btn" id="zoom-connect-hint-btn" title="Connect Zoom to import meetings"
+            style="font-size:12px;padding:3px 9px;display:none;opacity:0.6;">
+            📹 Connect Zoom
+          </button>
+        </div>
+      </div>
       <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
-      <button class="add-btn" id="cal-import-btn" style="margin-top:8px;border-style:solid;border-color:rgba(124,106,247,0.35);color:var(--accent)">
-        📅 Import from Calendar
-      </button>
     </div>
 
     <div>
       <div class="section-label">Attendees</div>
       <div class="attendee-list" id="attendee-list"></div>
+      <div class="attendee-limit-bar" id="attendee-limit-bar" style="display:none">
+        <span id="attendee-limit-text"></span>
+        <div class="attendee-limit-dots" id="attendee-limit-dots"></div>
+      </div>
       <button class="add-btn" id="add-attendee-btn" style="margin-top:8px">
         + Add Attendee
       </button>
@@ -936,31 +1237,6 @@
       <div style="font-size:13px;color:var(--muted)" id="rate-summary">Add attendees to see rate</div>
     </div>
 
-    <div>
-      <div class="section-label">Planned Duration (optional)</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="planned-duration-input" type="number" min="1" max="480" placeholder="e.g. 30"
-          style="width:80px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
-        <span style="font-size:13px;color:var(--muted)">minutes</span>
-      </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when meeting runs over</div>
-    </div>
-
-    <div>
-      <div class="section-label">Meeting Budget (optional)</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span style="font-size:13px;color:var(--muted)">$</span>
-        <input id="budget-input" type="number" min="1" placeholder="e.g. 500"
-          style="width:100px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-          color:var(--text);font-size:13px;padding:7px 10px;outline:none;" />
-      </div>
-      <div id="budget-bar-wrap" class="budget-bar-wrap" style="display:none">
-        <div id="budget-bar-fill" class="budget-bar-fill" style="width:0%"></div>
-      </div>
-      <div id="budget-status" style="font-size:11px;color:var(--muted);margin-top:4px">Get alerted when cost approaches budget</div>
-    </div>
-
   </div>
 
   <!-- RIGHT: Timer + Cost -->
@@ -968,9 +1244,6 @@
 
     <div id="running-indicator" class="running-pill hidden">
       <div class="running-dot"></div> Meeting in progress
-    </div>
-    <div id="overtime-banner" class="overtime-banner">
-      ⏰ Running over time — consider wrapping up!
     </div>
 
     <div class="cost-hero">
@@ -1011,12 +1284,19 @@
       <div id="breakdown-body"></div>
     </div>
 
+    <!-- Insights -->
+    <div id="insights-section" class="hidden"></div>
+
     <!-- History -->
     <div class="history-section">
       <div class="history-header">
         <div class="section-label" style="margin:0">Past Meetings</div>
-        <button class="btn btn-ghost" id="clear-history-btn"
-          style="padding:4px 10px;font-size:11px">Clear All</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost" id="monthly-report-btn"
+            style="padding:4px 10px;font-size:11px">📊 Monthly Report</button>
+          <button class="btn btn-ghost" id="clear-history-btn"
+            style="padding:4px 10px;font-size:11px">Clear All</button>
+        </div>
       </div>
       <div class="history-list" id="history-list">
         <div class="empty-state">No meetings saved yet.</div>
@@ -1026,8 +1306,8 @@
   </div>
 </div>
 
-<!-- Salary Presets modal -->
-<div class="modal-overlay" id="salary-modal">
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
   <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
     <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
@@ -1036,6 +1316,51 @@
     <div class="settings-actions">
       <button class="btn btn-ghost" id="settings-reset" style="font-size:12px;padding:6px 12px">↺ Reset to defaults</button>
       <button class="btn btn-primary" id="settings-close">Save & Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Debrief modal -->
+<div class="modal-overlay" id="debrief-modal">
+  <div class="modal" style="width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;gap:16px;">
+    <h2>📋 Meeting Debrief</h2>
+    <div class="modal-summary">
+      <span id="debrief-duration">–</span>
+      <strong id="debrief-cost">$0.00</strong>
+    </div>
+
+    <div>
+      <div class="section-label">Was this meeting worth it?</div>
+      <div class="rating-buttons" id="rating-buttons">
+        <button class="rating-btn" data-rating="productive">✅ Productive</button>
+        <button class="rating-btn" data-rating="mixed">🤔 Mixed</button>
+        <button class="rating-btn" data-rating="wasted">❌ Time Wasted</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Decisions Made</div>
+      <textarea class="debrief-textarea" id="debrief-decisions" placeholder="What was decided in this meeting?"></textarea>
+    </div>
+
+    <div>
+      <div class="section-label">Action Items</div>
+      <textarea class="debrief-textarea" id="debrief-actions" placeholder="Who is doing what, and by when?"></textarea>
+    </div>
+
+    <div id="debrief-cost-comparisons"></div>
+    <div id="debrief-ai-section"></div>
+
+    <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-ghost" id="debrief-discard">Discard</button>
+      <button class="btn btn-ghost" id="debrief-skip">Save Without Debrief</button>
+      <button class="btn-slack hidden" id="debrief-slack-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zm2.521-10.123a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+        Post to Slack
+      </button>
+      <button class="btn-ai" id="debrief-generate">✨ AI Summary</button>
+      <button class="btn btn-ghost" id="debrief-email" style="display:none">📧 Email to Attendees</button>
+      <button class="btn btn-primary" id="debrief-save">Save Meeting</button>
     </div>
   </div>
 </div>
@@ -1049,25 +1374,12 @@
       <span id="modal-duration">–</span>
       <strong id="modal-cost">$0.00</strong>
     </div>
-    <!-- Worth it rating -->
-    <div style="margin:4px 0 8px">
-      <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px">Was this meeting worth it?</div>
-      <div class="worth-it-row">
-        <button class="worth-btn" id="worth-yes" title="Yes, worth it">👍</button>
-        <span class="worth-it-label">or</span>
-        <button class="worth-btn" id="worth-no" title="Not worth it">👎</button>
-      </div>
-    </div>
-
-    <div id="slack-share-row" class="slack-row hidden">
-      <input type="checkbox" id="slack-share-chk" checked />
-      <label for="slack-share-chk">Share summary to Slack</label>
-    </div>
-    <div id="slack-setup-hint" class="slack-setup-hint hidden">
-      <a id="slack-setup-link">+ Connect Slack</a> to share this meeting to a channel
-    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" id="modal-discard">Discard</button>
+      <button class="btn-slack hidden" id="modal-slack-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zm2.521-10.123a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+        Post to Slack
+      </button>
       <button class="btn btn-primary" id="modal-save">Save</button>
     </div>
   </div>
@@ -1075,471 +1387,172 @@
 
 <!-- Integrations modal -->
 <div class="modal-overlay" id="integrations-modal">
-  <div class="modal" style="width:500px;max-height:90vh;overflow-y:auto;gap:0">
-
-    <!-- Tab bar -->
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
-      <button class="integ-tab active" data-tab="slack">💬 Slack</button>
-      <button class="integ-tab" data-tab="calendar">📅 Google Cal</button>
+  <div class="modal" style="width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;gap:20px;">
+    <div>
+      <h2>🔗 Integrations</h2>
+      <p style="margin-top:6px">Connect MeetingMeter to Slack and Google Calendar. Credentials are stored locally on your device.</p>
     </div>
 
-    <!-- SLACK TAB -->
-    <div id="integ-tab-slack">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <h2 style="font-size:18px">Connect Slack</h2>
-        <span class="integration-status not-connected" id="slack-status-badge">Not connected</span>
+    <!-- Slack -->
+    <div class="integration-block">
+      <div class="integration-block-header">
+        <div class="integration-icon slack">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#e01e5a"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zm2.521-10.123a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+        </div>
+        <div>
+          <div class="integration-title">Slack</div>
+          <div class="integration-subtitle">Post meeting cost summaries to a channel</div>
+        </div>
+        <span class="integration-status disconnected" id="slack-status-badge">Not connected</span>
       </div>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
-        After saving a meeting, MeetingMeter can automatically post a cost summary to your Slack channel. Follow these 4 easy steps:
-      </p>
-
-      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Slack in your browser</div>
-            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">api.slack.com/apps</strong> and sign in with your Slack account.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Create a new app</div>
-            <div style="font-size:13px;color:var(--muted)">Click <strong style="color:var(--text)">"Create New App"</strong> → choose <strong style="color:var(--text)">"From scratch"</strong> → name it anything (e.g. "MeetingMeter") → select your workspace → click Create.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Enable Incoming Webhooks</div>
-            <div style="font-size:13px;color:var(--muted)">On the left sidebar click <strong style="color:var(--text)">"Incoming Webhooks"</strong> → toggle it <strong style="color:var(--green)">ON</strong> → scroll down and click <strong style="color:var(--text)">"Add New Webhook to Workspace"</strong> → pick a channel → click Allow.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Copy &amp; paste the webhook URL below</div>
-            <div style="font-size:13px;color:var(--muted)">You'll see a URL starting with <strong style="color:var(--text)">https://hooks.slack.com/services/…</strong> — copy it and paste it in the box below.</div>
-          </div>
-        </div>
+      <div class="integration-input-row">
+        <input type="password" id="slack-webhook-input" placeholder="https://hooks.slack.com/services/…" autocomplete="off" />
+        <button class="btn-test" id="slack-test-btn">Test</button>
       </div>
-
-      <div class="integration-row" style="margin-bottom:8px">
-        <input class="integration-input" id="slack-webhook-input"
-          type="password" placeholder="https://hooks.slack.com/services/…" autocomplete="off" />
-        <button class="btn-sm btn-sm-ghost" id="slack-test-btn">Test</button>
+      <div class="integration-help">
+        In Slack: <strong>Apps → Incoming Webhooks → Add New Webhook</strong> → choose a channel → copy the URL above.
       </div>
-      <p style="font-size:12px;color:var(--muted)">Once connected, every saved meeting will offer to post a summary to your Slack channel automatically.</p>
     </div>
 
-    <!-- CALENDAR TAB -->
-    <div id="integ-tab-calendar" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <h2 style="font-size:18px">Connect Google Calendar</h2>
-        <span class="integration-status not-connected" id="gcal-status-badge">Not connected</span>
+    <!-- Google Calendar -->
+    <div class="integration-block">
+      <div class="integration-block-header">
+        <div class="integration-icon gcal">
+          <svg width="18" height="18" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2" fill="none" stroke="#4285F4" stroke-width="1.8"/><line x1="3" y1="9" x2="21" y2="9" stroke="#4285F4" stroke-width="1.8"/><line x1="8" y1="2" x2="8" y2="6" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/><rect x="7" y="13" width="3" height="3" rx="0.5" fill="#4285F4"/><rect x="10.5" y="13" width="3" height="3" rx="0.5" fill="#EA4335"/><rect x="14" y="13" width="3" height="3" rx="0.5" fill="#FBBC05"/></svg>
+        </div>
+        <div>
+          <div class="integration-title">Google Calendar</div>
+          <div class="integration-subtitle">Auto-load upcoming meetings into MeetingMeter</div>
+        </div>
+        <span class="integration-status disconnected" id="gcal-status-badge">Not connected</span>
       </div>
-      <p style="font-size:14px;color:var(--muted);margin-bottom:20px">
-        Once connected, you can import upcoming events from your calendar to pre-fill the meeting title and duration with one click. Follow these 4 steps:
-      </p>
-
-      <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px">
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">1</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Google Calendar</div>
-            <div style="font-size:13px;color:var(--muted)">Go to <strong style="color:var(--text)">calendar.google.com</strong> in your browser and sign in.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Open Settings</div>
-            <div style="font-size:13px;color:var(--muted)">Click the <strong style="color:var(--text)">⚙️ gear icon</strong> (top right) → click <strong style="color:var(--text)">"Settings"</strong>.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Find your calendar's secret link</div>
-            <div style="font-size:13px;color:var(--muted)">On the left sidebar, click your calendar name under <strong style="color:var(--text)">"Settings for my calendars"</strong> → scroll down to find <strong style="color:var(--text)">"Secret address in iCal format"</strong> → click the copy button next to it.</div>
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;align-items:flex-start">
-          <div style="width:26px;height:26px;border-radius:50%;background:rgba(124,106,247,0.15);color:var(--accent2);
-            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">4</div>
-          <div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:2px">Paste the link below</div>
-            <div style="font-size:13px;color:var(--muted)">The link starts with <strong style="color:var(--text)">https://calendar.google.com/calendar/ical/…</strong> — paste it below and click Test to confirm it works.</div>
-          </div>
-        </div>
+      <div class="integration-input-row">
+        <input type="password" id="gcal-ics-input" placeholder="https://calendar.google.com/calendar/ical/…" autocomplete="off" />
+        <button class="btn-test" id="gcal-test-btn">Test</button>
       </div>
-
-      <div class="integration-row" style="margin-bottom:8px">
-        <input class="integration-input" id="gcal-ics-input"
-          type="text" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" />
-        <button class="btn-sm btn-sm-ghost" id="gcal-test-btn">Test</button>
+      <div class="integration-help">
+        In Google Calendar: <strong>Settings → [Your Calendar] → Integrate → Secret address in iCal format</strong> → paste URL above.
       </div>
-      <p style="font-size:12px;color:var(--muted)">Your calendar link is private — it's stored only in your browser and never shared with anyone.</p>
     </div>
 
-    <!-- TEAMS TAB -->
-    <!-- APPLE CALENDAR TAB -->
+    <!-- Claude AI -->
+    <div class="integration-block">
+      <div class="integration-block-header">
+        <div class="integration-icon claude">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#7c6af7"/>
+          </svg>
+        </div>
+        <div>
+          <div class="integration-title">Claude AI (Debrief Summaries)</div>
+          <div class="integration-subtitle">Auto-summarise meeting outcomes with AI</div>
+        </div>
+        <span class="integration-status disconnected" id="claude-status-badge">Not connected</span>
+      </div>
+      <div class="integration-input-row">
+        <input type="password" id="claude-api-key-input" placeholder="sk-ant-api03-…" autocomplete="off" />
+      </div>
+      <div class="integration-help">
+        Get your key at <strong>console.anthropic.com → API Keys</strong>. Stored locally, never sent anywhere except Anthropic's API.
+      </div>
+    </div>
 
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+    <!-- Zoom (staging only) -->
+    <div class="integration-block" id="zoom-integration-block">
+      <div class="integration-block-header">
+        <div class="integration-icon" style="background:rgba(45,140,255,0.12);border:1px solid rgba(45,140,255,0.3);font-size:18px;">📹</div>
+        <div>
+          <div class="integration-title">Zoom</div>
+          <div class="integration-subtitle">Auto-load meetings &amp; attendees from your Zoom account</div>
+        </div>
+        <span class="integration-status disconnected" id="zoom-status-badge">Not connected</span>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-primary" id="zoom-connect-btn" style="font-size:13px;padding:8px 16px;">🔗 Connect Zoom</button>
+        <button class="btn btn-ghost" id="zoom-disconnect-btn" style="font-size:13px;padding:8px 16px;display:none;">Disconnect</button>
+      </div>
+      <div class="integration-help">
+        Connects via Zoom OAuth. Your meetings and attendee lists will auto-populate in MeetingMeter.
+      </div>
+    </div>
+
+    <!-- Email Template -->
+    <div class="integration-block">
+      <div class="integration-block-header">
+        <div class="integration-icon" style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.3);font-size:18px;">📧</div>
+        <div>
+          <div class="integration-title">Debrief Email Template</div>
+          <div class="integration-subtitle">Customise the email sent to attendees after each meeting</div>
+        </div>
+      </div>
+      <textarea id="email-template-input" rows="8" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:10px;outline:none;resize:vertical;font-family:monospace;line-height:1.5;margin-top:4px;"></textarea>
+      <div class="integration-help">
+        Variables: <strong>{{title}}</strong> · <strong>{{date}}</strong> · <strong>{{duration}}</strong> · <strong>{{cost}}</strong> · <strong>{{rating}}</strong> · <strong>{{decisions}}</strong> · <strong>{{actions}}</strong> · <strong>{{summary}}</strong>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="btn btn-ghost" id="integrations-cancel">Cancel</button>
-      <button class="btn btn-primary" id="integrations-save">Save</button>
+      <button class="btn btn-primary" id="integrations-save">Save Integrations</button>
     </div>
   </div>
 </div>
 
-<!-- Settings modal -->
-<div class="modal-overlay" id="settings-modal">
-  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto;gap:0">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <h2 style="font-size:18px">⚙️ Settings</h2>
-      <button id="settings-close-btn" style="background:transparent;border:none;color:var(--muted);font-size:20px;cursor:pointer">×</button>
-    </div>
-
-    <!-- Account section (Pro only) -->
-    <div id="settings-account-section">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Account</div>
-      <div id="settings-pro-block" style="display:none;background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:14px;font-weight:600">MeetingMeter Pro</div>
-            <div id="settings-pro-email" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
-          </div>
-          <span style="background:linear-gradient(135deg,#7c6af7,#a78bfa);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px">PRO</span>
-        </div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-          Click below to open the <strong style="color:var(--text)">Stripe billing portal</strong> where you can:<br>
-          · Update your payment method &nbsp;·&nbsp; View invoices &nbsp;·&nbsp; Cancel your subscription
-        </div>
-        <div id="settings-portal-email-row" style="display:none;margin-bottom:8px">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Enter the email you used to subscribe:</div>
-          <input id="settings-portal-email-input" type="email" placeholder="your@email.com"
-            style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;
-            color:var(--text);font-size:13px;padding:8px 12px;outline:none;margin-bottom:8px" />
-        </div>
-        <button id="settings-manage-btn" style="width:100%;padding:10px;border-radius:8px;background:var(--surface);
-          border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">
-          Open Billing Portal →
-        </button>
-      </div>
-      <div id="settings-free-block" style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:8px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Free Plan</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:12px">Up to 5 attendees. Upgrade to Pro for unlimited access.</div>
-        <a href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" style="display:block;text-align:center;padding:9px;border-radius:8px;
-          background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;font-size:13px;font-weight:700;text-decoration:none;">
-          Upgrade to Pro — $4.99/month →
-        </a>
-      </div>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0"></div>
-
-    <!-- FAQ -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px">FAQ</div>
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
-      <div class="faq-item">
-        <div class="faq-q">How do I cancel my subscription?</div>
-        <div class="faq-a">Click "Manage or Cancel Subscription" above. You'll be taken to the Stripe portal where you can cancel in one click. You keep Pro access until the end of your billing period.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">I switched devices — how do I restore Pro?</div>
-        <div class="faq-a">In the app, click "Upgrade to Pro" and use the "Restore with email" option at the bottom. Enter the email you paid with and your Pro access will be restored instantly.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Is my salary data stored anywhere?</div>
-        <div class="faq-a">No. All data lives only in your browser's local storage. Nothing is sent to our servers — not names, salaries, or meeting details.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">Can I use MeetingMeter on multiple devices?</div>
-        <div class="faq-a">Yes. Use the email restore feature on any device to unlock Pro. Your meeting history stays per-browser since nothing is synced to a server.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q">What payment methods are accepted?</div>
-        <div class="faq-a">All major credit and debit cards via Stripe. Payments are secure and encrypted — we never see your card details.</div>
-      </div>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0"></div>
-
-    <!-- Contact -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">Contact & Support</div>
-    <div style="background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px">
-      <div style="font-size:14px;font-weight:600;margin-bottom:4px">Need help?</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:14px">We typically respond within 24 hours.</div>
-      <form id="contact-form" action="https://formspree.io/f/xwvwrzvy" method="POST"
-        style="display:flex;flex-direction:column;gap:10px">
-        <input type="email" name="email" required placeholder="Your email"
-          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
-          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
-        <textarea name="message" required placeholder="How can we help you?" rows="3"
-          style="background:var(--surface);border:1px solid var(--border);border-radius:8px;
-          color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%;resize:none"></textarea>
-        <button type="submit" id="contact-submit-btn"
-          style="background:linear-gradient(135deg,#7c6af7,#9d8df8);color:#fff;border:none;
-          border-radius:8px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;">
-          Send Message →
-        </button>
-        <div id="contact-form-msg" style="font-size:12px;text-align:center;min-height:16px"></div>
-      </form>
-    </div>
-
-    <div style="height:1px;background:var(--border);margin:16px 0"></div>
-
-    <!-- About -->
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:10px">About</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:16px">
-      <span>MeetingMeter v1.0</span>
-      <a href="/" style="color:var(--accent2);text-decoration:none;font-size:13px;">meetingmeter.tech ↗</a>
-    </div>
-  </div>
-</div>
-
-<!-- Calendar import modal -->
-<div class="modal-overlay" id="cal-modal">
-  <div class="modal" style="width:440px;max-height:90vh;overflow-y:auto;">
-    <h2>📅 Import from Calendar</h2>
-    <p>Select an upcoming event to pre-fill the meeting title and duration.</p>
-    <div id="cal-events-list" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:4px">
-      <button class="btn btn-ghost" id="cal-modal-close">Close</button>
-    </div>
+<!-- Monthly Report modal -->
+<div class="report-overlay" id="report-modal">
+  <div class="report-box">
+    <button class="report-close" id="report-close">&times;</button>
+    <div class="report-title">📊 Monthly Spend Report</div>
+    <div class="report-sub" id="report-sub"></div>
+    <div id="report-content"></div>
+    <button class="report-print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
   </div>
 </div>
 
 <!-- Upgrade modal -->
-<div class="modal-overlay" id="upgrade-modal">
-  <div class="modal upgrade-modal">
-    <div>
-      <div style="font-size:36px;margin-bottom:4px">🚀</div>
-      <h2>Unlock MeetingMeter Pro</h2>
-      <p>Everything you need to run smarter, more accountable meetings.</p>
+<div class="upgrade-overlay" id="upgrade-modal">
+  <div class="upgrade-box">
+    <button class="upgrade-close-btn" id="upgrade-close">&times;</button>
+    <div class="upgrade-lock">🔒</div>
+    <div class="upgrade-title">Unlock unlimited attendees</div>
+    <p class="upgrade-sub">The free plan supports up to 3 attendees.<br>Upgrade for unlimited attendees, AI summaries, Zoom import, email debriefs, and more.</p>
+    <div class="upgrade-plans">
+      <!-- Monthly -->
+      <div class="upgrade-plan">
+        <div class="upgrade-plan-name">Monthly</div>
+        <div class="upgrade-plan-price"><sup>$</sup>4<span style="font-size:18px;letter-spacing:-0.5px">.99</span></div>
+        <div class="upgrade-plan-cadence">per month · cancel anytime</div>
+        <a href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002"
+           target="_blank" rel="noopener"
+           class="btn-upgrade-buy" id="upgrade-monthly-btn">
+          Get Monthly →
+        </a>
+      </div>
+      <!-- Annual -->
+      <div class="upgrade-plan best">
+        <div class="upgrade-plan-badge">Save 18%</div>
+        <div class="upgrade-plan-name">Annual</div>
+        <div class="upgrade-plan-price"><sup>$</sup>49</div>
+        <div class="upgrade-plan-cadence">per year · just $4.08/mo</div>
+        <a href="https://buy.stripe.com/aFaeV60fj3kX9x3cUp48003"
+           target="_blank" rel="noopener"
+           class="btn-upgrade-buy" id="upgrade-annual-btn">
+          Get Annual →
+        </a>
+      </div>
     </div>
-    <ul class="upgrade-features">
-      <li>Unlimited attendees (free = 5 max)</li>
-      <li>Google Calendar import</li>
-      <li>Slack integration</li>
-      <li>PDF &amp; CSV export</li>
-      <li>Role memory across meetings</li>
-    </ul>
-    <a class="btn-gumroad" href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" target="_blank">
-      Get Pro — $4.99/month →
-    </a>
-    <a class="btn-gumroad" href="https://buy.stripe.com/aFaeV60fj3kX9x3cUp48003" target="_blank"
-       style="background:linear-gradient(135deg,#34d399,#059669);box-shadow:0 0 16px rgba(52,211,153,0.3);margin-top:6px;">
-      Get Pro Annual — $49/yr (Best Value) →
-    </a>
-    <div class="divider-text">Already subscribed? Restore access with your email</div>
-    <div class="license-input-row">
-      <input type="email" id="license-key-input" placeholder="Your payment email…"
-        style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;
-               color:var(--text);font-size:13px;padding:8px 12px;outline:none;width:100%" />
-      <button class="btn btn-primary" id="license-verify-btn">Verify</button>
-    </div>
-    <div id="license-msg" style="font-size:12px;min-height:16px;text-align:center"></div>
-    <button class="btn btn-ghost" id="upgrade-modal-close">Maybe later</button>
+    <p class="upgrade-restore">
+      After payment, come back here and click:
+      <a href="#" id="restore-purchase-link">✅ I've purchased — unlock access</a>
+    </p>
   </div>
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
-  // ── Pro / Paywall ──────────────────────────────────────────
-  const FREE_ATTENDEE_LIMIT = 5;
-  const STRIPE_PAYMENT_URL = "https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002";
-
-  function isPro() {
-    return localStorage.getItem("mm_license_status") === "pro";
-  }
-
-  function showUpgradeModal() {
-    document.getElementById("upgrade-modal").style.display = "flex";
-    document.getElementById("license-msg").textContent = "";
-    document.getElementById("license-key-input").value = "";
-  }
-
-  function refreshProUI() {
-    const pro = isPro();
-    document.getElementById("pro-badge").style.display = pro ? "inline-block" : "none";
-    document.getElementById("cal-import-btn").innerHTML =
-      pro ? "📅 Import from Calendar" : "📅 Import from Calendar 🔒";
-    document.getElementById("integrations-btn").innerHTML =
-      pro ? "🔗 Integrations" : "🔗 Integrations 🔒";
-    document.getElementById("export-btn").innerHTML =
-      pro ? "📄 Export" : "📄 Export 🔒";
-    // Settings panel account blocks
-    const proBlock  = document.getElementById("settings-pro-block");
-    const freeBlock = document.getElementById("settings-free-block");
-    if (proBlock)  proBlock.style.display  = pro ? "block" : "none";
-    if (freeBlock) freeBlock.style.display = pro ? "none"  : "block";
-    const emailEl = document.getElementById("settings-pro-email");
-    if (emailEl) emailEl.textContent = localStorage.getItem("mm_pro_email") || "";
-  }
-
-  document.getElementById("upgrade-modal-close").addEventListener("click", () => {
-    document.getElementById("upgrade-modal").style.display = "none";
-  });
-
-  // ── Settings modal ──
-  document.getElementById("settings-open-btn").addEventListener("click", () => {
-    refreshProUI();
-    document.getElementById("settings-modal").style.display = "flex";
-  });
-  document.getElementById("settings-close-btn").addEventListener("click", () => {
-    document.getElementById("settings-modal").style.display = "none";
-  });
-
-  // ── Contact form ──
-  document.getElementById("contact-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("contact-submit-btn");
-    const msg = document.getElementById("contact-form-msg");
-    btn.textContent = "Sending…"; btn.disabled = true;
-    try {
-      const res = await fetch("https://formspree.io/f/xwvwrzvy", {
-        method: "POST",
-        headers: { "Accept": "application/json" },
-        body: new FormData(e.target)
-      });
-      if (res.ok) {
-        msg.style.color = "var(--green)";
-        msg.textContent = "✅ Message sent! We'll get back to you within 24 hours.";
-        e.target.reset();
-      } else {
-        msg.style.color = "var(--red)";
-        msg.textContent = "Something went wrong. Please try again.";
-      }
-    } catch {
-      msg.style.color = "var(--red)";
-      msg.textContent = "Could not send. Check your connection and try again.";
-    } finally {
-      btn.textContent = "Send Message →"; btn.disabled = false;
-    }
-  });
-
-  // Manage subscription from settings
-  document.getElementById("settings-manage-btn").addEventListener("click", async () => {
-    const btn = document.getElementById("settings-manage-btn");
-    const emailRow = document.getElementById("settings-portal-email-row");
-    const emailInput = document.getElementById("settings-portal-email-input");
-
-    // Use stored email or show inline input
-    let email = localStorage.getItem("mm_pro_email") || emailInput.value.trim();
-    if (!email) {
-      emailRow.style.display = "block";
-      emailInput.focus();
-      return;
-    }
-
-    btn.textContent = "Opening portal…"; btn.disabled = true;
-    try {
-      const res = await fetch("/api/customer-portal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        window.location.href = data.url;
-      } else {
-        emailRow.style.display = "block";
-        emailInput.style.borderColor = "var(--red)";
-        emailInput.placeholder = "Email not found — try again";
-      }
-    } catch {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      btn.textContent = "Open Billing Portal →"; btn.disabled = false;
-    }
-  });
-
-  async function activatePro(payload, msg, btn) {
-    btn.textContent = "Verifying…"; btn.disabled = true;
-    try {
-      const res = await fetch("/api/verify-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        localStorage.setItem("mm_license_status", "pro");
-        if (data.email) localStorage.setItem("mm_license_email", data.email);
-        if (msg) { msg.style.color = "#4ade80"; msg.textContent = "✅ Pro unlocked!"; }
-        refreshProUI();
-        setTimeout(() => { document.getElementById("upgrade-modal").style.display = "none"; }, 1200);
-      } else {
-        if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ " + (data.error || "Not verified."); }
-      }
-    } catch(e) {
-      if (msg) { msg.style.color = "#f87171"; msg.textContent = "❌ Network error. Try again."; }
-    }
-    btn.textContent = "Verify"; btn.disabled = false;
-  }
-
-  document.getElementById("license-verify-btn").addEventListener("click", () => {
-    const email = document.getElementById("license-key-input").value.trim();
-    const msg   = document.getElementById("license-msg");
-    if (!email) { msg.style.color = "#f87171"; msg.textContent = "Please enter your payment email."; return; }
-    activatePro({ email }, msg, document.getElementById("license-verify-btn"));
-  });
-
-  // Auto-detect Stripe redirect (stripe_session in URL)
-  (async () => {
-    const params = new URLSearchParams(window.location.search);
-    const sid = params.get("stripe_session");
-    if (sid && !isPro()) {
-      const dummyBtn = { textContent: "", disabled: false };
-      await activatePro({ session_id: sid }, null, dummyBtn);
-      // Clean URL
-      window.history.replaceState({}, "", window.location.pathname);
-      if (isPro()) showToast("🎉 Pro unlocked! Welcome to MeetingMeter Pro.", "#16a34a");
-    }
-  })();
-
-  // ── localStorage history helpers ───────────────────────────
-  function loadHistoryFromStorage() {
-    try { return JSON.parse(localStorage.getItem("mm_history") || "[]"); }
-    catch(e) { return []; }
-  }
-  function saveHistoryToStorage(h) {
-    localStorage.setItem("mm_history", JSON.stringify(h));
-  }
-
-  // ── Integration config helpers ─────────────────────────────
-  function loadIntegrations() {
-    try { return JSON.parse(localStorage.getItem("mm_integrations") || "{}"); }
-    catch(e) { return {}; }
-  }
-  function saveIntegrations(cfg) {
-    localStorage.setItem("mm_integrations", JSON.stringify(cfg));
-  }
-
-  // ── People role memory (name → {role, customSalary}) ───────
-  function loadPeopleRoles() {
-    try { return JSON.parse(localStorage.getItem("mm_people_roles") || "{}"); }
-    catch(e) { return {}; }
-  }
-  function savePeopleRole(name, role, customSalary) {
-    if (!name || name === "Unnamed") return;
-    const pr = loadPeopleRoles();
-    pr[name.trim()] = { role, customSalary: customSalary || 0 };
-    localStorage.setItem("mm_people_roles", JSON.stringify(pr));
-  }
+  const API = "http://localhost:8766";
 
   // ── Salary presets (annual → per-second) ──────────────────
   const DEFAULT_ROLES = {
@@ -1560,7 +1573,10 @@
       const saved = localStorage.getItem("mm_salary_presets");
       if (saved) {
         const parsed = JSON.parse(saved);
-        return { ...DEFAULT_ROLES, ...parsed, "Custom": 0 };
+        // Only apply saved values that are positive — zero/blank falls back to default
+        const valid = {};
+        Object.keys(parsed).forEach(k => { if (parsed[k] > 0) valid[k] = parsed[k]; });
+        return { ...DEFAULT_ROLES, ...valid, "Custom": 0 };
       }
     } catch (e) {}
     return { ...DEFAULT_ROLES };
@@ -1628,7 +1644,7 @@
     };
     grid.appendChild(addBtn);
 
-    document.getElementById("salary-modal").style.display = "flex";
+    document.getElementById("settings-modal").style.display = "flex";
   }
 
   // Helper: append one custom-role row (name input + salary input + delete btn)
@@ -1652,8 +1668,9 @@
     // 1. Read built-in role salary inputs
     document.querySelectorAll("#settings-grid input[data-role]").forEach(input => {
       const role = input.dataset.role;
-      const val = parseFloat(input.value) || 0;
-      ROLES[role] = val;
+      const val = parseFloat(input.value);
+      // If blank or zero, revert to the default rather than saving 0
+      ROLES[role] = (val > 0) ? val : (DEFAULT_ROLES[role] || 0);
     });
 
     // 2. Read custom role rows
@@ -1674,7 +1691,7 @@
 
     saveUserRoleNames(newUserRoleNames);
     saveRoles(ROLES);
-    document.getElementById("salary-modal").style.display = "none";
+    document.getElementById("settings-modal").style.display = "none";
     renderAttendees();
     updateStats();
   }
@@ -1699,20 +1716,63 @@
     return salaryToPerSecond(salary);
   }
 
+  // ── Paywall ────────────────────────────────────────────────
+  const FREE_ATTENDEE_LIMIT = 3;
+
+  function isPaid() {
+    return localStorage.getItem("mm_paid") === "true";
+  }
+
+  function unlockPaid() {
+    localStorage.setItem("mm_paid", "true");
+    document.getElementById("upgrade-modal").classList.remove("open");
+    showToast("🎉 Access unlocked! Unlimited attendees enabled.");
+    renderAttendees(); // refresh the limit bar
+  }
+
+  function showUpgradeModal() {
+    document.getElementById("upgrade-modal").classList.add("open");
+  }
+
+  // Detect ?mm_unlocked=1 redirect from Stripe success URL
+  (function checkStripeReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("mm_unlocked")) {
+      unlockPaid();
+      history.replaceState({}, "", window.location.pathname);
+    }
+  })();
+
+  // Close button
+  document.getElementById("upgrade-close").addEventListener("click", () => {
+    document.getElementById("upgrade-modal").classList.remove("open");
+  });
+  document.getElementById("upgrade-modal").addEventListener("click", function(e) {
+    if (e.target === this) this.classList.remove("open");
+  });
+
+  // "I've purchased" restore link
+  document.getElementById("restore-purchase-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    unlockPaid();
+  });
+
   // ── State ──────────────────────────────────────────────────
   let attendees = [];  // { id, name, role }
   let timerInterval = null;
   let elapsedSeconds = 0;
   let running = false;
   let paused = false;
+  let lastCompletedMeeting = null; // snapshot for exporting after save/discard
 
   // ── Attendees ──────────────────────────────────────────────
   function addAttendee() {
-    if (!isPro() && attendees.length >= FREE_ATTENDEE_LIMIT) {
-      showUpgradeModal(); return;
+    if (!isPaid() && attendees.length >= FREE_ATTENDEE_LIMIT) {
+      showUpgradeModal();
+      return;
     }
     const id = Date.now().toString();
-    attendees.push({ id, name: "", role: "Mid-level", customSalary: 0 });
+    attendees.push({ id, name: "", role: "Mid-level", customSalary: 0, email: "" });
     renderAttendees();
     // Focus new name input
     setTimeout(() => {
@@ -1734,7 +1794,7 @@
       const row = document.createElement("div");
       row.className = "attendee-row";
       row.dataset.id = a.id;
-      const initials = a.name ? a.name.slice(0,2).toUpperCase() : "?";
+      const initials = a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?";
       row.innerHTML = `
         <div class="attendee-avatar">${initials}</div>
         <input class="attendee-name" type="text" placeholder="Name" value="${a.name}" />
@@ -1750,37 +1810,47 @@
             border-radius:6px; color:var(--text); font-size:12px; padding:4px 8px;
             outline:none;" />
         <button class="remove-btn" title="Remove">×</button>
+        <input class="attendee-email" type="email" placeholder="email (optional — for sending action items)" value="${a.email || ""}" />
       `;
       row.querySelector(".attendee-name").addEventListener("input", e => {
         a.name = e.target.value;
         row.querySelector(".attendee-avatar").textContent =
-          a.name ? a.name.slice(0,2).toUpperCase() : "?";
-        // Look up remembered role for this person
-        const pr = loadPeopleRoles();
-        if (pr[a.name.trim()]) {
-          const mem = pr[a.name.trim()];
-          a.role = mem.role;
-          a.customSalary = mem.customSalary || 0;
-          renderAttendees();
-          return;
-        }
+          a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?";
         updateStats();
       });
       row.querySelector(".role-select").addEventListener("change", e => {
         a.role = e.target.value;
         const salInput = row.querySelector(".salary-input");
         salInput.style.display = a.role === "Custom" ? "block" : "none";
-        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
       row.querySelector(".salary-input").addEventListener("input", e => {
         a.customSalary = parseFloat(e.target.value) || 0;
-        savePeopleRole(a.name, a.role, a.customSalary);
         updateStats();
       });
+      row.querySelector(".attendee-email").addEventListener("input", e => { a.email = e.target.value.trim(); });
       row.querySelector(".remove-btn").addEventListener("click", () => removeAttendee(a.id));
       list.appendChild(row);
     });
+
+    // Update free-plan limit bar
+    const limitBar   = document.getElementById("attendee-limit-bar");
+    const limitText  = document.getElementById("attendee-limit-text");
+    const limitDots  = document.getElementById("attendee-limit-dots");
+    const addBtn     = document.getElementById("add-attendee-btn");
+    if (!isPaid()) {
+      const count = attendees.length;
+      limitBar.style.display = "flex";
+      limitText.textContent = `${count} / ${FREE_ATTENDEE_LIMIT} free`;
+      limitDots.innerHTML = Array.from({ length: FREE_ATTENDEE_LIMIT }, (_, i) =>
+        `<div class="limit-dot ${i < count ? "filled" : ""}"></div>`
+      ).join("") + `<div class="limit-dot locked" title="Upgrade to add more">🔒</div>`;
+      addBtn.textContent = count >= FREE_ATTENDEE_LIMIT ? "🔒 Upgrade to Add More" : "+ Add Attendee";
+    } else {
+      limitBar.style.display = "none";
+      addBtn.textContent = "+ Add Attendee";
+    }
+
     updateStats();
   }
 
@@ -1823,11 +1893,17 @@
   }
 
   function updateCostDisplay() {
-    const cost = totalPerSecond() * elapsedSeconds;
+    // If viewing a past meeting (after Reuse), show the saved cost instead of calculating
+    const cost = viewingPastMeeting ? viewingPastMeeting.total_cost : (totalPerSecond() * elapsedSeconds);
     const el = document.getElementById("cost-display");
     el.innerHTML = fmtCost(cost);
     el.classList.add("tick");
     setTimeout(() => el.classList.remove("tick"), 100);
+    // Feature 1: live cost in browser tab
+    if (running) {
+      const title = document.getElementById("meeting-title").value || "Meeting";
+      document.title = `${fmtMoneyPlain(cost)} · ${title} — MeetingMeter`;
+    }
   }
 
   function updateBreakdown() {
@@ -1837,11 +1913,13 @@
       return;
     }
     body.innerHTML = "";
+    // Use past meeting's duration if viewing one; otherwise use current elapsed seconds
+    const duration = viewingPastMeeting ? viewingPastMeeting.duration_seconds : elapsedSeconds;
     attendees.forEach(a => {
-      const cost = attendeePerSecond(a) * elapsedSeconds;
+      const cost = attendeePerSecond(a) * duration;
       const row = document.createElement("div");
       row.className = "breakdown-row";
-      const initials = a.name ? a.name.slice(0,2).toUpperCase() : "?";
+      const initials = a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?";
       row.innerHTML = `
         <div class="breakdown-avatar">${initials}</div>
         <div>
@@ -1854,79 +1932,13 @@
     });
   }
 
-  // ── Alert state flags ──
-  let budgetAlert80Fired = false;
-  let budgetAlert100Fired = false;
-  let overtimeFired = false;
-  let worthItRating = null; // null | "yes" | "no"
-
-  function resetAlertFlags() {
-    budgetAlert80Fired = false;
-    budgetAlert100Fired = false;
-    overtimeFired = false;
-    worthItRating = null;
-    document.getElementById("worth-yes").classList.remove("selected-yes");
-    document.getElementById("worth-no").classList.remove("selected-no");
-    document.getElementById("overtime-banner").style.display = "none";
-    document.getElementById("budget-bar-wrap").style.display = "none";
-    document.getElementById("budget-status").textContent = "Get alerted when cost approaches budget";
-    document.getElementById("budget-status").style.color = "var(--muted)";
-  }
-
-  function checkBudgetAlert(costUSD) {
-    const budget = parseFloat(document.getElementById("budget-input").value);
-    if (!budget || budget <= 0) return;
-    const pct = costUSD / budget;
-    const bar = document.getElementById("budget-bar-fill");
-    const wrap = document.getElementById("budget-bar-wrap");
-    const status = document.getElementById("budget-status");
-    wrap.style.display = "block";
-    const fillPct = Math.min(pct * 100, 100).toFixed(1);
-    bar.style.width = fillPct + "%";
-    if (pct >= 1) {
-      bar.style.background = "var(--red)";
-      status.style.color = "var(--red)";
-      status.textContent = `⚠️ Budget exceeded! ($${costUSD.toFixed(0)} of $${budget})`;
-      if (!budgetAlert100Fired) {
-        budgetAlert100Fired = true;
-        showToast(`🚨 Budget exceeded! Meeting cost has passed $${budget}`, "#dc2626");
-      }
-    } else if (pct >= 0.8) {
-      bar.style.background = "var(--yellow)";
-      status.style.color = "var(--yellow)";
-      status.textContent = `⚠️ Approaching budget (${Math.round(pct*100)}% of $${budget})`;
-      if (!budgetAlert80Fired) {
-        budgetAlert80Fired = true;
-        showToast(`⚠️ 80% of meeting budget reached — $${(budget - costUSD).toFixed(0)} remaining`, "#d97706");
-      }
-    } else {
-      bar.style.background = "var(--green)";
-      status.style.color = "var(--muted)";
-      status.textContent = `Budget: $${costUSD.toFixed(0)} of $${budget} used (${Math.round(pct*100)}%)`;
-    }
-  }
-
-  function checkOvertimeAlert() {
-    const planned = parseFloat(document.getElementById("planned-duration-input").value);
-    if (!planned || planned <= 0) return;
-    const plannedSeconds = planned * 60;
-    if (elapsedSeconds >= plannedSeconds && !overtimeFired) {
-      overtimeFired = true;
-      document.getElementById("overtime-banner").style.display = "flex";
-      showToast(`⏰ Meeting is running over the planned ${planned} minutes!`, "#dc2626");
-    }
-  }
-
   function startTimer() {
     timerInterval = setInterval(() => {
       elapsedSeconds++;
       document.getElementById("timer-display").textContent = fmtTime(elapsedSeconds);
       updateCostDisplay();
       updateBreakdown();
-      // ── Live alerts ──
-      const currentCostUSD = attendees.reduce((s, a) => s + attendeePerSecond(a) * elapsedSeconds, 0);
-      checkBudgetAlert(currentCostUSD);
-      checkOvertimeAlert();
+      updateStats(); // Update live stat chips (attendees, burn rate, etc.)
     }, 1000);
   }
 
@@ -1936,6 +1948,8 @@
       alert("Add at least one attendee before starting.");
       return;
     }
+    // Clear past meeting view state — start a new meeting
+    viewingPastMeeting = null;
     running = true; paused = false;
     document.getElementById("start-btn").classList.add("hidden");
     document.getElementById("pause-btn").classList.remove("hidden");
@@ -1960,31 +1974,12 @@
     clearInterval(timerInterval);
     running = false;
     document.getElementById("running-indicator").classList.add("hidden");
-
-    // Capture duration and cost at this moment
-    savedDuration = elapsedSeconds;
-    savedCostUSD = totalPerSecond() * elapsedSeconds;
-
-    // Show save modal
-    document.getElementById("modal-duration").textContent = fmtTime(savedDuration);
-    document.getElementById("modal-cost").textContent = fmtMoneyPlain(savedCostUSD);
-
-    // Show Slack row if configured, hint if not
-    const cfg = loadIntegrations();
-    const slackRow  = document.getElementById("slack-share-row");
-    const slackHint = document.getElementById("slack-setup-hint");
-    if (cfg.slack_webhook) {
-      slackRow.classList.remove("hidden");
-      slackHint.classList.add("hidden");
-    } else {
-      slackRow.classList.add("hidden");
-      slackHint.classList.remove("hidden");
-    }
-    document.getElementById("save-modal").style.display = "flex";
+    openDebriefModal();
   });
 
   document.getElementById("reset-btn").addEventListener("click", () => {
     clearInterval(timerInterval);
+    viewingPastMeeting = null; // Clear past meeting view when resetting
     elapsedSeconds = 0; running = false; paused = false;
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
@@ -1999,69 +1994,443 @@
 
   document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
 
-  // ── Save modal ─────────────────────────────────────────────
-  let savedDuration = 0;  // Capture duration when Stop is clicked
-  let savedCostUSD = 0;   // Capture cost when Stop is clicked
+  // ── Debrief modal ──────────────────────────────────────────
+  let currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
 
-  // Worth it button handlers
-  document.getElementById("worth-yes").addEventListener("click", () => {
-    worthItRating = "yes";
-    document.getElementById("worth-yes").classList.add("selected-yes");
-    document.getElementById("worth-no").classList.remove("selected-no");
-  });
-  document.getElementById("worth-no").addEventListener("click", () => {
-    worthItRating = "no";
-    document.getElementById("worth-no").classList.add("selected-no");
-    document.getElementById("worth-yes").classList.remove("selected-yes");
+  // Track if we're viewing a past meeting (for Reuse/reload)
+  let viewingPastMeeting = null; // { total_cost, duration_seconds } or null
+
+  function openDebriefModal() {
+    // Reset state
+    currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
+    document.getElementById("debrief-decisions").value = "";
+    document.getElementById("debrief-actions").value = "";
+    document.getElementById("debrief-ai-section").innerHTML = "";
+    document.querySelectorAll(".rating-btn").forEach(b => b.className = "rating-btn");
+
+    const costUSD = totalPerSecond() * elapsedSeconds;
+    document.getElementById("debrief-duration").textContent = fmtTime(elapsedSeconds);
+    document.getElementById("debrief-cost").textContent = fmtMoneyPlain(costUSD);
+    showCostComparisons(costUSD);
+
+    // Show/hide Slack button
+    const slackBtn = document.getElementById("debrief-slack-btn");
+    if (slackBtn) {
+      if (integrationsConfig.slack_webhook) {
+        slackBtn.classList.remove("hidden");
+      } else {
+        slackBtn.classList.add("hidden");
+      }
+    }
+    // Show email button only if at least one attendee has an email
+    const emailBtn = document.getElementById("debrief-email");
+    const hasEmails = attendees.some(a => a.email);
+    emailBtn.style.display = hasEmails ? "inline-flex" : "none";
+
+    document.getElementById("debrief-modal").style.display = "flex";
+  }
+
+  document.getElementById("debrief-email").addEventListener("click", () => {
+    const title     = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const costUSD   = totalPerSecond() * elapsedSeconds;
+    const decisions = document.getElementById("debrief-decisions").value.trim();
+    const actions   = document.getElementById("debrief-actions").value.trim();
+    const aiSummary = currentDebrief.aiSummary || "";
+    const ratingLabel = currentDebrief.rating
+      ? { productive: "✅ Productive", mixed: "🤔 Mixed", wasted: "❌ Time Wasted" }[currentDebrief.rating]
+      : "";
+
+    const summaryBlock = buildEmailSummary(aiSummary, decisions, actions);
+
+    const template = integrationsConfig.email_template || DEFAULT_EMAIL_TEMPLATE;
+    const body = template
+      .replace(/{{title}}/g,    title)
+      .replace(/{{date}}/g,     new Date().toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" }))
+      .replace(/{{duration}}/g, fmtTime(elapsedSeconds))
+      .replace(/{{cost}}/g,     fmtMoneyPlain(costUSD))
+      .replace(/{{rating}}/g,   ratingLabel ? `  ·  ${ratingLabel}` : "")
+      .replace(/{{summary}}/g,  summaryBlock);
+
+    const emails = attendees.filter(a => a.email).map(a => a.email).join(",");
+    triggerMailto(emails, `Meeting Debrief: ${title}`, body);
+    // Close debrief modal after sending
+    document.getElementById("save-modal").style.display = "none";
+    showToast("📧 Debrief sent to attendees");
   });
 
-  function saveMeeting() {
-    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const entry = {
-      id: Date.now().toString(),
-      timestamp: Date.now() / 1000,
-      title,
-      duration_seconds: savedDuration,
-      total_cost: parseFloat(savedCostUSD.toFixed(2)),
-      worth_it: worthItRating,
-      attendees: attendees.map(a => ({
-        name: a.name || "Unnamed",
-        role: a.role,
-        cost_usd: parseFloat((attendeePerSecond(a) * savedDuration).toFixed(2)),
-      })),
+  document.querySelectorAll(".rating-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".rating-btn").forEach(b => b.className = "rating-btn");
+      const r = btn.dataset.rating;
+      btn.classList.add(`active-${r}`);
+      currentDebrief.rating = r;
+    });
+  });
+
+  // ── Feature 2+3: cost comparisons + email detector ────────
+  const COMPARISONS = [
+    { emoji: "☕", label: "coffees",         price: 5.5  },
+    { emoji: "🍕", label: "pizzas",          price: 12   },
+    { emoji: "📺", label: "months Netflix",  price: 15.99 },
+    { emoji: "✈️", label: "domestic flights", price: 280  },
+    { emoji: "💡", label: "days home energy",price: 4.5  },
+    { emoji: "🎬", label: "cinema tickets",  price: 15   },
+  ];
+
+  function showCostComparisons(costUSD) {
+    const el = document.getElementById("debrief-cost-comparisons");
+    if (costUSD < 2) { el.innerHTML = ""; return; }
+    const chips = COMPARISONS
+      .map(c => ({ ...c, qty: costUSD / c.price }))
+      .filter(c => c.qty >= 0.5 && c.qty < 500)
+      .slice(0, 3)
+      .map(c => {
+        const qty = c.qty >= 10 ? Math.round(c.qty) : c.qty.toFixed(1).replace(/\.0$/, "");
+        return `<div class="cost-chip">${c.emoji} <span>${qty}</span> ${c.label}</div>`;
+      }).join("");
+    el.innerHTML = chips ? `<div class="section-label" style="margin-bottom:4px">This meeting cost…</div><div class="cost-comparisons">${chips}</div>` : "";
+  }
+
+  // ── Strip markdown formatting for plain-text email ─────────
+  function stripMarkdown(text) {
+    if (!text) return "";
+    return text
+      .replace(/\*\*(.+?)\*\*/g, "$1")   // **bold** → bold
+      .replace(/\*(.+?)\*/g,     "$1")   // *italic* → italic
+      .replace(/#{1,6}\s+/g,     "")     // ## headings
+      .replace(/^\s*[-_]{3,}\s*$/gm, "") // horizontal rules
+      .trim();
+  }
+
+  // ── Build email summary block ─────────────────────────────
+  // Always includes AI summary + decisions + actions when present,
+  // with markdown stripped for clean plain-text rendering
+  function buildEmailSummary(aiSummary, decisions, actions) {
+    const parts = [];
+    if (aiSummary)  parts.push(`AI SUMMARY:\n${stripMarkdown(aiSummary)}`);
+    if (decisions)  parts.push(`DECISIONS MADE:\n${stripMarkdown(decisions)}`);
+    if (actions)    parts.push(`ACTION ITEMS:\n${stripMarkdown(actions)}`);
+    return parts.join("\n\n") || "No notes recorded.";
+  }
+
+  // ── mailto helper — safe across all browsers ───────────────
+  // window.location.href with mailto: opens the email client without
+  // navigating the page on all modern browsers (Chrome, Safari, Firefox).
+  // Body is capped to avoid 400 errors from oversized URLs.
+  function triggerMailto(emails, subject, body) {
+    const MAX = 8000; // encoded body length — window.open mailto: handles this fine
+    let safeBody = body;
+    if (encodeURIComponent(body).length > MAX) {
+      // Truncate at last full sentence within limit
+      const raw = body.substring(0, 2500);
+      const lastStop = Math.max(raw.lastIndexOf(". "), raw.lastIndexOf(".\n"));
+      safeBody = (lastStop > 200 ? raw.substring(0, lastStop + 1) : raw) + "\n\n[Note: summary truncated — full details saved in MeetingMeter]";
+    }
+    // _blank keeps the current app tab open — opens email client or Gmail in a new tab
+    window.open(`mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`, "_blank");
+  }
+
+  // ── Send debrief email helper ──────────────────────────────
+  function sendDebriefEmail(item) {
+    const template = integrationsConfig.email_template || DEFAULT_EMAIL_TEMPLATE;
+    const d = item.debrief || {};
+    const ratingLabel = d.rating ? { productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating] : "";
+    const summaryBlock = buildEmailSummary(d.aiSummary, d.decisions, d.actions);
+    const body = template
+      .replace(/{{title}}/g,    item.title)
+      .replace(/{{date}}/g,     new Date(item.timestamp * 1000).toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" }))
+      .replace(/{{duration}}/g, fmtTime(item.duration_seconds))
+      .replace(/{{cost}}/g,     fmtMoneyPlain(item.total_cost))
+      .replace(/{{rating}}/g,   ratingLabel ? `  ·  ${ratingLabel}` : "")
+      .replace(/{{summary}}/g,  summaryBlock);
+    const emails = item.attendees.filter(a => a.email).map(a => a.email).join(",");
+    triggerMailto(emails, `Meeting Debrief: ${item.title}`, body);
+  }
+
+  function checkEmailBanner(seconds, debrief) {
+    const isShort   = seconds < 600;
+    const isWasted  = debrief?.rating === "wasted";
+    const noDecisions = !debrief?.decisions?.trim();
+    if (isWasted || (isShort && noDecisions)) {
+      const section = document.getElementById("debrief-ai-section");
+      const banner = document.createElement("div");
+      banner.className = "email-banner";
+      banner.innerHTML = `<span style="font-size:20px">📧</span><span><strong>This meeting could've been an email.</strong> Next time, try a Slack message or a shared doc instead.</span>`;
+      section.prepend(banner);
+    }
+  }
+
+  // ── Feature 4: Team insights ───────────────────────────────
+  function renderInsights(items) {
+    const el = document.getElementById("insights-section");
+    if (!items || items.length < 3) { el.classList.add("hidden"); return; }
+
+    const total     = items.length;
+    const totalCost = items.reduce((s, m) => s + (m.total_cost || 0), 0);
+    const avgCost   = totalCost / total;
+    const avgMins   = items.reduce((s, m) => s + (m.duration_seconds || 0), 0) / total / 60;
+    const ratings   = items.filter(m => m.debrief?.rating);
+    const productive = ratings.filter(m => m.debrief.rating === "productive").length;
+    const wasted     = ratings.filter(m => m.debrief.rating === "wasted").length;
+    const mixed      = ratings.filter(m => m.debrief.rating === "mixed").length;
+    const pct = (n) => ratings.length ? Math.round(n / ratings.length * 100) : 0;
+
+    const barHtml = ratings.length ? `
+      <div class="insight-bar">
+        <div class="insight-bar-seg" style="width:${pct(productive)}%;background:var(--green)"></div>
+        <div class="insight-bar-seg" style="width:${pct(mixed)}%;background:var(--yellow)"></div>
+        <div class="insight-bar-seg" style="width:${pct(wasted)}%;background:var(--red)"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px">
+        ${pct(productive)}% productive · ${pct(wasted)}% wasted
+      </div>` : "";
+
+    el.classList.remove("hidden");
+    el.innerHTML = `
+      <div class="insights-section">
+        <div class="section-label">📊 Your Meeting Insights</div>
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="insight-val">${fmtMoneyPlain(avgCost)}</div>
+            <div class="insight-lbl">Avg meeting cost</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-val">${avgMins.toFixed(0)}m</div>
+            <div class="insight-lbl">Avg duration</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-val">${fmtMoneyPlain(totalCost)}</div>
+            <div class="insight-lbl">Total spent on meetings</div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-val">${total}</div>
+            <div class="insight-lbl">Meetings tracked</div>
+          </div>
+        </div>
+        ${barHtml}
+      </div>`;
+  }
+
+  // ── Feature 5: Share link ──────────────────────────────────
+  function generateShareLink(item) {
+    const data = {
+      t: item.title,
+      d: item.duration_seconds,
+      c: item.total_cost,
+      ts: item.timestamp,
+      a: item.attendees.map(a => a.name),
+      db: item.debrief || null,
     };
-    const history = loadHistoryFromStorage();
-    history.unshift(entry);
-    saveHistoryToStorage(history);
-    renderHistory(history);
-    return entry;
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    return `${location.origin}${location.pathname}?share=${encoded}`;
+  }
+
+  function checkShareParam() {
+    const params = new URLSearchParams(location.search);
+    const share = params.get("share");
+    if (!share) return;
+    try {
+      const data = JSON.parse(decodeURIComponent(escape(atob(share))));
+      const d = data.db || {};
+      const ratingLabel = d.rating ? { productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating] : "";
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;display:flex;align-items:center;justify-content:center;";
+      overlay.innerHTML = `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:24px">📋</div>
+            <div>
+              <h2 style="font-size:18px;font-weight:700">${data.t}</h2>
+              <div style="font-size:12px;color:var(--muted)">${new Date(data.ts*1000).toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})} · ${fmtTime(data.d)} · $${data.c?.toFixed(2)}</div>
+            </div>
+          </div>
+          ${ratingLabel ? `<div style="font-size:13px;font-weight:600">${ratingLabel}</div>` : ""}
+          ${data.a?.length ? `<div><div class="section-label">Attendees</div><div style="font-size:13px;margin-top:6px;color:var(--muted)">${data.a.join(", ")}</div></div>` : ""}
+          ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.decisions}</div></div>` : ""}
+          ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.actions}</div></div>` : ""}
+          ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box">${d.aiSummary}</div></div>` : ""}
+          <div style="display:flex;justify-content:center;padding-top:8px;border-top:1px solid var(--border);">
+            <a href="${location.origin}${location.pathname}" style="font-size:12px;color:var(--accent);text-decoration:none">⚡ Track your own meetings at MeetingMeter</a>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+    } catch(e) { console.error("Invalid share link", e); }
+  }
+
+  document.getElementById("debrief-generate").addEventListener("click", async () => {
+    // Always re-read from localStorage in case it was saved after page load
+    const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
+    if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
+    const key = integrationsConfig.claude_api_key || "";
+    if (!key) {
+      showToast("⚠️ Add your Claude API key in Integrations first");
+      return;
+    }
+    currentDebrief.decisions = document.getElementById("debrief-decisions").value.trim();
+    currentDebrief.actions   = document.getElementById("debrief-actions").value.trim();
+
+    const section = document.getElementById("debrief-ai-section");
+    section.innerHTML = `<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span>Generating summary…</span></div>`;
+
+    const btn = document.getElementById("debrief-generate");
+    btn.disabled = true;
+
+    try {
+      const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+      const costUSD = totalPerSecond() * elapsedSeconds;
+      const attendeeNames = attendees.map(a => `${a.name || "Unnamed"} (${a.role})`).join(", ");
+      const ratingLabel = currentDebrief.rating ? { productive: "Productive", mixed: "Mixed", wasted: "Time Wasted" }[currentDebrief.rating] : "Not rated";
+
+      const prompt = `You are a concise meeting assistant. Summarize this meeting in 3-4 bullet points (plain text, no markdown formatting, use • as bullet character).
+
+Meeting: ${title}
+Duration: ${fmtTime(elapsedSeconds)}
+Cost: ${fmtMoneyPlain(costUSD)}
+Attendees: ${attendeeNames || "Not specified"}
+Rating: ${ratingLabel}
+Decisions made: ${currentDebrief.decisions || "None recorded"}
+Action items: ${currentDebrief.actions || "None recorded"}
+
+Write a crisp executive summary (3-4 bullets max). Focus on decisions and next steps. Be direct.`;
+
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const summary = data.content?.[0]?.text || "";
+      currentDebrief.aiSummary = summary;
+
+      section.innerHTML = `
+        <div class="section-label">AI Summary</div>
+        <div class="ai-summary-box">${summary.replace(/</g,"&lt;")}</div>
+      `;
+    } catch (e) {
+      section.innerHTML = `<div style="color:var(--red);font-size:12px;padding:8px 0">⚠️ ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("debrief-save").addEventListener("click", async () => {
+    currentDebrief.decisions = document.getElementById("debrief-decisions").value.trim();
+    currentDebrief.actions   = document.getElementById("debrief-actions").value.trim();
+    document.getElementById("debrief-modal").style.display = "none";
+    checkEmailBanner(elapsedSeconds, currentDebrief);
+    await saveMeeting(currentDebrief);
+    // Prompt for emails if none set
+    const missingEmails = attendees.some(a => !a.email);
+    if (missingEmails) {
+      setTimeout(() => {
+        showToast("💡 Add attendee emails to send the debrief summary — click 📧 Email on the saved meeting", 6000);
+      }, 800);
+    }
+    resetAfterSave();
+  });
+
+  document.getElementById("debrief-skip").addEventListener("click", async () => {
+    document.getElementById("debrief-modal").style.display = "none";
+    await saveMeeting(null);
+    resetAfterSave();
+  });
+
+  document.getElementById("debrief-discard").addEventListener("click", () => {
+    document.getElementById("debrief-modal").style.display = "none";
+    resetAfterSave();
+  });
+
+  // ── Save modal (legacy — kept for fallback) ─────────────────
+  async function saveMeeting(debrief) {
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = totalPerSecond() * elapsedSeconds;
+    const payload = {
+      title,
+      duration_seconds: elapsedSeconds,
+      total_cost: parseFloat(cost.toFixed(2)),
+      attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role, email: a.email || "" })),
+      debrief: debrief || null,
+    };
+
+    // Always save to localStorage (works in demo mode + as local cache)
+    const stored = JSON.parse(localStorage.getItem("mm_history") || "[]");
+    stored.unshift({ ...payload, id: Date.now(), timestamp: Math.floor(Date.now() / 1000) });
+    localStorage.setItem("mm_history", JSON.stringify(stored.slice(0, 50)));
+
+    try {
+      await fetch(`${API}/api/history`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      await loadHistory();
+    } catch (e) {
+      // Backend not available — render from localStorage
+      renderHistory(JSON.parse(localStorage.getItem("mm_history") || "[]"));
+    }
   }
 
   document.getElementById("modal-save").addEventListener("click", async () => {
     document.getElementById("save-modal").style.display = "none";
-    let entry;
-    try { entry = saveMeeting(); } catch(e) { console.error("saveMeeting failed", e); resetAfterSave(); return; }
-    // Share to Slack if checked
-    const chk = document.getElementById("slack-share-chk");
-    if (chk && !chk.closest(".hidden") && chk.checked) {
-      slackNotify(entry); // fire-and-forget — don't block reset on network call
-    }
-    resetAlertFlags();
+    await saveMeeting(null);
     resetAfterSave();
   });
 
   document.getElementById("modal-discard").addEventListener("click", () => {
     document.getElementById("save-modal").style.display = "none";
-    resetAlertFlags();
     resetAfterSave();
   });
 
-  function resetAfterSave() {
+  function clearAll() {
+    if (running && !confirm("A meeting is in progress. Clear everything and start over?")) return;
     clearInterval(timerInterval);
-    timerInterval = null;
-    running = false;
-    paused = false;
+    viewingPastMeeting = null; // Clear past meeting view
+    elapsedSeconds = 0; running = false; paused = false;
+    attendees = [];
+    document.getElementById("meeting-title").value = "";
+    document.getElementById("timer-display").textContent = "00:00:00";
+    document.getElementById("start-btn").classList.remove("hidden");
+    document.getElementById("pause-btn").classList.add("hidden");
+    document.getElementById("stop-btn").classList.add("hidden");
+    document.getElementById("reset-btn").classList.add("hidden");
+    document.getElementById("running-indicator").classList.add("hidden");
+    document.getElementById("pause-btn").textContent = "⏸ Pause";
+    // Clear debrief notes for a fresh start
+    currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
+    document.getElementById("debrief-decisions").value = "";
+    document.getElementById("debrief-actions").value = "";
+    renderAttendees();
+    updateCostDisplay();
+    updateBreakdown();
+  }
+
+  document.getElementById("new-meeting-btn").addEventListener("click", clearAll);
+
+  function resetAfterSave() {
+    lastCompletedMeeting = {
+      title: document.getElementById("meeting-title").value || "Untitled Meeting",
+      seconds: elapsedSeconds,
+      attendees: attendees.map(a => ({ ...a })),
+    };
+    viewingPastMeeting = null; // Clear past meeting view after save
     elapsedSeconds = 0;
+    document.title = "MeetingMeter"; // reset tab title
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
     document.getElementById("pause-btn").classList.add("hidden");
@@ -2072,48 +2441,310 @@
     updateBreakdown();
   }
 
-  // ── History ────────────────────────────────────────────────
-  function loadHistory() {
-    renderHistory(loadHistoryFromStorage());
+  // Returns data for export — uses live state during a meeting,
+  // falls back to last completed meeting, then to most recent history item
+  function getExportData() {
+    if (elapsedSeconds > 0) {
+      return {
+        title: document.getElementById("meeting-title").value || "Untitled Meeting",
+        seconds: elapsedSeconds,
+        attendees: attendees,
+      };
+    }
+    if (lastCompletedMeeting) return lastCompletedMeeting;
+    // Fall back to most recent saved meeting from history
+    try {
+      const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+      if (history.length > 0) {
+        const m = history[0];
+        return { title: m.title, seconds: m.duration_seconds, attendees: m.attendees || [] };
+      }
+    } catch (_) {}
+    return null;
   }
+
+  // ── History ────────────────────────────────────────────────
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${API}/api/history`);
+      const data = await res.json();
+      renderHistory(data);
+    } catch (e) {
+      // Fall back to localStorage
+      const local = JSON.parse(localStorage.getItem("mm_history") || "[]");
+      renderHistory(local);
+    }
+  }
+
+  const RATING_LABEL = { productive: "✅ Productive", mixed: "🤔 Mixed", wasted: "❌ Time Wasted" };
 
   function renderHistory(items) {
     const list = document.getElementById("history-list");
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
       list.innerHTML = `<div class="empty-state">No meetings saved yet.</div>`;
+      renderInsights([]);
       return;
     }
+    renderInsights(items);
     list.innerHTML = "";
     items.forEach(item => {
       const card = document.createElement("div");
       card.className = "history-card";
+      card.style.flexDirection = "column";
+      card.style.alignItems = "stretch";
       const date = new Date(item.timestamp * 1000);
       const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       const timeStr = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-      const ratingEmoji = item.worth_it === "yes" ? " 👍" : item.worth_it === "no" ? " 👎" : "";
+
+      const d = item.debrief;
+      let debriefHtml = "";
+      if (d && (d.rating || d.decisions || d.actions || d.aiSummary)) {
+        const ratingClass = d.rating || "";
+        const ratingText = d.rating ? RATING_LABEL[d.rating] : "";
+        const summaryText = d.aiSummary || d.decisions || "";
+        debriefHtml = `<div class="history-outcome">
+          ${ratingText ? `<div class="history-outcome-rating ${ratingClass}">${ratingText}</div>` : ""}
+          ${summaryText ? `<div style="white-space:pre-line">${summaryText}</div>` : ""}
+          ${d.actions && !d.aiSummary ? `<div style="margin-top:6px;color:var(--accent)">→ ${d.actions}</div>` : ""}
+        </div>`;
+      }
+
+      const hasEmails = item.attendees && item.attendees.some(a => a.email);
+      const hasDebrief = d && (d.decisions || d.actions || d.aiSummary);
+
       card.innerHTML = `
-        <div class="history-icon">📋</div>
-        <div class="history-info">
-          <div class="history-title">${item.title}${ratingEmoji}</div>
-          <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="history-icon">📋</div>
+          <div class="history-info">
+            <div class="history-title">${item.title}</div>
+            <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
+          </div>
+          <div class="history-cost">${fmtMoneyPlain(item.total_cost)}</div>
+          <button class="history-del" data-id="${item.id}" title="Delete">×</button>
         </div>
-        <div class="history-cost">$${item.total_cost.toFixed(2)}</div>
-        <button class="history-del" data-id="${item.id}" title="Delete">×</button>
+        ${debriefHtml}
+        <div class="history-actions">
+          <button class="history-action-btn email-btn" title="${hasEmails ? "Email debrief to attendees" : "Add attendee emails to send debrief"}" style="${!hasEmails ? "opacity:0.5;" : ""}">📧 Email${!hasEmails ? " +" : ""}</button>
+          ${hasDebrief ? `<button class="history-action-btn expand-btn" title="View full debrief">📋 View Debrief</button>` : ""}
+          ${!d?.aiSummary ? `<button class="history-action-btn ai-btn" title="Generate AI summary">✨ AI Summary</button>` : ""}
+          <button class="history-action-btn share-btn" title="Copy shareable link">🔗 Share</button>
+          <button class="history-action-btn reload-btn" title="Reload these attendees">🔁 Reuse</button>
+        </div>
+        ${!hasEmails ? `<div class="add-emails-row" id="add-emails-${item.id}" style="display:none;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--muted);font-weight:600;">ADD ATTENDEE EMAILS TO SEND DEBRIEF</div>
+          ${item.attendees.map((a, i) => `<div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?"}</div>
+            <span style="font-size:12px;flex:0 0 90px;color:var(--text);">${a.name || "Unnamed"}</span>
+            <input type="email" placeholder="email@example.com" data-attendee-idx="${i}" class="attendee-email-input" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;" />
+          </div>`).join("")}
+          <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
+            <button class="btn btn-ghost cancel-emails-btn" style="font-size:12px;padding:4px 10px;">Cancel</button>
+            <button class="btn btn-primary send-emails-btn" style="font-size:12px;padding:4px 10px;">📧 Send Debrief</button>
+          </div>
+        </div>` : ""}
       `;
-      card.querySelector(".history-del").addEventListener("click", (e) => {
+      card.querySelector(".history-del").addEventListener("click", async (e) => {
         const id = e.target.dataset.id;
-        const updated = loadHistoryFromStorage().filter(h => h.id !== id);
-        saveHistoryToStorage(updated);
-        loadHistory();
+        const local = JSON.parse(localStorage.getItem("mm_history") || "[]");
+        localStorage.setItem("mm_history", JSON.stringify(local.filter(m => String(m.id) !== String(id))));
+        try {
+          await fetch(`${API}/api/history/${id}`, { method: "DELETE" });
+          await loadHistory();
+        } catch {
+          renderHistory(JSON.parse(localStorage.getItem("mm_history") || "[]"));
+        }
       });
+
+      // Email button — send debrief or prompt for emails
+      const emailBtn = card.querySelector(".email-btn");
+      if (emailBtn) {
+        emailBtn.addEventListener("click", () => {
+          if (!hasEmails) {
+            // Show the add-emails row
+            const row = card.querySelector(`#add-emails-${item.id}`);
+            if (row) row.style.display = row.style.display === "none" ? "flex" : "none";
+            return;
+          }
+          sendDebriefEmail(item);
+        });
+      }
+
+      // Cancel emails row
+      const cancelEmailsBtn = card.querySelector(".cancel-emails-btn");
+      if (cancelEmailsBtn) {
+        cancelEmailsBtn.addEventListener("click", () => {
+          const row = card.querySelector(`#add-emails-${item.id}`);
+          if (row) row.style.display = "none";
+        });
+      }
+
+      // Send debrief after manually entering emails
+      const sendEmailsBtn = card.querySelector(".send-emails-btn");
+      if (sendEmailsBtn) {
+        sendEmailsBtn.addEventListener("click", () => {
+          const inputs = card.querySelectorAll(".attendee-email-input");
+          const updatedAttendees = [...item.attendees];
+          inputs.forEach(input => {
+            const idx = parseInt(input.dataset.attendeeIdx);
+            if (input.value.trim()) updatedAttendees[idx] = { ...updatedAttendees[idx], email: input.value.trim() };
+          });
+          // Save emails back to localStorage
+          const stored = JSON.parse(localStorage.getItem("mm_history") || "[]");
+          const idx = stored.findIndex(m => String(m.id) === String(item.id));
+          if (idx !== -1) {
+            stored[idx].attendees = updatedAttendees;
+            localStorage.setItem("mm_history", JSON.stringify(stored));
+          }
+          sendDebriefEmail({ ...item, attendees: updatedAttendees });
+        });
+      }
+
+      // Reuse button — reload attendees into the form
+      const reloadBtn = card.querySelector(".reload-btn");
+      if (reloadBtn) {
+        reloadBtn.addEventListener("click", () => {
+          attendees = item.attendees.map(a => ({
+            id: Date.now().toString() + Math.random(),
+            name: a.name || "",
+            role: a.role || "Mid-level",
+            email: a.email || "",
+            customSalary: 0,
+          }));
+          // Track this past meeting so cost display shows saved cost instead of $0
+          viewingPastMeeting = {
+            total_cost: item.total_cost,
+            duration_seconds: item.duration_seconds,
+          };
+          renderAttendees();
+          updateStats();
+          // Update displays to show past meeting's duration and cost
+          document.getElementById("timer-display").textContent = fmtTime(item.duration_seconds);
+          updateCostDisplay(); // Update to show past meeting's cost
+          updateBreakdown(); // Update per-person breakdown with past meeting duration
+          document.getElementById("meeting-title").value = item.title;
+          showToast(`✓ Loaded "${item.title}" attendees`);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
+
+      // AI Summary button — generate summary for a saved meeting
+      const aiBtn = card.querySelector(".ai-btn");
+      if (aiBtn) {
+        aiBtn.addEventListener("click", async () => {
+          const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
+          if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
+          const key = integrationsConfig.claude_api_key || "";
+          if (!key) { showToast("⚠️ Add Claude API key in Integrations first"); return; }
+
+          aiBtn.textContent = "⏳ Generating…";
+          aiBtn.disabled = true;
+
+          try {
+            const d = item.debrief || {};
+            const attendeeNames = item.attendees.map(a => `${a.name} (${a.role})`).join(", ");
+            const prompt = `Summarize this meeting in 3-4 bullet points (plain text, use • as bullet).
+
+Meeting: ${item.title}
+Duration: ${fmtTime(item.duration_seconds)}
+Cost: $${item.total_cost?.toFixed(2)}
+Attendees: ${attendeeNames}
+Decisions: ${d.decisions || "None recorded"}
+Action items: ${d.actions || "None recorded"}
+
+Be concise and direct.`;
+
+            const res = await fetch("https://api.anthropic.com/v1/messages", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": key,
+                "anthropic-version": "2023-06-01",
+                "anthropic-dangerous-direct-browser-access": "true",
+              },
+              body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 300, messages: [{ role: "user", content: prompt }] }),
+            });
+
+            if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+            const data = await res.json();
+            const summary = data.content?.[0]?.text || "";
+
+            // Save summary back to localStorage
+            const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+            const idx = history.findIndex(m => String(m.id) === String(item.id));
+            if (idx !== -1) {
+              if (!history[idx].debrief) history[idx].debrief = {};
+              history[idx].debrief.aiSummary = summary;
+              localStorage.setItem("mm_history", JSON.stringify(history));
+            }
+
+            // Update card immediately
+            aiBtn.closest(".history-actions").insertAdjacentHTML("beforebegin",
+              `<div class="history-outcome"><div>${summary.replace(/</g,"&lt;")}</div></div>`);
+            aiBtn.remove();
+            showToast("✅ AI Summary generated");
+          } catch(e) {
+            showToast("⚠️ " + e.message);
+            aiBtn.textContent = "✨ AI Summary";
+            aiBtn.disabled = false;
+          }
+        });
+      }
+
+      // Share button — copy link to clipboard
+      const shareBtn = card.querySelector(".share-btn");
+      if (shareBtn) {
+        shareBtn.addEventListener("click", () => {
+          const link = generateShareLink(item);
+          navigator.clipboard.writeText(link).then(() => {
+            shareBtn.textContent = "✓ Copied!";
+            shareBtn.style.borderColor = "var(--green)";
+            shareBtn.style.color = "var(--green)";
+            setTimeout(() => {
+              shareBtn.textContent = "🔗 Share";
+              shareBtn.style.borderColor = "";
+              shareBtn.style.color = "";
+            }, 2000);
+          });
+        });
+      }
+
+      // View debrief button — expand full debrief in a toast-style overlay
+      const expandBtn = card.querySelector(".expand-btn");
+      if (expandBtn) {
+        expandBtn.addEventListener("click", () => {
+          const d = item.debrief || {};
+          const existing = document.getElementById("debrief-overlay");
+          if (existing) existing.remove();
+          const overlay = document.createElement("div");
+          overlay.id = "debrief-overlay";
+          overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;";
+          overlay.innerHTML = `
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <h2 style="font-size:16px;font-weight:700;">📋 ${item.title}</h2>
+                <button onclick="this.closest('#debrief-overlay').remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">×</button>
+              </div>
+              <div style="font-size:12px;color:var(--muted)">${new Date(item.timestamp*1000).toLocaleString()} · ${fmtTime(item.duration_seconds)} · ${fmtMoneyPlain(item.total_cost)}</div>
+              ${d.rating ? `<div class="history-outcome-rating ${d.rating}" style="font-size:11px;font-weight:700;text-transform:uppercase">${{ productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating]}</div>` : ""}
+              ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.decisions}</div></div>` : ""}
+              ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.actions}</div></div>` : ""}
+              ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box" style="margin-top:6px">${d.aiSummary}</div></div>` : ""}
+            </div>`;
+          document.body.appendChild(overlay);
+          overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+        });
+      }
+
       list.appendChild(card);
     });
   }
 
-  document.getElementById("clear-history-btn").addEventListener("click", () => {
+  document.getElementById("clear-history-btn").addEventListener("click", async () => {
     if (confirm("Clear all meeting history?")) {
-      saveHistoryToStorage([]);
-      loadHistory();
+      // Always clear localStorage first — API is optional (not available on staging/web)
+      localStorage.removeItem("mm_history");
+      renderHistory([]);
+      try { await fetch(`${API}/api/history`, { method: "DELETE" }); } catch (_) {}
     }
   });
 
@@ -2163,11 +2794,8 @@
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
-    if (!isPro()) { showUpgradeModal(); return; }
-    // Use savedDuration if timer has been reset, otherwise current elapsed
-    const exportSecs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
-    if (exportSecs === 0 && attendees.length === 0) {
-      alert("Run a meeting first, then export the report.");
+    if (!getExportData()) {
+      alert("No meeting data to export yet. Start and complete a meeting first.");
       return;
     }
     showExportMenu();
@@ -2194,77 +2822,133 @@
     setTimeout(() => document.addEventListener("click", () => menu.remove(), { once: true }), 50);
   }
 
+  // ── Toast notification ─────────────────────────────────────
+  function showToast(msg, duration = 3500) {
+    let t = document.getElementById("mm-toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.id = "mm-toast";
+      t.style.cssText = [
+        "position:fixed","bottom:28px","left:50%","transform:translateX(-50%)",
+        "background:#1e1e2e","color:#f0f0f5","padding:10px 22px",
+        "border-radius:10px","font-size:13px","font-weight:500",
+        "box-shadow:0 4px 20px rgba(0,0,0,.5)","z-index:9999",
+        "opacity:0","transition:opacity .25s","pointer-events:none",
+      ].join(";");
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(t._to);
+    t._to = setTimeout(() => { t.style.opacity = "0"; }, duration);
+  }
+
   function exportCSV() {
-    // Use savedDuration/savedCostUSD if timer has already been reset
-    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
-    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
+    const data = getExportData();
+    if (!data) return;
+    const { title, seconds, attendees: snap } = data;
+    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
     const sym = currencySymbol();
     const cur = currentCurrency;
-    let csv = `Meeting Report\n`;
-    csv += `Title,${title}\n`;
-    csv += `Duration,${fmtTime(secs)}\n`;
-    csv += `Total Cost,${sym}${cost.toFixed(2)} ${cur}\n`;
-    csv += `Currency,${cur}\n\n`;
-    csv += `Name,Role,Salary (Annual),Cost This Meeting\n`;
-    attendees.forEach(a => {
-      const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
-      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
-      csv += `${a.name || "Unnamed"},${a.role},${sym}${salary},${sym}${personCost.toFixed(2)}\n`;
-    });
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `${title.replace(/\s+/g,"-")}-cost-report.csv`;
-    a.click(); URL.revokeObjectURL(url);
+    const filename = title.replace(/\s+/g, "-") + "-cost-report.csv";
+
+    if (window.pywebview && window.pywebview.api) {
+      const rows = snap.map(a => {
+        const salary = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
+        return {
+          name: a.name || "Unnamed",
+          role: a.role,
+          salary: sym + Math.round(toCurrentCurrency(salary)),
+          cost: sym + personCost.toFixed(2),
+        };
+      });
+      window.pywebview.api.save_csv({
+        title,
+        duration: fmtTime(seconds),
+        total_cost: sym + cost.toFixed(2) + " " + cur,
+        currency: cur,
+        attendees: rows,
+      }, filename).then(res => {
+        if (res && res.ok) showToast("✅ CSV saved to " + res.path.split("/").pop());
+        else if (res && res.error) showToast("⚠️ " + res.error);
+      });
+    } else {
+      let csv = "Meeting Report\n";
+      csv += "Title," + title + "\n";
+      csv += "Duration," + fmtTime(seconds) + "\n";
+      csv += "Total Cost," + sym + cost.toFixed(2) + " " + cur + "\n";
+      csv += "Currency," + cur + "\n\n";
+      csv += `Name,Role,Salary (Annual ${cur}),Cost This Meeting (${cur})\n`;
+      snap.forEach(a => {
+        const salaryUSD = a.role === "Custom" ? a.customSalary : ROLES[a.role];
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
+        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(toCurrentCurrency(salaryUSD)) + "," + sym + personCost.toFixed(2) + "\n";
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      a.click(); URL.revokeObjectURL(url);
+    }
   }
 
   function exportPrint() {
-    // Use savedDuration/savedCostUSD if timer has already been reset
-    const secs = elapsedSeconds > 0 ? elapsedSeconds : savedDuration;
-    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const cost = toCurrentCurrency(elapsedSeconds > 0 ? totalPerSecond() * secs : savedCostUSD);
+    const data = getExportData();
+    if (!data) return;
+    const { title, seconds, attendees: snap } = data;
+    const cost = toCurrentCurrency(snap.reduce((s, a) => s + attendeePerSecond(a), 0) * seconds);
     const sym = currencySymbol();
-    const rows = attendees.map(a => {
-      const personCost = toCurrentCurrency(attendeePerSecond(a) * secs);
-      const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
-      return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
-        <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
-    }).join("");
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title} - Cost Report</title>
-    <style>body{font-family:system-ui;padding:40px;max-width:700px;margin:0 auto}
-    h1{font-size:24px;margin-bottom:4px}
-    .meta{color:#666;font-size:14px;margin-bottom:32px}
-    .total{font-size:48px;font-weight:800;color:#f59e0b;margin:16px 0}
-    table{width:100%;border-collapse:collapse;margin-top:24px}
-    th{text-align:left;padding:8px 12px;background:#f5f5f5;font-size:12px;text-transform:uppercase}
-    td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
-    .footer{margin-top:32px;font-size:12px;color:#999}
-    .print-btn{display:inline-block;margin-top:24px;padding:10px 24px;background:#6c63ff;color:#fff;
-      border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:system-ui}
-    .print-btn:hover{background:#5a52d5}
-    @media print{.print-btn{display:none}}
-    </style></head><body>
-    <h1>💸 Meeting Cost Report</h1>
-    <div class="meta">${title} &mdash; Duration: ${fmtTime(secs)}</div>
-    <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${currentCurrency}</span></div>
-    <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
-    <tbody>${rows}</tbody></table>
-    <button class="print-btn" onclick="window.print()">🖨️ Save as PDF / Print</button>
-    <div class="footer">Generated by MeetingMeter &mdash; ${new Date().toLocaleString()}</div>
-    <scr\ipt>window.onafterprint = function(){ window.close(); };<\/script>
-    </body></html>`;
-    const w = window.open("", "_blank");
-    if (w) {
-      w.document.open("text/html", "replace");
-      w.document.write(html);
-      w.document.close();
+    const cur = currentCurrency;
+
+    if (window.pywebview && window.pywebview.api) {
+      const attendeeData = snap.map(a => {
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
+        const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
+        return {
+          name: a.name || "Unnamed",
+          role: a.role,
+          rate: `${sym}${rate.toFixed(2)}/min`,
+          cost: `${sym}${personCost.toFixed(2)}`,
+        };
+      });
+      window.pywebview.api.save_pdf({
+        title,
+        duration: fmtTime(seconds),
+        total_cost: `${sym}${cost.toFixed(2)}`,
+        currency: cur,
+        sym,
+        attendees: attendeeData,
+      }).then(res => {
+        if (res && res.ok) showToast("✅ PDF saved to " + res.path.split("/").pop());
+        else if (res && res.error) showToast("⚠️ " + res.error);
+      });
     } else {
-      // Fallback if popup blocked
-      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-      const url  = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      const rows = snap.map(a => {
+        const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
+        const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
+        return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
+          <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
+      }).join("");
+      const html = `<!DOCTYPE html><html><head><title>${title} — Cost Report</title>
+      <style>body{font-family:system-ui;padding:40px;max-width:700px;margin:0 auto}
+      h1{font-size:24px;margin-bottom:4px}.meta{color:#666;font-size:14px;margin-bottom:32px}
+      .total{font-size:48px;font-weight:800;color:#f59e0b;margin:16px 0}
+      table{width:100%;border-collapse:collapse;margin-top:24px}
+      th{text-align:left;padding:8px 12px;background:#f5f5f5;font-size:12px;text-transform:uppercase}
+      td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+      .footer{margin-top:32px;font-size:12px;color:#999}
+      </style></head><body>
+      <h1>💸 Meeting Cost Report</h1>
+      <div class="meta">${title} · Duration: ${fmtTime(seconds)}</div>
+      <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${cur}</span></div>
+      <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
+      <tbody>${rows}</tbody></table>
+      <div class="footer">Generated by MeetingMeter · ${new Date().toLocaleString()}</div>
+      </body></html>`;
+      const w = window.open("", "_blank");
+      w.document.write(html); w.document.close();
+      setTimeout(() => { w.print(); w.onafterprint = () => w.close(); }, 500);
     }
   }
 
@@ -2279,260 +2963,836 @@
     if (e.code === "KeyR" && !running) document.getElementById("reset-btn").click();
   });
 
-  // ── Integrations modal ────────────────────────────────────
-  function openIntegrations() {
-    const cfg = loadIntegrations();
-    document.getElementById("slack-webhook-input").value  = cfg.slack_webhook   || "";
-    document.getElementById("gcal-ics-input").value       = cfg.gcal_ics_url    || "";
-    _refreshIntegrationBadges(cfg);
-    document.getElementById("integrations-modal").style.display = "flex";
+  // ── Mock/Demo Mode ────────────────────────────────────────
+  // Auto-enable demo mode when NOT running on localhost (i.e. Vercel staging)
+  // Also enable via ?demo query param or localStorage flag
+  const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const ZOOM_ENABLED = location.hostname !== "meetingmeter.tech"; // staging/localhost only until stable
+  if (!ZOOM_ENABLED) {
+    // Hide all Zoom UI on production until integration is fully tested
+    document.getElementById("zoom-integration-block").style.display = "none";
+    document.getElementById("load-zoom-btn").style.display = "none";
+  }
+  let DEMO_MODE = !isLocalhost || localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
+
+  if (DEMO_MODE) {
+    console.log("🎬 MeetingMeter running in DEMO MODE (no backend required)");
+    document.body.style.setProperty("--accent", "#fbbf24"); // change accent to gold to indicate demo
   }
 
-  function _setBadge(id, connected) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = connected ? "Connected" : "Not connected";
-    el.className = "integration-status " + (connected ? "connected" : "not-connected");
+  // ── Integrations ───────────────────────────────────────────
+  const DEFAULT_EMAIL_TEMPLATE = `Hi team,
+
+Here's the debrief for our meeting: {{title}}
+📅 {{date}}  ·  ⏱ {{duration}}  ·  💰 {{cost}}{{rating}}
+
+{{summary}}
+—
+Sent via MeetingMeter · meetingmeter.tech`;
+
+  let integrationsConfig = {
+    slack_webhook: "",
+    gcal_ics_url: "",
+    claude_api_key: "",
+    email_template: "",
+  };
+
+  async function loadIntegrations() {
+    // Always try localStorage first (persists Claude API key in all modes)
+    try {
+      const saved = localStorage.getItem("mm_integrations");
+      if (saved) integrationsConfig = { ...integrationsConfig, ...JSON.parse(saved) };
+    } catch (e) {}
+
+    if (DEMO_MODE) return;
+
+    try {
+      const res = await fetch(`${API}/api/config`);
+      if (res.ok) {
+        const remote = await res.json();
+        // Merge: remote takes precedence except for claude_api_key (keep local)
+        const claudeKey = integrationsConfig.claude_api_key;
+        integrationsConfig = { ...integrationsConfig, ...remote };
+        if (claudeKey && !integrationsConfig.claude_api_key) {
+          integrationsConfig.claude_api_key = claudeKey;
+        }
+      }
+    } catch (e) {
+      // server not available, use localStorage values
+    }
   }
 
-  function _refreshIntegrationBadges(cfg) {
-    _setBadge("slack-status-badge",    !!cfg.slack_webhook);
-    _setBadge("gcal-status-badge",     !!cfg.gcal_ics_url);
+  async function saveIntegrations() {
+    // Always persist to localStorage (works everywhere incl. demo + Vercel)
+    localStorage.setItem("mm_integrations", JSON.stringify(integrationsConfig));
+
+    if (DEMO_MODE) {
+      showToast("✅ Integrations saved");
+      updateIntegrationStatus();
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/config`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(integrationsConfig),
+      });
+      if (res.ok) {
+        showToast("✅ Integrations saved");
+      } else {
+        showToast("✅ Integrations saved locally");
+      }
+    } catch (e) {
+      showToast("✅ Integrations saved locally");
+    }
+    updateIntegrationStatus();
   }
 
+  // Integrations modal handlers
   document.getElementById("integrations-btn").addEventListener("click", () => {
-    if (!isPro()) { showUpgradeModal(); return; }
-    openIntegrations();
+    // Populate current config into form
+    document.getElementById("slack-webhook-input").value = integrationsConfig.slack_webhook || "";
+    document.getElementById("gcal-ics-input").value = integrationsConfig.gcal_ics_url || "";
+    document.getElementById("claude-api-key-input").value = integrationsConfig.claude_api_key || "";
+    document.getElementById("email-template-input").value = integrationsConfig.email_template || DEFAULT_EMAIL_TEMPLATE;
+
+    // Update status badges
+    updateIntegrationStatus();
+
+    document.getElementById("integrations-modal").style.display = "flex";
+  });
+
+  // integrations-close removed (button uses integrations-cancel id)
+
+  document.getElementById("integrations-save").addEventListener("click", () => {
+    integrationsConfig.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
+    integrationsConfig.gcal_ics_url = document.getElementById("gcal-ics-input").value.trim();
+    integrationsConfig.claude_api_key = document.getElementById("claude-api-key-input").value.trim();
+    integrationsConfig.email_template = document.getElementById("email-template-input").value;
+    saveIntegrations();
+    setTimeout(() => {
+      document.getElementById("integrations-modal").style.display = "none";
+    }, 500);
   });
 
   document.getElementById("integrations-cancel").addEventListener("click", () => {
     document.getElementById("integrations-modal").style.display = "none";
   });
 
-  document.getElementById("integrations-save").addEventListener("click", () => {
-    const cfg = loadIntegrations();
-    cfg.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
-    cfg.gcal_ics_url  = document.getElementById("gcal-ics-input").value.trim();
-    saveIntegrations(cfg);
-    document.getElementById("integrations-modal").style.display = "none";
-  });
+  function updateIntegrationStatus() {
+    const slackBadge = document.getElementById("slack-status-badge");
+    const calBadge   = document.getElementById("gcal-status-badge");
+    const claudeBadge = document.getElementById("claude-status-badge");
+    const zoomBadge  = document.getElementById("zoom-status-badge");
 
-  // ── Integration tabs ──
-  const integTabs = ["slack", "calendar"];
-  document.querySelectorAll(".integ-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".integ-tab").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      const target = tab.dataset.tab;
-      integTabs.forEach(t => {
-        const el = document.getElementById(`integ-tab-${t}`);
-        if (el) el.style.display = t === target ? "block" : "none";
-      });
-    });
-  });
-
-  // ── FAQ accordion ──
-  document.querySelectorAll(".faq-q").forEach(q => {
-    q.addEventListener("click", () => {
-      const item = q.closest(".faq-item");
-      const wasOpen = item.classList.contains("open");
-      document.querySelectorAll(".faq-item").forEach(i => i.classList.remove("open"));
-      if (!wasOpen) item.classList.add("open");
-    });
-  });
-
-  // Close salary modal on overlay click
-  document.getElementById("salary-modal").addEventListener("click", (e) => {
-    if (e.target === document.getElementById("salary-modal"))
-      document.getElementById("salary-modal").style.display = "none";
-  });
-
-  // "Connect Slack" link in save modal opens integrations
-  document.getElementById("slack-setup-link").addEventListener("click", () => {
-    document.getElementById("save-modal").style.display = "none";
-    openIntegrations();
-  });
-
-  // ── Slack test ─────────────────────────────────────────────
-  document.getElementById("slack-test-btn").addEventListener("click", async () => {
-    const url = document.getElementById("slack-webhook-input").value.trim();
-    if (!url) { alert("Paste a Slack webhook URL first."); return; }
-    const btn = document.getElementById("slack-test-btn");
-    btn.textContent = "Sending…"; btn.disabled = true;
-    try {
-      const res = await fetch("/api/slack-notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          webhook_url: url,
-          title: "MeetingMeter Test",
-          duration: "00:05:00",
-          total_cost: "$42.00",
-          currency: "USD",
-          attendees: [{ name: "You", role: "Senior", cost: "$42.00" }],
-        }),
-      });
-      const data = await res.json();
-      btn.textContent = data.ok ? "✓ Sent!" : "✗ Failed";
-      if (!data.ok) alert("Slack error: " + (data.error || "unknown"));
-    } catch(e) {
-      btn.textContent = "✗ Error";
-      alert("Could not reach /api/slack-notify: " + e.message);
+    function setBadge(el, connected) {
+      if (!el) return;
+      el.textContent = connected ? "Connected" : "Not connected";
+      el.className = "integration-status " + (connected ? "connected" : "disconnected");
     }
-    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
-  });
 
+    setBadge(slackBadge,  !!integrationsConfig.slack_webhook);
+    setBadge(calBadge,    !!integrationsConfig.gcal_ics_url);
+    setBadge(claudeBadge, !!integrationsConfig.claude_api_key);
 
+    const zoomToken = getZoomToken();
+    setBadge(zoomBadge, !!zoomToken);
 
-  // ── Toast helper ───────────────────────────────────────────
-  function showToast(msg, color) {
-    const t = document.createElement("div");
-    t.textContent = msg;
-    t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-      background:${color||"#1e1e2e"};color:#fff;padding:10px 20px;border-radius:8px;
-      font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.4);pointer-events:none;
-      opacity:1;transition:opacity 0.5s ease`;
-    document.body.appendChild(t);
-    setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 500); }, 3000);
-  }
+    // Show/hide Zoom connect/disconnect buttons
+    const connectBtn    = document.getElementById("zoom-connect-btn");
+    const disconnectBtn = document.getElementById("zoom-disconnect-btn");
+    if (connectBtn)    connectBtn.style.display    = zoomToken ? "none"         : "inline-block";
+    if (disconnectBtn) disconnectBtn.style.display = zoomToken ? "inline-block" : "none";
 
-  // ── Slack notify on save ───────────────────────────────────
-  async function slackNotify(entry) {
-    const cfg = loadIntegrations();
-    if (!cfg.slack_webhook) return;
-    const sym = currencySymbol();
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-    try {
-      const res = await fetch("/api/slack-notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          webhook_url: cfg.slack_webhook,
-          title:       entry.title,
-          duration:    fmtTime(entry.duration_seconds),
-          total_cost:  sym + toCurrentCurrency(entry.total_cost).toFixed(2),
-          currency:    currentCurrency,
-          attendees:   entry.attendees.map(a => ({
-            name: a.name, role: a.role,
-            cost: sym + toCurrentCurrency(a.cost_usd || 0).toFixed(2),
-          })),
-        }),
-      });
-      clearTimeout(timeout);
-      const data = await res.json();
-      if (data.ok) showToast("✅ Sent to Slack", "#16a34a");
-      else showToast("⚠️ Slack error: " + (data.error || "unknown"), "#dc2626");
-    } catch(e) {
-      clearTimeout(timeout);
-      if (e.name === "AbortError") showToast("⚠️ Slack timed out", "#dc2626");
-      else showToast("⚠️ Slack failed: " + e.message, "#dc2626");
-      console.warn("Slack notify failed:", e);
-    }
-  }
-
-  // ── Calendar test ──────────────────────────────────────────
-  document.getElementById("gcal-test-btn").addEventListener("click", async () => {
-    const url = document.getElementById("gcal-ics-input").value.trim();
-    if (!url) { alert("Paste a Google Calendar ICS URL first."); return; }
-    const btn = document.getElementById("gcal-test-btn");
-    btn.textContent = "Fetching…"; btn.disabled = true;
-    try {
-      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(url));
-      const data = await res.json();
-      if (data.ok) {
-        btn.textContent = `✓ ${data.events.length} events`;
+    // Show/hide "From Zoom" button in header — always visible when Zoom is enabled
+    const zoomBtn     = document.getElementById("load-zoom-btn");
+    const zoomHintBtn = document.getElementById("zoom-connect-hint-btn");
+    if (ZOOM_ENABLED) {
+      if (zoomToken) {
+        if (zoomBtn)     zoomBtn.style.display     = "inline-block";
+        if (zoomHintBtn) zoomHintBtn.style.display = "none";
       } else {
-        btn.textContent = "✗ Failed";
-        alert("Calendar error: " + data.error);
+        if (zoomBtn)     zoomBtn.style.display     = "none";
+        if (zoomHintBtn) zoomHintBtn.style.display = "inline-block";
       }
-    } catch(e) {
-      btn.textContent = "✗ Error";
-      alert("Could not reach /api/calendar-events: " + e.message);
     }
-    setTimeout(() => { btn.textContent = "Test"; btn.disabled = false; }, 2500);
-  });
+  }
 
-  // ── Calendar import modal ──────────────────────────────────
-  document.getElementById("cal-import-btn").addEventListener("click", async () => {
-    if (!isPro()) { showUpgradeModal(); return; }
-    const cfg = loadIntegrations();
-    if (!cfg.gcal_ics_url) {
-      openIntegrations();
+  // ── Zoom OAuth ──────────────────────────────────────────────
+
+  function getZoomToken() {
+    try {
+      const raw = localStorage.getItem("mm_zoom_token");
+      if (!raw) return null;
+      const t = JSON.parse(raw);
+      // Check expiry (expires_in is in seconds)
+      if (t.obtained_at && t.expires_in) {
+        const expiresAt = t.obtained_at + t.expires_in * 1000;
+        if (Date.now() > expiresAt - 60_000) return null; // expired or about to expire
+      }
+      return t;
+    } catch(e) { return null; }
+  }
+
+  function storeZoomToken(tokenData) {
+    localStorage.setItem("mm_zoom_token", JSON.stringify(tokenData));
+  }
+
+  function clearZoomToken() {
+    localStorage.removeItem("mm_zoom_token");
+  }
+
+  // Handle zoom_token in URL (set by callback.js after OAuth)
+  (function handleZoomCallback() {
+    const params = new URLSearchParams(location.search);
+    const raw = params.get("zoom_token");
+    const err = params.get("zoom_error");
+
+    if (err) {
+      showToast("❌ Zoom: " + decodeURIComponent(err));
+      // Clean URL
+      history.replaceState({}, "", location.pathname);
       return;
     }
-    const btn = document.getElementById("cal-import-btn");
-    btn.textContent = "⏳ Loading…"; btn.disabled = true;
 
-    try {
-      const res  = await fetch("/api/calendar-events?ics_url=" + encodeURIComponent(cfg.gcal_ics_url));
-      const data = await res.json();
-      const list = document.getElementById("cal-events-list");
-      list.innerHTML = "";
-
-      if (!data.ok || data.events.length === 0) {
-        list.innerHTML = `<div class="empty-state">${data.ok ? "No upcoming events in the next 7 days." : data.error}</div>`;
-      } else {
-        const pr = loadPeopleRoles();
-        data.events.forEach(ev => {
-          const card = document.createElement("div");
-          card.className = "cal-event-card";
-          const hrs  = Math.floor(ev.duration_min / 60);
-          const mins = ev.duration_min % 60;
-          const dur  = hrs ? `${hrs}h ${mins}m` : `${mins}m`;
-          const evAttendees = ev.attendees || [];
-          const attendeePreview = evAttendees.length
-            ? evAttendees.map(n => {
-                const known = pr[n.trim()];
-                return `<span style="background:rgba(124,106,247,0.12);border:1px solid rgba(124,106,247,0.25);
-                  border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent-light)">
-                  ${n}${known ? " · " + known.role : " · ?"}
-                </span>`;
-              }).join(" ")
-            : "";
-          card.innerHTML = `
-            <div class="cal-event-title">${ev.summary}</div>
-            <div class="cal-event-meta">${ev.start} · ${dur}${ev.location ? " · 📍 " + ev.location : ""}</div>
-            ${attendeePreview ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${attendeePreview}</div>` : ""}
-          `;
-          card.addEventListener("click", () => {
-            // Fill title
-            document.getElementById("meeting-title").value = ev.summary;
-            // Add attendees if any
-            if (evAttendees.length > 0) {
-              attendees = [];
-              evAttendees.forEach(name => {
-                const mem = pr[name.trim()];
-                attendees.push({
-                  id: Date.now().toString() + Math.random(),
-                  name: name.trim(),
-                  role: mem ? mem.role : "Mid-level",
-                  customSalary: mem ? (mem.customSalary || 0) : 0,
-                });
-              });
-              renderAttendees();
-            }
-            document.getElementById("cal-modal").style.display = "none";
-          });
-          list.appendChild(card);
-        });
+    if (raw) {
+      try {
+        const tokenData = JSON.parse(decodeURIComponent(raw));
+        storeZoomToken(tokenData);
+        showToast("✅ Zoom connected!");
+        // Clean URL so token isn't in address bar
+        history.replaceState({}, "", location.pathname);
+        updateIntegrationStatus();
+      } catch(e) {
+        showToast("❌ Zoom: invalid token response");
       }
-      document.getElementById("cal-modal").style.display = "flex";
-    } catch(e) {
-      alert("Could not load calendar: " + e.message);
     }
-    btn.textContent = "📅 Import from Calendar"; btn.disabled = false;
+  })();
+
+  // Connect button → redirect to /api/zoom/auth
+  document.getElementById("zoom-connect-btn").addEventListener("click", () => {
+    window.location.href = "/api/zoom/auth";
   });
 
-  document.getElementById("cal-modal-close").addEventListener("click", () => {
-    document.getElementById("cal-modal").style.display = "none";
+  // "Connect Zoom" hint button in header → open Integrations modal
+  const zoomHintBtn = document.getElementById("zoom-connect-hint-btn");
+  if (zoomHintBtn) {
+    zoomHintBtn.addEventListener("click", () => {
+      document.getElementById("integrations-btn").click();
+      setTimeout(() => {
+        document.getElementById("zoom-integration-block")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 150);
+    });
+  }
+
+  // Disconnect button
+  document.getElementById("zoom-disconnect-btn").addEventListener("click", () => {
+    clearZoomToken();
+    updateIntegrationStatus();
+    showToast("🔌 Zoom disconnected");
+  });
+
+  // "From Zoom" button → fetch meetings and show picker
+  document.getElementById("load-zoom-btn").addEventListener("click", async () => {
+    const token = getZoomToken();
+    if (!token) {
+      showToast("⚠️ Connect Zoom in Integrations first");
+      return;
+    }
+
+    const btn = document.getElementById("load-zoom-btn");
+    btn.textContent = "⏳ Loading…";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`/api/zoom/meetings?access_token=${encodeURIComponent(token.access_token)}`);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to load meetings");
+      }
+
+      const data = await res.json();
+      const meetings = data.meetings || [];
+
+      if (!meetings.length) {
+        showToast("📭 No upcoming Zoom meetings found");
+        btn.textContent = "📹 From Zoom";
+        btn.disabled = false;
+        return;
+      }
+
+      // Build a simple picker overlay
+      const overlay = document.createElement("div");
+      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;";
+      overlay.innerHTML = `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;width:440px;max-width:95vw;max-height:80vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <h3 style="font-size:16px;font-weight:700;">📹 Pick a Zoom Meeting</h3>
+            <button id="zoom-picker-close" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;">×</button>
+          </div>
+          <div id="zoom-meetings-list" style="display:flex;flex-direction:column;gap:8px;">
+            ${meetings.map(m => {
+              const start = m.start_time ? new Date(m.start_time).toLocaleString("en-US", { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }) : "Scheduled";
+              const dur   = m.duration ? `${m.duration} min` : "";
+              return `<button class="zoom-meeting-item" data-id="${m.id}" data-topic="${encodeURIComponent(m.topic||"Zoom Meeting")}" data-duration="${m.duration||0}"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:left;cursor:pointer;color:var(--text);display:flex;flex-direction:column;gap:4px;">
+                <div style="font-size:14px;font-weight:600;">${m.topic || "Zoom Meeting"}</div>
+                <div style="font-size:12px;color:var(--muted);">${start}${dur ? " · " + dur : ""}</div>
+              </button>`;
+            }).join("")}
+          </div>
+        </div>`;
+
+      document.body.appendChild(overlay);
+
+      overlay.querySelector("#zoom-picker-close").addEventListener("click", () => overlay.remove());
+      overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+      overlay.querySelectorAll(".zoom-meeting-item").forEach(item => {
+        item.addEventListener("click", async () => {
+          const topic      = decodeURIComponent(item.dataset.topic);
+          const duration   = parseInt(item.dataset.duration) || 0;
+          const meetingId  = item.dataset.id;
+
+          // Set title
+          document.getElementById("meeting-title").value = topic;
+
+          // Pre-fill duration target if available
+          if (duration) {
+            const durationInput = document.getElementById("duration-input");
+            if (durationInput) durationInput.value = duration;
+          }
+
+          overlay.remove();
+          showToast(`✅ Loaded "${topic}" from Zoom`);
+
+          // Try to fetch registrant emails in background
+          try {
+            const regRes = await fetch(`/api/zoom/registrants?access_token=${encodeURIComponent(token.access_token)}&meeting_id=${encodeURIComponent(meetingId)}`);
+            if (regRes.ok) {
+              const regData = await regRes.json();
+              const registrants = regData.registrants || [];
+              if (registrants.length > 0) {
+                // Match registrants to attendees by name, or add as new attendees with emails
+                registrants.forEach(reg => {
+                  const fullName = `${reg.first_name || ""} ${reg.last_name || ""}`.trim();
+                  const email    = reg.email || "";
+                  if (!email) return;
+
+                  // Try to match existing attendee by name
+                  const match = attendees.find(a => a.name && a.name.toLowerCase() === fullName.toLowerCase());
+                  if (match) {
+                    match.email = email;
+                  } else if (fullName) {
+                    // Add as new attendee
+                    attendees.push({ id: Date.now().toString() + Math.random(), name: fullName, role: "Mid-level", email, customSalary: 0 });
+                  }
+                });
+                renderAttendees();
+                updateStats();
+                showToast(`📧 ${registrants.length} attendee email${registrants.length > 1 ? "s" : ""} loaded from Zoom`);
+              }
+            }
+          } catch(e) {
+            // Silently fail — registrants are a bonus, not required
+          }
+        });
+      });
+
+    } catch(e) {
+      showToast("❌ Zoom: " + e.message);
+    } finally {
+      btn.textContent = "📹 From Zoom";
+      btn.disabled = false;
+    }
+  });
+
+  // Slack test button
+  document.getElementById("slack-test-btn").addEventListener("click", async () => {
+    const webhook = document.getElementById("slack-webhook-input").value.trim();
+    if (!webhook) {
+      showToast("⚠️ Enter a Slack webhook URL first");
+      return;
+    }
+
+    const btn = document.getElementById("slack-test-btn");
+    btn.disabled = true;
+    btn.textContent = "Testing...";
+
+    try {
+      if (DEMO_MODE) {
+        // In demo mode, simulate success
+        await new Promise(r => setTimeout(r, 800));
+        showToast("✅ Slack webhook test successful (demo)");
+      } else {
+        const res = await fetch(`${API}/api/slack-notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            webhook_url: webhook,
+            title: "Test Message",
+            duration: "0:05:00",
+            cost: 50.00,
+            attendees: [{ name: "Alice", role: "Senior" }],
+          }),
+        });
+        if (res.ok) {
+          showToast("✅ Slack webhook test successful");
+        } else {
+          showToast("⚠️ Slack webhook test failed");
+        }
+      }
+    } catch (e) {
+      showToast("⚠️ Error: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Test";
+    }
+  });
+
+  // Calendar test button
+  document.getElementById("gcal-test-btn").addEventListener("click", async () => {
+    const icsUrl = document.getElementById("gcal-ics-input").value.trim();
+    if (!icsUrl) {
+      showToast("⚠️ Enter a Google Calendar ICS URL first");
+      return;
+    }
+
+    const btn = document.getElementById("gcal-test-btn");
+    btn.disabled = true;
+    btn.textContent = "Testing...";
+
+    try {
+      if (DEMO_MODE) {
+        // In demo mode, simulate some events
+        await new Promise(r => setTimeout(r, 800));
+        showToast("✅ Calendar URL test successful (demo)");
+      } else {
+        const res = await fetch(`${API}/api/calendar-events`);
+        if (res.ok) {
+          const events = await res.json();
+          showToast(`✅ Found ${events.length} upcoming events`);
+        } else {
+          showToast("⚠️ Calendar URL test failed");
+        }
+      }
+    } catch (e) {
+      showToast("⚠️ Error: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Test";
+    }
+  });
+
+  // Load calendar events for the picker
+  async function loadCalendarEvents() {
+    if (DEMO_MODE) {
+      return [
+        { title: "Team Standup", start: new Date(Date.now() + 3600000), duration_minutes: 15,
+          attendees: [{ name: "Alice Chen", email: "alice@company.com" }, { name: "Bob Kim", email: "bob@company.com" }, { name: "Sara Lee", email: "sara@company.com" }] },
+        { title: "Client Call", start: new Date(Date.now() + 7200000), duration_minutes: 60,
+          attendees: [{ name: "James Wu", email: "james@client.com" }, { name: "Maria Gomez", email: "maria@company.com" }] },
+        { title: "Planning Session", start: new Date(Date.now() + 86400000), duration_minutes: 90,
+          attendees: [{ name: "David Park", email: "david@company.com" }, { name: "Emma Jones", email: "emma@company.com" }, { name: "Liam Brown", email: "liam@company.com" }, { name: "Zoe White", email: "zoe@company.com" }] },
+      ];
+    }
+
+    try {
+      const res = await fetch(`${API}/api/calendar-events`);
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      console.error("Failed to load calendar events", e);
+    }
+    return [];
+  }
+
+  // Calendar picker button
+  document.getElementById("load-calendar-btn").addEventListener("click", async () => {
+    if (!DEMO_MODE && !integrationsConfig.gcal_ics_url) {
+      showToast("⚠️ Configure Google Calendar in Integrations first");
+      return;
+    }
+
+    const picker = document.getElementById("calendar-dropdown");
+    const btn = document.getElementById("load-calendar-btn");
+
+    if (picker.classList.contains("open")) {
+      picker.classList.remove("open");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Loading...";
+
+    try {
+      const events = await loadCalendarEvents();
+      const list = document.getElementById("calendar-events-list");
+      list.innerHTML = "";
+
+      if (events.length === 0) {
+        list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;">No upcoming events</div>';
+      } else {
+        events.forEach(event => {
+          const item = document.createElement("div");
+          item.style.cssText = "padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.2s";
+          const duration = event.duration_minutes || 60;
+          const start = new Date(event.start);
+          const timeStr = start.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+          item.textContent = `${event.title} — ${timeStr} (${duration}m)`;
+          item.onclick = () => selectCalendarEvent(event);
+          item.onmouseover = () => item.style.background = "var(--surface2)";
+          item.onmouseout = () => item.style.background = "none";
+          list.appendChild(item);
+        });
+      }
+
+      picker.classList.add("open");
+    } catch (e) {
+      showToast("⚠️ Error loading events: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "📅 From Calendar";
+    }
+  });
+
+  function selectCalendarEvent(event) {
+    document.getElementById("meeting-title").value = event.title;
+
+    if (event.attendees && event.attendees.length > 0) {
+      attendees = event.attendees.map(a => ({
+        id: Date.now().toString() + Math.random(),
+        name: a.name || "",
+        email: a.email || "",
+        role: "Mid-level",
+        customSalary: 0,
+      }));
+      renderAttendees();
+      updateStats();
+      showToast(`✓ Loaded "${event.title}" · ${event.attendees.length} attendees auto-filled`);
+    } else {
+      showToast(`✓ Loaded "${event.title}"`);
+    }
+
+    document.getElementById("calendar-dropdown").classList.remove("open");
+    document.getElementById("load-calendar-btn").textContent = "📅 From Calendar";
+  }
+
+  // Post to Slack from debrief modal
+  document.getElementById("debrief-slack-btn").addEventListener("click", async () => {
+    if (!integrationsConfig.slack_webhook) return;
+    const btn = document.getElementById("debrief-slack-btn");
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const cost = totalPerSecond() * elapsedSeconds;
+    btn.disabled = true;
+    try {
+      if (DEMO_MODE) {
+        await new Promise(r => setTimeout(r, 600));
+        btn.classList.add("sent");
+        btn.textContent = "✓ Sent";
+        showToast("✅ Posted to Slack (demo)");
+      } else {
+        await fetch(`${API}/api/slack-notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            webhook_url: integrationsConfig.slack_webhook,
+            title, duration: fmtTime(elapsedSeconds),
+            cost: parseFloat(cost.toFixed(2)),
+            attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role, email: a.email || "" })),
+          }),
+        });
+        btn.classList.add("sent");
+        btn.textContent = "✓ Sent";
+        showToast("✅ Posted to Slack");
+      }
+    } catch (e) {
+      showToast("⚠️ Slack error: " + e.message);
+      btn.disabled = false;
+    }
+  });
+
+  // Post to Slack button in save modal
+  document.getElementById("modal-slack-btn").addEventListener("click", async () => {
+    if (!integrationsConfig.slack_webhook) {
+      showToast("⚠️ Slack not configured");
+      return;
+    }
+
+    const btn = document.getElementById("modal-slack-btn");
+    const title = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const duration = fmtTime(elapsedSeconds);
+    const cost = totalPerSecond() * elapsedSeconds;
+    const costStr = fmtMoneyPlain(cost);
+
+    btn.disabled = true;
+    btn.textContent = "Posting...";
+
+    try {
+      if (DEMO_MODE) {
+        await new Promise(r => setTimeout(r, 600));
+        showToast("✅ Posted to Slack (demo)");
+      } else {
+        await fetch(`${API}/api/slack-notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            webhook_url: integrationsConfig.slack_webhook,
+            title: title,
+            duration: duration,
+            cost: parseFloat(cost.toFixed(2)),
+            attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role, email: a.email || "" })),
+          }),
+        });
+        showToast("✅ Posted to Slack");
+      }
+    } catch (e) {
+      showToast("⚠️ Error posting to Slack: " + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "📨 Post to Slack";
+    }
+  });
+
+  // Show/hide Slack post button based on config
+  function updateSlackPostButtonVisibility() {
+    const btn = document.getElementById("modal-slack-btn");
+    btn.style.display = integrationsConfig.slack_webhook ? "inline-block" : "none";
+  }
+
+  // ── Templates ──────────────────────────────────────────────
+  const DEFAULT_TEMPLATES = [
+    { id: "standup", name: "Weekly Standup",  title: "Weekly Standup",
+      attendees: [
+        { name: "", role: "Mid-level", customSalary: 0, email: "" },
+        { name: "", role: "Mid-level", customSalary: 0, email: "" },
+        { name: "", role: "Manager",   customSalary: 0, email: "" },
+      ]
+    },
+    { id: "1on1", name: "1:1 Check-in", title: "1:1 Check-in",
+      attendees: [
+        { name: "", role: "Mid-level", customSalary: 0, email: "" },
+        { name: "", role: "Manager",   customSalary: 0, email: "" },
+      ]
+    },
+    { id: "client", name: "Client Call", title: "Client Call",
+      attendees: [
+        { name: "", role: "Senior",  customSalary: 0, email: "" },
+        { name: "", role: "Manager", customSalary: 0, email: "" },
+      ]
+    },
+    { id: "teamsync", name: "Team Sync", title: "Team Sync",
+      attendees: [
+        { name: "", role: "Mid-level", customSalary: 0, email: "" },
+        { name: "", role: "Mid-level", customSalary: 0, email: "" },
+        { name: "", role: "Senior",    customSalary: 0, email: "" },
+        { name: "", role: "Manager",   customSalary: 0, email: "" },
+      ]
+    },
+  ];
+
+  function getCustomTemplates() {
+    try { return JSON.parse(localStorage.getItem("mm_templates") || "[]"); } catch { return []; }
+  }
+
+  function getAllTemplates() {
+    return [...getCustomTemplates(), ...DEFAULT_TEMPLATES];
+  }
+
+  function renderTemplateList() {
+    const list = document.getElementById("template-list");
+    const all = getAllTemplates();
+    const custom = getCustomTemplates();
+    list.innerHTML = all.map(t => `
+      <div class="template-item" data-id="${t.id}">
+        <span class="template-item-name">${t.name}</span>
+        <span class="template-item-count">${t.attendees.length} people</span>
+        ${custom.find(c => c.id === t.id)
+          ? `<button class="template-del" data-del="${t.id}" title="Delete">×</button>`
+          : ""}
+      </div>
+    `).join("");
+
+    list.querySelectorAll(".template-item").forEach(el => {
+      el.addEventListener("click", e => {
+        if (e.target.closest(".template-del")) return;
+        const tmpl = getAllTemplates().find(t => t.id === el.dataset.id);
+        if (!tmpl) return;
+        if (running && !confirm("A meeting is in progress. Load template?")) return;
+        if (running) clearAll();
+        // Fresh start: clear all debrief notes when loading template
+        currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
+        document.getElementById("debrief-decisions").value = "";
+        document.getElementById("debrief-actions").value = "";
+        document.getElementById("debrief-ai-section").innerHTML = "";
+        // Load template attendees and title
+        document.getElementById("meeting-title").value = tmpl.title;
+        attendees = tmpl.attendees.map(a => ({ ...a, id: Date.now().toString() + Math.random().toString(36).slice(2) }));
+        renderAttendees();
+        showToast(`📋 Loaded "${tmpl.name}"`);
+        document.getElementById("template-dropdown").classList.remove("open");
+      });
+    });
+
+    list.querySelectorAll(".template-del").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = btn.dataset.del;
+        const custom = getCustomTemplates().filter(t => t.id !== id);
+        localStorage.setItem("mm_templates", JSON.stringify(custom));
+        renderTemplateList();
+      });
+    });
+  }
+
+  // Toggle template dropdown
+  document.getElementById("template-btn").addEventListener("click", e => {
+    e.stopPropagation();
+    const dd = document.getElementById("template-dropdown");
+    const wasOpen = dd.classList.contains("open");
+    dd.classList.toggle("open", !wasOpen);
+    if (!wasOpen) renderTemplateList();
+  });
+  document.addEventListener("click", () => {
+    document.getElementById("template-dropdown").classList.remove("open");
+  });
+  document.getElementById("template-dropdown").addEventListener("click", e => e.stopPropagation());
+
+  // Save current meeting as template
+  document.getElementById("template-save-btn").addEventListener("click", () => {
+    const name = document.getElementById("template-name-input").value.trim();
+    if (!name) { showToast("⚠️ Enter a template name"); return; }
+    if (attendees.length === 0) { showToast("⚠️ Add attendees first"); return; }
+    const custom = getCustomTemplates();
+    custom.unshift({
+      id: Date.now().toString(),
+      name,
+      title: document.getElementById("meeting-title").value || name,
+      attendees: attendees.map(a => ({ name: a.name, role: a.role, customSalary: a.customSalary, email: a.email })),
+    });
+    localStorage.setItem("mm_templates", JSON.stringify(custom));
+    document.getElementById("template-name-input").value = "";
+    renderTemplateList();
+    showToast(`✅ Template "${name}" saved`);
+  });
+
+  // ── Monthly Report ──────────────────────────────────────────
+  function openMonthlyReport() {
+    const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+    if (history.length === 0) { showToast("⚠️ No meetings saved yet"); return; }
+
+    const sym = currencySymbol();
+
+    // Group by month
+    const months = {};
+    history.forEach(m => {
+      const d = new Date((m.timestamp || Date.now() / 1000) * 1000);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("en-US", { year: "numeric", month: "long" });
+      if (!months[key]) months[key] = { label, meetings: [], totalCost: 0, totalSeconds: 0 };
+      months[key].meetings.push(m);
+      months[key].totalCost += m.total_cost || 0;
+      months[key].totalSeconds += m.duration_seconds || 0;
+    });
+
+    const sortedKeys = Object.keys(months).sort().reverse();
+    const grandTotal  = sortedKeys.reduce((s, k) => s + months[k].totalCost, 0);
+    const grandCount  = history.length;
+    const grandSecs   = sortedKeys.reduce((s, k) => s + months[k].totalSeconds, 0);
+    const avgPerMtg   = grandTotal / grandCount;
+    const mostExp     = [...history].sort((a, b) => (b.total_cost || 0) - (a.total_cost || 0))[0];
+
+    // Summary cards
+    const summaryHtml = `
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Spent</div>
+          <div style="font-size:26px;font-weight:800;color:var(--gold);">${sym}${toCurrentCurrency(grandTotal).toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${sortedKeys.length} month${sortedKeys.length !== 1 ? "s" : ""}</div>
+        </div>
+        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Meetings Tracked</div>
+          <div style="font-size:26px;font-weight:800;">${grandCount}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtTime(grandSecs)} total time</div>
+        </div>
+        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Avg Cost / Meeting</div>
+          <div style="font-size:26px;font-weight:800;">${sym}${toCurrentCurrency(avgPerMtg).toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtTime(Math.round(grandSecs / grandCount))} avg duration</div>
+        </div>
+        <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Most Expensive</div>
+          <div style="font-size:18px;font-weight:800;color:#f87171;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sym}${toCurrentCurrency(mostExp.total_cost || 0).toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${mostExp.title || "Untitled"}</div>
+        </div>
+      </div>`;
+
+    // Monthly breakdown
+    const maxMonthCost = Math.max(...sortedKeys.map(k => months[k].totalCost));
+    const monthsHtml = sortedKeys.map(key => {
+      const mo = months[key];
+      const barPct = maxMonthCost > 0 ? (mo.totalCost / maxMonthCost * 100).toFixed(1) : 0;
+      const avgCost = mo.totalCost / mo.meetings.length;
+      const maxMeetingCost = Math.max(...mo.meetings.map(m => m.total_cost || 0));
+
+      const rows = mo.meetings
+        .sort((a, b) => (b.total_cost || 0) - (a.total_cost || 0))
+        .map(m => {
+          const barW = maxMeetingCost > 0 ? ((m.total_cost || 0) / maxMeetingCost * 100).toFixed(1) : 0;
+          return `<div class="report-meeting-row">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+                <span class="report-meeting-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.title || "Untitled"}</span>
+                <span class="report-meeting-cost">${sym}${toCurrentCurrency(m.total_cost || 0).toFixed(2)}</span>
+              </div>
+              <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+                <div style="height:100%;width:${barW}%;background:linear-gradient(90deg,#7c6af7,#a78bfa);border-radius:2px;"></div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">${fmtTime(m.duration_seconds)} · ${m.attendees?.length || 0} attendees</div>
+            </div>
+          </div>`;
+        }).join("");
+
+      return `
+        <div class="report-month">
+          <div class="report-month-header">
+            <div style="flex:1;">
+              <div class="report-month-name">${mo.label}</div>
+              <div class="report-month-meta">${mo.meetings.length} meeting${mo.meetings.length !== 1 ? "s" : ""} · avg ${sym}${toCurrentCurrency(avgCost).toFixed(2)} · ${fmtTime(mo.totalSeconds)}</div>
+              <div style="height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;">
+                <div style="height:100%;width:${barPct}%;background:linear-gradient(90deg,#f59e0b,#fde68a);border-radius:2px;"></div>
+              </div>
+            </div>
+            <div class="report-month-total" style="margin-left:16px;">${sym}${toCurrentCurrency(mo.totalCost).toFixed(2)}</div>
+          </div>
+          ${rows}
+        </div>`;
+    }).join("");
+
+    document.getElementById("report-sub").textContent =
+      `Generated ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
+    document.getElementById("report-content").innerHTML = summaryHtml + monthsHtml;
+    document.getElementById("report-modal").classList.add("open");
+  }
+
+  document.getElementById("monthly-report-btn").addEventListener("click", openMonthlyReport);
+  document.getElementById("report-close").addEventListener("click", () => {
+    document.getElementById("report-modal").classList.remove("open");
+  });
+  document.getElementById("report-modal").addEventListener("click", function(e) {
+    if (e.target === this) this.classList.remove("open");
   });
 
   // ── Init ───────────────────────────────────────────────────
-  addAttendee(); // start with one blank attendee
+  addAttendee();
   loadHistory();
-  refreshProUI();
+  checkShareParam();
+  loadIntegrations().then(() => {
+    updateIntegrationStatus();
+    updateSlackPostButtonVisibility();
+  });
 </script>
 </body>
 </html>
