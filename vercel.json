@@ -6,7 +6,8 @@
     { "src": "google6511461603d34f80.html", "use": "@vercel/static" },
     { "src": "sitemap.xml",                 "use": "@vercel/static" },
     { "src": "robots.txt",                  "use": "@vercel/static" },
-    { "src": "api/*.py",                    "use": "@vercel/python" }
+    { "src": "api/*.py",                    "use": "@vercel/python" },
+    { "src": "api/zoom/*.js",               "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/slack-notify",           "dest": "/api/slack-notify.py" },
@@ -14,6 +15,10 @@
     { "src": "/api/verify-license",         "dest": "/api/verify-license.py" },
     { "src": "/api/verify-subscription",    "dest": "/api/verify-subscription.py" },
     { "src": "/api/customer-portal",        "dest": "/api/customer-portal.py" },
+    { "src": "/api/zoom/callback",          "dest": "/api/zoom/callback.js" },
+    { "src": "/api/zoom/auth",              "dest": "/api/zoom/auth.js" },
+    { "src": "/api/zoom/meetings",          "dest": "/api/zoom/meetings.js" },
+    { "src": "/api/zoom/registrants",       "dest": "/api/zoom/registrants.js" },
     { "src": "/google6511461603d34f80.html","dest": "/google6511461603d34f80.html" },
     { "src": "/sitemap.xml",                "dest": "/sitemap.xml" },
     { "src": "/robots.txt",                 "dest": "/robots.txt" },
