@@ -2601,27 +2601,22 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
         });
       }
 
-      // Slack button on history card — post this saved meeting to Slack
+      // Slack card button — post saved meeting summary to Slack
       const slackCardBtn = card.querySelector(".slack-card-btn");
       if (slackCardBtn) {
         slackCardBtn.addEventListener("click", async () => {
           const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
           const webhookUrl = stored.slack_webhook || integrationsConfig.slack_webhook || "";
-          if (!webhookUrl) {
-            showToast("⚠️ Connect Slack in Integrations first");
-            return;
-          }
+          if (!webhookUrl) { showToast("⚠️ Connect Slack in Integrations first"); return; }
           slackCardBtn.textContent = "⏳ Posting…";
           slackCardBtn.disabled = true;
           try {
             const d = item.debrief || {};
-            const duration = fmtTime(item.duration_seconds);
-            const cost = fmtMoneyPlain(item.total_cost);
             const ratingText = d.rating ? `\n*Rating:* ${RATING_LABEL[d.rating]}` : "";
             const summary = d.aiSummary || d.decisions || "";
             const actions = d.actions && !d.aiSummary ? `\n*Action Items:* ${d.actions}` : "";
             const attendeeList = item.attendees.map(a => `• ${a.name || "Unnamed"} (${a.role})`).join("\n");
-            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${cost}  |  *Duration:* ${duration}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${summary ? `\n\n*Summary:*\n${summary}` : ""}${actions}`;
+            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${fmtMoneyPlain(item.total_cost)}  |  *Duration:* ${fmtTime(item.duration_seconds)}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${summary ? `\n\n*Summary:*\n${summary}` : ""}${actions}`;
             const res = await fetch("/api/slack-notify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -2630,14 +2625,8 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
             if (res.ok) {
               slackCardBtn.textContent = "✅ Sent!";
               slackCardBtn.classList.add("sent");
-              setTimeout(() => {
-                slackCardBtn.textContent = "💬 Slack";
-                slackCardBtn.disabled = false;
-                slackCardBtn.classList.remove("sent");
-              }, 3000);
-            } else {
-              throw new Error("Slack post failed");
-            }
+              setTimeout(() => { slackCardBtn.textContent = "💬 Slack"; slackCardBtn.disabled = false; slackCardBtn.classList.remove("sent"); }, 3000);
+            } else { throw new Error(); }
           } catch {
             showToast("❌ Failed to post to Slack");
             slackCardBtn.textContent = "💬 Slack";
@@ -3014,7 +3003,7 @@ Be concise and direct.`;
   // Auto-enable demo mode when NOT running on localhost (i.e. Vercel staging)
   // Also enable via ?demo query param or localStorage flag
   const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  const ZOOM_ENABLED = true; // Zoom API is deployed and enabled on all environments
+  const ZOOM_ENABLED = true; // enabled on all environments
   let DEMO_MODE = !isLocalhost || localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
 
   if (DEMO_MODE) {
