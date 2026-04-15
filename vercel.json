@@ -1,27 +1,39 @@
 {
   "version": 2,
-  "name": "meetingmeter-staging",
   "builds": [
-    {
-      "src": "meetingmeter.html",
-      "use": "@vercel/static"
-    }
+    { "src": "meetingmeter.html",           "use": "@vercel/static" },
+    { "src": "index.html",                  "use": "@vercel/static" },
+    { "src": "google6511461603d34f80.html", "use": "@vercel/static" },
+    { "src": "sitemap.xml",                 "use": "@vercel/static" },
+    { "src": "robots.txt",                  "use": "@vercel/static" },
+    { "src": "api/*.py",                    "use": "@vercel/python" }
   ],
   "routes": [
+    { "src": "/api/slack-notify",           "dest": "/api/slack-notify.py" },
+    { "src": "/api/calendar-events",        "dest": "/api/calendar-events.py" },
+    { "src": "/api/verify-license",         "dest": "/api/verify-license.py" },
+    { "src": "/api/verify-subscription",    "dest": "/api/verify-subscription.py" },
+    { "src": "/api/customer-portal",        "dest": "/api/customer-portal.py" },
+    { "src": "/google6511461603d34f80.html","dest": "/google6511461603d34f80.html" },
+    { "src": "/sitemap.xml",                "dest": "/sitemap.xml" },
+    { "src": "/robots.txt",                 "dest": "/robots.txt" },
+    { "src": "/app",                        "dest": "/meetingmeter.html" },
+    { "src": "/staging",                    "dest": "/meetingmeter.html" },
+    { "src": "/",                           "dest": "/index.html" }
+  ],
+  "redirects": [
     {
-      "src": "/",
-      "dest": "/meetingmeter.html"
-    },
-    {
-      "src": "/staging",
-      "dest": "/meetingmeter.html"
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.meetingmeter.tech" }],
+      "destination": "https://meetingmeter.tech/:path*",
+      "permanent": true
     }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
         { "key": "X-Content-Type-Options", "value": "nosniff" }
       ]
     }
