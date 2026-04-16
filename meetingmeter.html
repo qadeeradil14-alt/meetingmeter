@@ -2633,6 +2633,7 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
       const emailBtn = card.querySelector(".email-btn");
       if (emailBtn) {
         emailBtn.addEventListener("click", () => {
+          if (!isPaid()) { showUpgradeModal(); return; }
           if (!hasEmails) {
             // Show the add-emails row
             const row = card.querySelector(`#add-emails-${item.id}`);
