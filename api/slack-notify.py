@@ -32,40 +32,52 @@ class handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "Invalid Slack webhook URL"}, 400)
             return
 
-        title       = body.get("title", "Untitled Meeting")
-        duration    = body.get("duration", "00:00:00")
-        total_cost  = body.get("total_cost", "$0.00")
-        currency    = body.get("currency", "USD")
-        attendees   = body.get("attendees", [])
+        # Card button sends a pre-formatted message — forward it directly
+        message = body.get("message", "")
+        if message:
+            payload = {"text": message}
+        else:
+            # Structured format from debrief / save-modal buttons
+            title     = body.get("title", "Untitled Meeting")
+            duration  = body.get("duration", "00:00:00")
+            currency  = body.get("currency", "USD")
 
-        attendee_lines = "\n".join(
-            f"  • {a.get('name', '?')} ({a.get('role', '')}) — {a.get('cost', '$0.00')}"
-            for a in attendees
-        ) or "  No attendees recorded."
+            # Accept total_cost as a pre-formatted string OR cost as a raw number
+            cost_raw = body.get("total_cost") if body.get("total_cost") is not None else body.get("cost", 0)
+            if isinstance(cost_raw, (int, float)):
+                total_cost = f"${cost_raw:,.2f}"
+            else:
+                total_cost = str(cost_raw) if cost_raw else "$0.00"
 
-        payload = {
-            "blocks": [
-                {
-                    "type": "header",
-                    "text": {"type": "plain_text", "text": f"💸 MeetingMeter: {title}"}
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {"type": "mrkdwn", "text": f"*Duration*\n{duration}"},
-                        {"type": "mrkdwn", "text": f"*Total Cost*\n:moneybag: *{total_cost}* {currency}"},
-                    ]
-                },
-                {
-                    "type": "section",
-                    "text": {"type": "mrkdwn", "text": f"*Attendee Breakdown*\n{attendee_lines}"}
-                },
-                {
-                    "type": "context",
-                    "elements": [{"type": "mrkdwn", "text": "Sent by *MeetingMeter* — Know the real cost of every meeting."}]
-                }
-            ]
-        }
+            attendees = body.get("attendees", [])
+            attendee_lines = "\n".join(
+                f"  • {a.get('name', '?')} ({a.get('role', '')}) — {a.get('cost', '')}"
+                for a in attendees
+            ) or "  No attendees recorded."
+
+            payload = {
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {"type": "plain_text", "text": f"💸 MeetingMeter: {title}"}
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                            {"type": "mrkdwn", "text": f"*Duration*\n{duration}"},
+                            {"type": "mrkdwn", "text": f"*Total Cost*\n:moneybag: *{total_cost}*"},
+                        ]
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*Attendee Breakdown*\n{attendee_lines}"}
+                    },
+                    {
+                        "type": "context",
+                        "elements": [{"type": "mrkdwn", "text": "Sent by *MeetingMeter* — Know the real cost of every meeting."}]
+                    }
+                ]
+            }
 
         data = json.dumps(payload).encode()
         req  = urllib.request.Request(webhook_url, data=data, method="POST")

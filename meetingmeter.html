@@ -3082,6 +3082,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Integrations modal handlers
   document.getElementById("integrations-btn").addEventListener("click", () => {
+    // Integrations are a Pro feature — gate access
+    if (!isPaid()) {
+      showUpgradeModal();
+      return;
+    }
+
     // Populate current config into form
     document.getElementById("slack-webhook-input").value = integrationsConfig.slack_webhook || "";
     document.getElementById("gcal-ics-input").value = integrationsConfig.gcal_ics_url || "";
@@ -3530,9 +3536,14 @@ Sent via MeetingMeter · meetingmeter.tech`;
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             webhook_url: integrationsConfig.slack_webhook,
-            title, duration: fmtTime(elapsedSeconds),
-            cost: parseFloat(cost.toFixed(2)),
-            attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role, email: a.email || "" })),
+            title,
+            duration: fmtTime(elapsedSeconds),
+            total_cost: fmtMoneyPlain(cost),
+            attendees: attendees.map(a => ({
+              name: a.name || "Unnamed",
+              role: a.role,
+              cost: fmtMoneyPlain(attendeePerSecond(a) * elapsedSeconds),
+            })),
           }),
         });
         btn.classList.add("sent");
@@ -3556,7 +3567,6 @@ Sent via MeetingMeter · meetingmeter.tech`;
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
     const duration = fmtTime(elapsedSeconds);
     const cost = totalPerSecond() * elapsedSeconds;
-    const costStr = fmtMoneyPlain(cost);
 
     btn.disabled = true;
     btn.textContent = "Posting...";
@@ -3573,8 +3583,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
             webhook_url: integrationsConfig.slack_webhook,
             title: title,
             duration: duration,
-            cost: parseFloat(cost.toFixed(2)),
-            attendees: attendees.map(a => ({ name: a.name || "Unnamed", role: a.role, email: a.email || "" })),
+            total_cost: fmtMoneyPlain(cost),
+            attendees: attendees.map(a => ({
+              name: a.name || "Unnamed",
+              role: a.role,
+              cost: fmtMoneyPlain(attendeePerSecond(a) * elapsedSeconds),
+            })),
           }),
         });
         showToast("✅ Posted to Slack");
