@@ -1721,7 +1721,8 @@
   const FREE_ATTENDEE_LIMIT = 3;
 
   function isPaid() {
-    return localStorage.getItem("mm_paid") === "true";
+    return localStorage.getItem("mm_paid") === "true" ||
+           localStorage.getItem("mm_admin") === "true";
   }
 
   function unlockPaid() {
@@ -1734,6 +1735,26 @@
   function showUpgradeModal() {
     document.getElementById("upgrade-modal").classList.add("open");
   }
+
+  // Admin bypass — visit /app?admin=mm_owner_2024 to unlock all features permanently
+  (function checkAdminKey() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("admin") === "mm_owner_2024") {
+      localStorage.setItem("mm_admin", "true");
+      localStorage.setItem("mm_paid", "true");
+      history.replaceState({}, "", window.location.pathname);
+      showToast("🔑 Admin mode enabled — all features unlocked");
+      renderAttendees();
+    }
+    // ?admin=reset removes admin bypass
+    if (params.get("admin") === "reset") {
+      localStorage.removeItem("mm_admin");
+      localStorage.removeItem("mm_paid");
+      history.replaceState({}, "", window.location.pathname);
+      showToast("🔒 Admin mode cleared");
+      renderAttendees();
+    }
+  })();
 
   // Detect ?mm_unlocked=1 redirect from Stripe success URL
   (function checkStripeReturn() {
