@@ -1542,10 +1542,20 @@
         </a>
       </div>
     </div>
-    <p class="upgrade-restore">
-      After payment, come back here and click:
-      <a href="#" id="restore-purchase-link">✅ I've purchased — unlock access</a>
-    </p>
+    <div id="restore-section" style="margin-top:16px;">
+      <p class="upgrade-restore" style="margin-bottom:8px;">
+        Already purchased? Enter your purchase email to restore access:
+      </p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <input type="email" id="restore-email-input" placeholder="your@email.com"
+          style="flex:1;min-width:180px;max-width:260px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:13px;outline:none;" />
+        <button id="restore-purchase-link"
+          style="padding:8px 16px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+          ✅ Restore Access
+        </button>
+      </div>
+      <div id="restore-msg" style="font-size:12px;margin-top:8px;min-height:18px;text-align:center;"></div>
+    </div>
   </div>
 </div>
 
@@ -1773,10 +1783,50 @@
     if (e.target === this) this.classList.remove("open");
   });
 
-  // "I've purchased" restore link
-  document.getElementById("restore-purchase-link").addEventListener("click", function(e) {
+  // "Restore Access" — verify email against Stripe before unlocking
+  document.getElementById("restore-purchase-link").addEventListener("click", async function(e) {
     e.preventDefault();
-    unlockPaid();
+    const emailInput = document.getElementById("restore-email-input");
+    const msgEl = document.getElementById("restore-msg");
+    const email = emailInput.value.trim().toLowerCase();
+
+    if (!email || !email.includes("@")) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "Please enter a valid email address.";
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = "Checking…";
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Verifying with Stripe…";
+
+    try {
+      const res = await fetch("/api/verify-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        msgEl.style.color = "var(--green)";
+        msgEl.textContent = "✅ Subscription verified!";
+        setTimeout(() => {
+          unlockPaid();
+          document.getElementById("restore-msg").textContent = "";
+        }, 800);
+      } else {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
+      }
+    } catch {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "❌ Verification failed — please try again.";
+    } finally {
+      this.disabled = false;
+      this.textContent = "✅ Restore Access";
+    }
   });
 
   // ── State ──────────────────────────────────────────────────
