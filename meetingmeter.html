@@ -2331,6 +2331,7 @@
   }
 
   document.getElementById("debrief-generate").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     // Always re-read from localStorage in case it was saved after page load
     const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
     if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
@@ -2672,10 +2673,11 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
         });
       }
 
-      // Slack card button — post saved meeting summary to Slack
+      // Slack card button — post saved meeting summary to Slack (Pro only)
       const slackCardBtn = card.querySelector(".slack-card-btn");
       if (slackCardBtn) {
         slackCardBtn.addEventListener("click", async () => {
+          if (!isPaid()) { showUpgradeModal(); return; }
           const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
           const webhookUrl = stored.slack_webhook || integrationsConfig.slack_webhook || "";
           if (!webhookUrl) { showToast("⚠️ Connect Slack in Integrations first"); return; }
@@ -2683,11 +2685,12 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
           slackCardBtn.disabled = true;
           try {
             const d = item.debrief || {};
+            // Only use AI-generated summary — not raw user input
+            const aiSummary = d.aiSummary || "";
             const ratingText = d.rating ? `\n*Rating:* ${RATING_LABEL[d.rating]}` : "";
-            const summary = d.aiSummary || d.decisions || "";
-            const actions = d.actions && !d.aiSummary ? `\n*Action Items:* ${d.actions}` : "";
+            const actions = d.actions ? `\n*Action Items:* ${d.actions}` : "";
             const attendeeList = item.attendees.map(a => `• ${a.name || "Unnamed"} (${a.role})`).join("\n");
-            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${fmtMoneyPlain(item.total_cost)}  |  *Duration:* ${fmtTime(item.duration_seconds)}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${summary ? `\n\n*Summary:*\n${summary}` : ""}${actions}`;
+            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${fmtMoneyPlain(item.total_cost)}  |  *Duration:* ${fmtTime(item.duration_seconds)}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${aiSummary ? `\n\n*AI Summary:*\n${aiSummary}` : ""}${actions}`;
             const res = await fetch("/api/slack-notify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -2738,6 +2741,7 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
       const aiBtn = card.querySelector(".ai-btn");
       if (aiBtn) {
         aiBtn.addEventListener("click", async () => {
+          if (!isPaid()) { showUpgradeModal(); return; }
           const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
           if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
           const key = integrationsConfig.claude_api_key || "";
@@ -2901,6 +2905,7 @@ Be concise and direct.`;
 
   // ── Export (PDF via print + CSV) ───────────────────────────
   document.getElementById("export-btn").addEventListener("click", () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     if (!getExportData()) {
       alert("No meeting data to export yet. Start and complete a meeting first.");
       return;
@@ -3280,6 +3285,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Connect button → redirect to /api/zoom/auth
   document.getElementById("zoom-connect-btn").addEventListener("click", () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     window.location.href = "/api/zoom/auth";
   });
 
@@ -3303,6 +3309,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // "From Zoom" button → fetch meetings and show picker
   document.getElementById("load-zoom-btn").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     const token = getZoomToken();
     if (!token) {
       showToast("⚠️ Connect Zoom in Integrations first");
@@ -3519,6 +3526,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Calendar picker button
   document.getElementById("load-calendar-btn").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     if (!DEMO_MODE && !integrationsConfig.gcal_ics_url) {
       showToast("⚠️ Configure Google Calendar in Integrations first");
       return;
@@ -3590,6 +3598,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Post to Slack from debrief modal
   document.getElementById("debrief-slack-btn").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     if (!integrationsConfig.slack_webhook) return;
     const btn = document.getElementById("debrief-slack-btn");
     const title = document.getElementById("meeting-title").value || "Untitled Meeting";
@@ -3629,6 +3638,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Post to Slack button in save modal
   document.getElementById("modal-slack-btn").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
     if (!integrationsConfig.slack_webhook) {
       showToast("⚠️ Slack not configured");
       return;
