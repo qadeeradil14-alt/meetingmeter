@@ -1498,6 +1498,10 @@
     <div>
       <h2>🔗 Integrations</h2>
       <p style="margin-top:6px">Connect MeetingMeter to Slack and Google Calendar. Credentials are stored locally on your device.</p>
+      <div style="background:rgba(124,106,247,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-top:12px;font-size:13px;color:var(--text);">
+        <strong>💾 Your integrations persist after logout</strong><br/>
+        Logging out does <strong>not</strong> erase your integration settings. They'll be available when you log back in on this device. If sharing this device, manually clear browser data to remove them.
+      </div>
     </div>
 
     <!-- Slack -->
@@ -1669,6 +1673,10 @@
         <details style="cursor:pointer;">
           <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">How are my integrations secured?</summary>
           <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">All API keys and webhooks are stored locally in your browser. They are never sent to our servers or shared with third parties.</p>
+        </details>
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">Do my integrations get deleted when I sign out?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">No. Your integrations (Slack, Google Calendar, Claude, Zoom) persist locally on your device after logout. They'll be available when you log back in. If you're sharing a device, you can manually clear browser data to remove them.</p>
         </details>
         <details style="cursor:pointer;">
           <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">What data does MeetingMeter collect?</summary>
