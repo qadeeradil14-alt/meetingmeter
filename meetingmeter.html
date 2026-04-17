@@ -777,16 +777,16 @@
       position: relative;
     }
     .calendar-dropdown {
-      position: absolute;
-      top: calc(100% + 4px);
-      left: 0;
-      right: 0;
-      max-height: 320px;
+      position: fixed;
+      top: auto;
+      min-width: 280px;
+      max-width: 360px;
+      max-height: 70vh;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      z-index: 50;
+      z-index: 150;
       overflow-y: auto;
       display: none;
     }
@@ -1061,10 +1061,11 @@
     /* ── Templates dropdown ── */
     .template-picker { position: relative; }
     .template-dropdown {
-      display: none; position: absolute; top: calc(100% + 6px); right: 0;
+      display: none; position: fixed; top: auto;
       background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; min-width: 210px; z-index: 50;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden;
+      border-radius: 10px; min-width: 240px; max-width: 320px; z-index: 150;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      max-height: 70vh; overflow-y: auto;
     }
     .template-dropdown.open { display: block; }
     .template-dropdown-header {
@@ -4238,7 +4239,8 @@ Sent via MeetingMeter · meetingmeter.tech`;
   }
 
   // Calendar picker button
-  document.getElementById("load-calendar-btn").addEventListener("click", async () => {
+  document.getElementById("load-calendar-btn").addEventListener("click", async (e) => {
+    e.stopPropagation();
     if (!isPaid()) { showUpgradeModal(); return; }
     if (!DEMO_MODE && !integrationsConfig.gcal_ics_url) {
       showToast("⚠️ Configure Google Calendar in Integrations first");
@@ -4253,12 +4255,15 @@ Sent via MeetingMeter · meetingmeter.tech`;
       return;
     }
 
+    // Open dropdown immediately with a loading state inside it (no button text change = no layout shift)
+    const list = document.getElementById("calendar-events-list");
+    list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center;">Loading events…</div>';
+    picker.classList.add("open");
+    positionDropdown(picker, btn);
     btn.disabled = true;
-    btn.textContent = "Loading...";
 
     try {
       const events = await loadCalendarEvents();
-      const list = document.getElementById("calendar-events-list");
       list.innerHTML = "";
 
       if (events.length === 0) {
@@ -4277,13 +4282,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
           list.appendChild(item);
         });
       }
-
-      picker.classList.add("open");
-    } catch (e) {
-      showToast("⚠️ Error loading events: " + e.message);
+      // Reposition in case height changed
+      positionDropdown(picker, btn);
+    } catch (err) {
+      list.innerHTML = '<div style="padding:12px;color:var(--red);font-size:13px;">⚠️ ' + err.message + '</div>';
     } finally {
       btn.disabled = false;
-      btn.textContent = "📅 From Calendar";
     }
   });
 
@@ -4306,7 +4310,6 @@ Sent via MeetingMeter · meetingmeter.tech`;
     }
 
     document.getElementById("calendar-dropdown").classList.remove("open");
-    document.getElementById("load-calendar-btn").textContent = "📅 From Calendar";
   }
 
   // Post to Slack from debrief modal
@@ -4486,18 +4489,47 @@ Sent via MeetingMeter · meetingmeter.tech`;
     });
   }
 
+  // Helper: position a fixed-positioned dropdown below its trigger button
+  function positionDropdown(dropdown, button) {
+    const rect = button.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const ddWidth = Math.max(dropdown.offsetWidth || 240, 240);
+    let left = rect.left;
+    // If dropdown would overflow right edge, anchor to right edge of button
+    if (left + ddWidth > vw - 8) {
+      left = Math.max(8, rect.right - ddWidth);
+    }
+    dropdown.style.top = (rect.bottom + 6) + "px";
+    dropdown.style.left = left + "px";
+  }
+
   // Toggle template dropdown
   document.getElementById("template-btn").addEventListener("click", e => {
     e.stopPropagation();
     const dd = document.getElementById("template-dropdown");
+    const btn = document.getElementById("template-btn");
     const wasOpen = dd.classList.contains("open");
-    dd.classList.toggle("open", !wasOpen);
-    if (!wasOpen) renderTemplateList();
+    if (!wasOpen) {
+      renderTemplateList();
+      dd.classList.add("open");
+      positionDropdown(dd, btn);
+    } else {
+      dd.classList.remove("open");
+    }
   });
   document.addEventListener("click", () => {
     document.getElementById("template-dropdown").classList.remove("open");
+    document.getElementById("calendar-dropdown").classList.remove("open");
   });
   document.getElementById("template-dropdown").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("calendar-dropdown").addEventListener("click", e => e.stopPropagation());
+  // Reposition dropdowns on window resize/scroll
+  window.addEventListener("resize", () => {
+    const tdd = document.getElementById("template-dropdown");
+    const cdd = document.getElementById("calendar-dropdown");
+    if (tdd.classList.contains("open")) positionDropdown(tdd, document.getElementById("template-btn"));
+    if (cdd.classList.contains("open")) positionDropdown(cdd, document.getElementById("load-calendar-btn"));
+  });
 
   // Save current meeting as template
   document.getElementById("template-save-btn").addEventListener("click", () => {
