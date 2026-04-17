@@ -1742,36 +1742,6 @@
   </div>
 </div>
 
-<!-- Email Verification Modal -->
-<div class="modal-overlay" id="email-verification-modal" style="display:none;">
-  <div class="modal" style="width:420px;max-width:95vw;">
-    <h2>🔐 Verify Email</h2>
-    <p style="color:var(--muted);font-size:13px;margin:12px 0;">
-      For security, we need to verify you have access to this email address.
-    </p>
-    <div style="background:var(--surface2);border:1px solid var(--border);padding:12px;border-radius:8px;margin:16px 0;font-size:13px;">
-      <strong id="verify-email-display"></strong>
-    </div>
-    <div style="margin:16px 0;">
-      <div class="section-label">Verification Code</div>
-      <p style="color:var(--muted);font-size:12px;margin-bottom:8px;">
-        Check the code displayed above:
-      </p>
-      <input type="text" id="verification-code-input" placeholder="Enter 6-digit code"
-        style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;outline:none;text-align:center;letter-spacing:2px;"
-        maxlength="10" />
-      <div id="verify-code-display" style="background:var(--surface);padding:12px;border-radius:8px;margin-top:8px;text-align:center;font-family:monospace;font-size:18px;font-weight:bold;color:var(--accent);letter-spacing:3px;"></div>
-    </div>
-    <div id="verification-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="verify-cancel">Cancel</button>
-      <button class="btn btn-primary" id="verify-submit">Verify</button>
-    </div>
-  </div>
-</div>
-  </div>
-</div>
-
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -2012,12 +1982,23 @@
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Verifying with Stripe…";
 
+    // Add 20-second timeout so fetch doesn't hang forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
       const res = await fetch("/api/verify-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
       const data = await res.json();
 
       if (data.ok) {
@@ -2032,9 +2013,14 @@
         msgEl.style.color = "var(--red)";
         msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
       }
-    } catch {
+    } catch (err) {
+      clearTimeout(timeoutId);
       msgEl.style.color = "var(--red)";
-      msgEl.textContent = "❌ Verification failed — please try again.";
+      if (err.name === "AbortError") {
+        msgEl.textContent = "❌ Request timed out. Please try again.";
+      } else {
+        msgEl.textContent = "❌ " + (err.message || "Verification failed — please try again.");
+      }
     } finally {
       this.disabled = false;
       this.textContent = "✅ Restore Access";
