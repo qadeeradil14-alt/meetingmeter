@@ -3258,7 +3258,7 @@ Action items (raw notes): ${d.actions || "None recorded"}`;
             }
 
             // Re-render history so the refined summary and actions both appear
-            renderHistory();
+            renderHistory(history);
             showToast("✅ AI Summary generated");
           } catch(e) {
             showToast("⚠️ " + e.message);
