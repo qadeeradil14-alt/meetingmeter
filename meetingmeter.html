@@ -1742,45 +1742,27 @@
   </div>
 </div>
 
-<!-- Restore Access — Last 4 Card Digits Modal -->
-<div class="modal-overlay" id="restore-last4-modal" style="display:none;">
+<!-- Email Code Verification Modal (shared: restore + manage) -->
+<div class="modal-overlay" id="email-code-modal" style="display:none;">
   <div class="modal" style="width:420px;max-width:95vw;">
-    <h2>🔒 Verify It's You</h2>
+    <h2 id="email-code-title">📧 Check Your Email</h2>
     <p style="color:var(--muted);font-size:13px;margin:12px 0;">
-      We found a subscription with that email. To confirm it's yours, please enter the last 4 digits of the card you subscribed with.
+      We sent a 6-digit code to <strong id="email-code-dest"></strong>. Enter it below to continue.
     </p>
     <div style="margin:16px 0;">
-      <div class="section-label">Last 4 digits of card</div>
-      <input type="text" id="restore-last4-input" placeholder="••••"
-        inputmode="numeric" pattern="[0-9]*" maxlength="4"
-        style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;outline:none;text-align:center;letter-spacing:6px;font-weight:600;" />
+      <div class="section-label">Verification Code</div>
+      <input type="text" id="email-code-input" placeholder="••••••"
+        inputmode="numeric" pattern="[0-9]*" maxlength="6"
+        style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:20px;outline:none;text-align:center;letter-spacing:8px;font-weight:600;" />
     </div>
-    <div id="restore-last4-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
+    <div id="email-code-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="restore-last4-cancel">Cancel</button>
-      <button class="btn btn-primary" id="restore-last4-submit">Verify</button>
+      <button class="btn btn-ghost" id="email-code-cancel">Cancel</button>
+      <button class="btn btn-primary" id="email-code-submit">Verify</button>
     </div>
-  </div>
-</div>
-
-<!-- Card Verification Modal (for Manage Subscription) -->
-<div class="modal-overlay" id="card-verify-modal" style="display:none;">
-  <div class="modal" style="width:420px;max-width:95vw;">
-    <h2>🔒 Verify Your Card</h2>
-    <p style="color:var(--muted);font-size:13px;margin:12px 0;">
-      To manage your subscription, please confirm the last 4 digits of the card you used to subscribe. Only the cardholder knows this.
+    <p style="color:var(--muted);font-size:11px;margin-top:12px;text-align:center;">
+      Didn't get the email? Check spam, or <a href="#" id="email-code-resend" style="color:var(--accent);">resend code</a>.
     </p>
-    <div style="margin:16px 0;">
-      <div class="section-label">Last 4 digits of card</div>
-      <input type="text" id="card-last4-input" placeholder="••••"
-        inputmode="numeric" pattern="[0-9]*" maxlength="4"
-        style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;outline:none;text-align:center;letter-spacing:6px;font-weight:600;" />
-    </div>
-    <div id="card-verify-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" id="card-verify-cancel">Cancel</button>
-      <button class="btn btn-primary" id="card-verify-submit">Continue</button>
-    </div>
   </div>
 </div>
 
@@ -2003,14 +1985,59 @@
     if (e.target === this) this.classList.remove("open");
   });
 
-  // "Restore Access" — email + last4 card digits required to unlock
-  let restoreEmail = "";
+  // ── Email Code Verification (shared: restore access + manage subscription) ──
+  // Shared state for the email-code modal
+  let ecEmail = "";        // which email is being verified
+  let ecChallenge = "";    // signed token returned by backend (proves code was issued)
+  let ecPurpose = "";      // "restore" or "manage" — decides post-verify action
 
+  function openEmailCodeModal(email, purpose) {
+    ecEmail = email;
+    ecPurpose = purpose;
+    document.getElementById("email-code-dest").textContent = email;
+    document.getElementById("email-code-input").value = "";
+    document.getElementById("email-code-msg").textContent = "";
+    document.getElementById("email-code-modal").style.display = "flex";
+    setTimeout(() => document.getElementById("email-code-input").focus(), 100);
+  }
+
+  async function sendCodeTo(email, msgEl, btn, originalBtnText) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    try {
+      const res = await fetch("/api/send-verification-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const data = await res.json();
+      if (data.ok && data.challenge) {
+        ecChallenge = data.challenge;
+        return true;
+      } else {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ " + (data.error || "Could not send code.");
+        return false;
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = err.name === "AbortError"
+        ? "❌ Request timed out. Please try again."
+        : "❌ Error sending code. Please try again.";
+      return false;
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = originalBtnText; }
+    }
+  }
+
+  // "Restore Access" — send code, then open modal
   document.getElementById("restore-purchase-link").addEventListener("click", async function(e) {
     e.preventDefault();
-    const emailInput = document.getElementById("restore-email-input");
+    const email = document.getElementById("restore-email-input").value.trim().toLowerCase();
     const msgEl = document.getElementById("restore-msg");
-    const email = emailInput.value.trim().toLowerCase();
 
     if (!email || !email.includes("@")) {
       msgEl.style.color = "var(--red)";
@@ -2019,98 +2046,91 @@
     }
 
     this.disabled = true;
-    this.textContent = "Checking…";
+    this.textContent = "Sending code…";
     msgEl.style.color = "var(--muted)";
-    msgEl.textContent = "Verifying with Stripe…";
+    msgEl.textContent = "Sending verification code to your inbox…";
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-    try {
-      const res = await fetch("/api/verify-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      const data = await res.json();
-
-      if (data.needs_last4) {
-        // Email has a subscription — prompt for last4 card digits to prove ownership
-        restoreEmail = email;
-        msgEl.textContent = "";
-        document.getElementById("restore-last4-input").value = "";
-        document.getElementById("restore-last4-msg").textContent = "";
-        document.getElementById("restore-last4-modal").style.display = "flex";
-        setTimeout(() => document.getElementById("restore-last4-input").focus(), 100);
-      } else if (data.ok) {
-        msgEl.style.color = "var(--green)";
-        msgEl.textContent = "✅ Subscription verified!";
-        localStorage.setItem("mm_email", email);
-        setTimeout(() => { unlockPaid(); document.getElementById("restore-msg").textContent = ""; }, 800);
-      } else {
-        msgEl.style.color = "var(--red)";
-        msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
-      }
-    } catch (err) {
-      clearTimeout(timeoutId);
-      msgEl.style.color = "var(--red)";
-      msgEl.textContent = err.name === "AbortError"
-        ? "❌ Request timed out. Please try again."
-        : "❌ " + (err.message || "Verification failed — please try again.");
-    } finally {
-      this.disabled = false;
-      this.textContent = "✅ Restore Access";
+    const sent = await sendCodeTo(email, msgEl, this, "✅ Restore Access");
+    if (sent) {
+      msgEl.style.color = "var(--green)";
+      msgEl.textContent = "✅ Code sent! Check your inbox.";
+      openEmailCodeModal(email, "restore");
     }
   });
 
-  // Restore-last4 modal handlers
-  document.getElementById("restore-last4-cancel").addEventListener("click", () => {
-    document.getElementById("restore-last4-modal").style.display = "none";
-    restoreEmail = "";
+  // Email code modal — cancel
+  document.getElementById("email-code-cancel").addEventListener("click", () => {
+    document.getElementById("email-code-modal").style.display = "none";
+    ecEmail = ""; ecChallenge = ""; ecPurpose = "";
   });
 
-  document.getElementById("restore-last4-submit").addEventListener("click", async function() {
-    const last4 = document.getElementById("restore-last4-input").value.trim();
-    const msgEl = document.getElementById("restore-last4-msg");
+  // Email code modal — resend
+  document.getElementById("email-code-resend").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const msgEl = document.getElementById("email-code-msg");
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Resending code…";
+    const sent = await sendCodeTo(ecEmail, msgEl, null, null);
+    if (sent) {
+      msgEl.style.color = "var(--green)";
+      msgEl.textContent = "✅ New code sent.";
+    }
+  });
 
-    if (!/^\d{4}$/.test(last4)) {
+  // Email code modal — submit
+  document.getElementById("email-code-submit").addEventListener("click", async function() {
+    const code = document.getElementById("email-code-input").value.trim();
+    const msgEl = document.getElementById("email-code-msg");
+
+    if (!/^\d{6}$/.test(code)) {
       msgEl.style.color = "var(--red)";
-      msgEl.textContent = "Please enter exactly 4 digits.";
+      msgEl.textContent = "Please enter the 6-digit code.";
       return;
     }
 
     this.disabled = true;
     this.textContent = "Verifying…";
     msgEl.style.color = "var(--muted)";
-    msgEl.textContent = "Checking card…";
+    msgEl.textContent = "Verifying…";
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
     try {
-      const res = await fetch("/api/verify-subscription", {
+      // Endpoint depends on purpose: verify-code (for restore) or customer-portal (for manage)
+      const endpoint = ecPurpose === "manage" ? "/api/customer-portal" : "/api/verify-code";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: restoreEmail, last4 }),
+        body: JSON.stringify({ email: ecEmail, code, challenge: ecChallenge }),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
       const data = await res.json();
 
-      if (data.ok) {
+      if (!data.ok) {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ " + (data.error || "Incorrect or expired code.");
+        return;
+      }
+
+      if (ecPurpose === "restore") {
         msgEl.style.color = "var(--green)";
         msgEl.textContent = "✅ Verified!";
-        localStorage.setItem("mm_email", restoreEmail);
+        localStorage.setItem("mm_email", ecEmail);
         setTimeout(() => {
-          document.getElementById("restore-last4-modal").style.display = "none";
+          document.getElementById("email-code-modal").style.display = "none";
           unlockPaid();
           document.getElementById("restore-msg").textContent = "";
-        }, 800);
-      } else {
-        msgEl.style.color = "var(--red)";
-        msgEl.textContent = "❌ " + (data.error || "Verification failed.");
+        }, 700);
+      } else if (ecPurpose === "manage") {
+        if (data.url) {
+          document.getElementById("email-code-modal").style.display = "none";
+          window.open(data.url, "_blank");
+        } else {
+          msgEl.style.color = "var(--red)";
+          msgEl.textContent = "❌ Could not open Stripe portal.";
+        }
       }
     } catch (err) {
       clearTimeout(timeoutId);
@@ -3679,70 +3699,25 @@ Sent via MeetingMeter · meetingmeter.tech`;
     showUpgradeModal();
   });
 
-  document.getElementById("manage-subscription-btn").addEventListener("click", async () => {
+  document.getElementById("manage-subscription-btn").addEventListener("click", async function() {
     const email = localStorage.getItem("mm_email") || "";
     if (!email) {
       showToast("⚠️ Email not found. Please try the restore purchase option in the upgrade modal.");
       return;
     }
-    // Open card verification modal — require last 4 digits before opening Stripe portal
-    document.getElementById("card-last4-input").value = "";
-    document.getElementById("card-verify-msg").textContent = "";
-    document.getElementById("card-verify-modal").style.display = "flex";
-    setTimeout(() => document.getElementById("card-last4-input").focus(), 100);
-  });
-
-  // Card verification cancel
-  document.getElementById("card-verify-cancel").addEventListener("click", () => {
-    document.getElementById("card-verify-modal").style.display = "none";
-  });
-
-  // Card verification submit — verify last4, then open Stripe portal
-  document.getElementById("card-verify-submit").addEventListener("click", async function() {
-    const email = localStorage.getItem("mm_email") || "";
-    const last4 = document.getElementById("card-last4-input").value.trim();
-    const msgEl = document.getElementById("card-verify-msg");
-
-    if (!/^\d{4}$/.test(last4)) {
-      msgEl.style.color = "var(--red)";
-      msgEl.textContent = "Please enter exactly 4 digits.";
-      return;
-    }
 
     this.disabled = true;
-    this.textContent = "Verifying…";
-    msgEl.style.color = "var(--muted)";
-    msgEl.textContent = "Verifying card…";
+    const originalText = this.textContent;
+    this.textContent = "Sending code…";
+    showToast("📧 Sending verification code to your email…");
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
-
-    try {
-      const res = await fetch("/api/customer-portal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, last4 }),
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      const data = await res.json();
-
-      if (data.url) {
-        document.getElementById("card-verify-modal").style.display = "none";
-        window.open(data.url, "_blank");
-      } else {
-        msgEl.style.color = "var(--red)";
-        msgEl.textContent = "❌ " + (data.error || "Verification failed.");
-      }
-    } catch (err) {
-      clearTimeout(timeoutId);
-      msgEl.style.color = "var(--red)";
-      msgEl.textContent = err.name === "AbortError"
-        ? "❌ Request timed out. Please try again."
-        : "❌ Error verifying card. Please try again.";
-    } finally {
-      this.disabled = false;
-      this.textContent = "Continue";
+    const tempMsg = { style: { color: "" }, textContent: "" };
+    const sent = await sendCodeTo(email, tempMsg, this, originalText);
+    if (sent) {
+      showToast("✅ Code sent! Check your inbox.");
+      openEmailCodeModal(email, "manage");
+    } else {
+      showToast("⚠️ " + (tempMsg.textContent || "Could not send code."));
     }
   });
 
