@@ -43,6 +43,15 @@ export default async function handler(req, res) {
 
     if (!tokenRes.ok) {
       const err = await tokenRes.text();
+      // Log diagnostic info (without exposing full credentials)
+      console.error("Zoom token exchange failed:", {
+        error: err,
+        clientIdPrefix: clientId.substring(0, 6),
+        clientIdLength: clientId.length,
+        clientSecretLength: clientSecret.length,
+        redirectUri: redirectUri,
+        host: host,
+      });
       return res.redirect(`/app?zoom_error=${encodeURIComponent("Token exchange failed: " + err)}`);
     }
 

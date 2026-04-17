@@ -86,7 +86,7 @@ class handler(BaseHTTPRequestHandler):
         return events[:10]
 
     def _attendees(self, text):
-        """Extract attendee display names from ATTENDEE lines, handling ICS line folding."""
+        """Extract attendee {name, email} entries from ATTENDEE lines, handling ICS line folding."""
         # Unfold continuation lines first (RFC 5545: lines starting with space/tab)
         unfolded = []
         for line in text.splitlines():
@@ -95,7 +95,7 @@ class handler(BaseHTTPRequestHandler):
             else:
                 unfolded.append(line)
 
-        names = []
+        results = []
         for line in unfolded:
             if not line.upper().startswith("ATTENDEE"):
                 continue
@@ -110,19 +110,24 @@ class handler(BaseHTTPRequestHandler):
                     cn = part[3:].strip().strip('"')
                     break
 
-            # If CN= is present and not an email, use it
+            email = mailto_part.replace("mailto:", "").replace("MAILTO:", "").strip()
+            if "@" not in email:
+                email = ""
+
+            # Derive a display name
             if cn and "@" not in cn and len(cn) > 1:
-                names.append(cn)
+                name = cn
+            elif email:
+                prefix = email.split("@")[0].split("+")[0]
+                # "first.last" -> "First Last"
+                parts = [p for p in prefix.split(".") if p]
+                name = " ".join(p.capitalize() for p in parts) if parts else prefix.capitalize()
             else:
-                # Fall back to email prefix (capitalize first letter of each word)
-                email = mailto_part.replace("mailto:", "").strip()
-                if "@" in email:
-                    prefix = email.split("@")[0]
-                    # Strip common suffixes like .meetingmeter, +tag etc.
-                    prefix = prefix.split("+")[0].split(".")[0]
-                    if len(prefix) > 1:
-                        names.append(prefix.capitalize())
-        return names
+                name = ""
+
+            if name or email:
+                results.append({"name": name, "email": email})
+        return results
 
     def _field(self, text, name):
         lines = text.splitlines()

@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
+  <meta name="theme-color" content="#0f0f13" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MeetingMeter" />
+  <meta name="format-detection" content="telephone=no" />
   <title>MeetingMeter</title>
   <style>
     :root {
@@ -27,6 +33,15 @@
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
       min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior-y: contain;
+    }
+
+    /* iOS safe-area insets so content isn't hidden by the notch / home indicator */
+    @supports (padding: max(0px)) {
+      header { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+      body { padding-bottom: env(safe-area-inset-bottom); }
     }
 
     /* ── Header ── */
@@ -534,6 +549,29 @@
     }
     .settings-btn:hover { color: var(--text); border-color: var(--accent); }
 
+    .header-action-btn {
+      font-size: 13px !important;
+      padding: 8px 14px !important;
+      white-space: nowrap;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .pro-label {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      color: var(--bg);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 4px;
+      letter-spacing: 0.05em;
+    }
+
     .settings-grid {
       display: flex;
       flex-direction: column;
@@ -932,26 +970,92 @@
 
     /* ── Mobile responsive ── */
     @media (max-width: 768px) {
-      header { padding: 12px 16px; gap: 8px; flex-wrap: wrap; }
+      header { padding: 10px 14px; gap: 8px; flex-wrap: wrap; position: sticky; top: 0; z-index: 90; }
       header .tagline { display: none; }
       header > div:last-child { gap: 6px; flex-wrap: wrap; }
-      .app { grid-template-columns: 1fr; }
-      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 16px; }
-      .right-panel { padding: 20px 16px; gap: 16px; }
+      .logo { font-size: 16px; }
+      .logo-icon { width: 28px; height: 28px; font-size: 14px; }
+
+      .app { grid-template-columns: 1fr; min-height: auto; }
+      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 18px; overflow-y: visible; }
+      .right-panel { padding: 22px 16px 28px; gap: 20px; }
+
+      /* Section header row holding Meeting Title + header action buttons becomes a stacked layout */
+      .left-panel .section-label > div { width: 100%; }
+      .header-action-btn { font-size: 12px !important; padding: 8px 10px !important; height: 38px; flex: 1 1 calc(50% - 4px); min-width: 0; }
+
       .cost-number { font-size: clamp(52px, 14vw, 90px) !important; }
-      .timer-display { font-size: clamp(28px, 9vw, 48px) !important; }
-      .controls { flex-wrap: wrap; gap: 8px; }
-      .controls .btn { flex: 1; min-width: 120px; padding: 12px 10px; font-size: 14px; }
-      .stat-chips { gap: 8px; }
-      .stat-chip { padding: 8px 12px; }
-      .breakdown { width: 100%; }
+      .cost-cents { font-size: clamp(24px, 6vw, 36px); }
+      .timer-display { font-size: clamp(28px, 9vw, 48px) !important; letter-spacing: 2px; }
+
+      /* Primary controls — larger touch targets (Apple HIG minimum 44px) */
+      .controls { flex-wrap: wrap; gap: 10px; width: 100%; }
+      .controls .btn { flex: 1 1 calc(50% - 5px); min-height: 48px; padding: 12px 14px; font-size: 15px; }
+      .controls .btn:first-child { flex: 1 1 100%; }
+
+      .stat-chips { gap: 8px; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
+      .stat-chip { padding: 10px 8px; }
+      .stat-chip-val { font-size: 15px; }
+      .stat-chip-lbl { font-size: 9px; }
+
+      .breakdown, .history-section, .cost-hero { width: 100%; max-width: 100%; }
       .history-section { margin-top: 8px; }
-      .modal { padding: 24px 18px; }
+
+      /* Inputs — 16px font-size prevents iOS zoom-on-focus */
+      input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="url"], input[type="search"], select, textarea { font-size: 16px !important; }
+      .attendee-name, .attendee-email, .role-select, #meeting-title { font-size: 15px; }
+      .role-select { padding: 6px 8px; font-size: 13px; min-height: 34px; }
+      .remove-btn { padding: 8px 10px; font-size: 20px; }
+
+      /* Modals — full-width, scroll-safe, safe-area-aware */
+      .modal-overlay { padding: 12px; align-items: flex-start !important; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .modal { width: 100%; max-width: 100%; max-height: none; padding: 20px 18px calc(20px + env(safe-area-inset-bottom)); margin: 8px 0; border-radius: 14px; }
+      .modal-actions { flex-wrap: wrap; gap: 8px; }
+      .modal-actions .btn { flex: 1 1 auto; min-height: 44px; }
       .upgrade-plans { grid-template-columns: 1fr; }
+
+      /* Template & Calendar dropdowns — anchor full width on mobile */
+      .template-dropdown, .calendar-dropdown { left: 0; right: 0; min-width: 0; width: calc(100vw - 32px); max-width: 420px; }
+
+      /* History cards */
+      .history-card { padding: 10px 12px; gap: 10px; }
+      .history-icon { width: 32px; height: 32px; font-size: 14px; }
+      .history-title { font-size: 13px; }
+      .history-cost { font-size: 14px; }
+
+      /* Per-person breakdown rows stay readable */
+      .breakdown-row { padding: 10px 12px; }
+
+      /* Attendee row — more room for inputs on narrow screens */
+      .attendee-row { padding: 10px; gap: 8px; }
+      .attendee-avatar { width: 32px; height: 32px; font-size: 12px; }
+      .attendee-email { padding-left: 44px; font-size: 13px; }
+
+      /* Settings modals */
+      .settings-builtin-grid { grid-template-columns: 1fr; }
+      .custom-role-row { grid-template-columns: 1fr 1fr auto; }
     }
+
     @media (max-width: 480px) {
-      .stat-chips { grid-template-columns: repeat(3, 1fr); display: grid; }
+      header { padding: 10px 12px; }
       header .settings-btn span { display: none; }
+      .header-action-btn { flex: 1 1 calc(50% - 3px); font-size: 11px !important; padding: 8px 6px !important; }
+      .stat-chip-val { font-size: 14px; }
+      .report-box { padding: 20px 16px; border-radius: 12px; }
+      .timer-display { font-size: clamp(26px, 8vw, 42px) !important; }
+    }
+
+    /* Very small screens (iPhone SE etc.) */
+    @media (max-width: 360px) {
+      .header-action-btn { flex: 1 1 100%; }
+      .stat-chips { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Coarse pointer devices (touchscreens) — beef up tap targets for any pointer-based interaction */
+    @media (pointer: coarse) {
+      button, .btn, .settings-btn, .add-btn, .history-del, .remove-btn, .template-del { min-height: 40px; }
+      .template-item { padding: 12px 14px; }
+      .calendar-event-item { padding: 12px 14px; }
     }
 
     /* ── Templates dropdown ── */
@@ -1166,8 +1270,9 @@
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
     <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
-    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar">🔗 Integrations</button>
+    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar"><span>🔗 Integrations</span><span id="integrations-pro-label" class="pro-label" style="display:none;">PRO</span></button>
     <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
+    <button class="settings-btn" id="account-settings-btn" title="Account & subscription">👤 Account</button>
   </div>
 </header>
 
@@ -1177,16 +1282,14 @@
   <div class="left-panel">
 
     <div>
-      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         Meeting Title
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button class="settings-btn" id="new-meeting-btn" title="Clear everything and start a new meeting"
-            style="font-size:12px;padding:3px 9px;color:var(--muted);">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="settings-btn header-action-btn" id="new-meeting-btn" title="Clear everything and start a new meeting">
             ↺ New
           </button>
           <div class="template-picker" id="template-picker">
-            <button class="settings-btn" id="template-btn" title="Meeting templates"
-              style="font-size:12px;padding:3px 9px;">
+            <button class="settings-btn header-action-btn" id="template-btn" title="Meeting templates">
               📋 Templates
             </button>
             <div class="template-dropdown" id="template-dropdown">
@@ -1199,8 +1302,7 @@
             </div>
           </div>
           <div class="calendar-picker" id="calendar-picker-wrap">
-            <button class="settings-btn" id="load-calendar-btn" title="Load from Google Calendar"
-              style="font-size:12px;padding:3px 9px;">
+            <button class="settings-btn header-action-btn" id="load-calendar-btn" title="Load from Google Calendar">
               📅 From Calendar
             </button>
             <div class="calendar-dropdown" id="calendar-dropdown">
@@ -1208,12 +1310,12 @@
               <div id="calendar-events-list"><div class="calendar-empty">Loading…</div></div>
             </div>
           </div>
-          <button class="settings-btn" id="load-zoom-btn" title="Load from Zoom"
-            style="font-size:12px;padding:3px 9px;display:none;">
+          <button class="settings-btn header-action-btn" id="load-zoom-btn" title="Load from Zoom"
+            style="display:none;">
             📹 From Zoom
           </button>
-          <button class="settings-btn" id="zoom-connect-hint-btn" title="Connect Zoom to import meetings"
-            style="font-size:12px;padding:3px 9px;display:none;opacity:0.6;">
+          <button class="settings-btn header-action-btn" id="zoom-connect-hint-btn" title="Connect Zoom to import meetings"
+            style="display:none;opacity:0.6;">
             📹 Connect Zoom
           </button>
         </div>
@@ -1307,8 +1409,8 @@
   </div>
 </div>
 
-<!-- Settings modal -->
-<div class="modal-overlay" id="settings-modal">
+<!-- Salary Presets modal -->
+<div class="modal-overlay" id="salary-presets-modal">
   <div class="modal" style="max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
     <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
@@ -1499,6 +1601,87 @@
   </div>
 </div>
 
+<!-- Settings modal -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="margin:0;">⚙️ Settings</h2>
+      <button class="modal-close" id="settings-modal-close" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;">×</button>
+    </div>
+
+    <!-- Account Section -->
+    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Account</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;">
+        <span style="color:var(--muted);font-size:13px;">Email</span>
+        <span style="color:var(--text);font-size:13px;font-weight:500;" id="account-email">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <span style="color:var(--muted);font-size:13px;">Plan</span>
+        <span style="color:var(--text);font-size:13px;font-weight:500;" id="account-plan">Free</span>
+      </div>
+    </div>
+
+    <!-- Subscription Section -->
+    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Subscription</div>
+      <div id="subscription-info" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
+          <span style="color:var(--muted);font-size:13px;">Status</span>
+          <span style="color:var(--green);font-size:13px;font-weight:600;">✓ Active</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
+          <span style="color:var(--muted);font-size:13px;">Billing</span>
+          <span style="color:var(--text);font-size:13px;font-weight:500;" id="subscription-billing">—</span>
+        </div>
+        <button class="btn btn-ghost" id="manage-subscription-btn" style="width:100%;margin-top:8px;font-size:13px;padding:8px 12px;">Manage Subscription in Stripe →</button>
+      </div>
+      <div id="subscription-free" style="display:none;">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Upgrade to Pro for unlimited attendees, AI summaries, integrations, and more.</p>
+        <button class="btn btn-primary" id="upgrade-btn-settings" style="width:100%;font-size:13px;padding:8px 12px;">Upgrade to Pro →</button>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">FAQ</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">How do I cancel my subscription?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">You can cancel anytime through your Stripe customer portal. Your access will remain active until the end of your billing period.</p>
+        </details>
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">Will my data be deleted if I cancel?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">No, your meeting history and settings are stored locally on your device and will remain available even after cancellation.</p>
+        </details>
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">Can I get an invoice?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">Yes, invoices are available in your Stripe account. Visit your Stripe customer portal to download receipts and invoices.</p>
+        </details>
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">How are my integrations secured?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">All API keys and webhooks are stored locally in your browser. They are never sent to our servers or shared with third parties.</p>
+        </details>
+        <details style="cursor:pointer;">
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">What data does MeetingMeter collect?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">MeetingMeter is 100% local. Meeting data, attendees, and settings stay on your device. No analytics, no tracking, no data collection.</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Support Section -->
+    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Support</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Have a question or found a bug? We'd love to hear from you.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="https://twitter.com/meetingmeterapp" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">𝕏 Twitter</a>
+        <a href="mailto:support@meetingmeter.tech" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">📧 Email</a>
+        <a href="https://meetingmeter.tech" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">🌐 Website</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Monthly Report modal -->
 <div class="report-overlay" id="report-modal">
   <div class="report-box">
@@ -1559,11 +1742,42 @@
   </div>
 </div>
 
+<!-- Email Verification Modal -->
+<div class="modal-overlay" id="email-verification-modal" style="display:none;">
+  <div class="modal" style="width:420px;max-width:95vw;">
+    <h2>🔐 Verify Email</h2>
+    <p style="color:var(--muted);font-size:13px;margin:12px 0;">
+      For security, we need to verify you have access to this email address.
+    </p>
+    <div style="background:var(--surface2);border:1px solid var(--border);padding:12px;border-radius:8px;margin:16px 0;font-size:13px;">
+      <strong id="verify-email-display"></strong>
+    </div>
+    <div style="margin:16px 0;">
+      <div class="section-label">Verification Code</div>
+      <p style="color:var(--muted);font-size:12px;margin-bottom:8px;">
+        Check the code displayed above:
+      </p>
+      <input type="text" id="verification-code-input" placeholder="Enter 6-digit code"
+        style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:14px;outline:none;text-align:center;letter-spacing:2px;"
+        maxlength="10" />
+      <div id="verify-code-display" style="background:var(--surface);padding:12px;border-radius:8px;margin-top:8px;text-align:center;font-family:monospace;font-size:18px;font-weight:bold;color:var(--accent);letter-spacing:3px;"></div>
+    </div>
+    <div id="verification-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="verify-cancel">Cancel</button>
+      <button class="btn btn-primary" id="verify-submit">Verify</button>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  const API = "http://localhost:8766";
+  // Use localhost backend only when running on localhost; otherwise use same-origin (Vercel functions)
+  const API = (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? "http://localhost:8766" : "";
 
   // ── Salary presets (annual → per-second) ──────────────────
   const DEFAULT_ROLES = {
@@ -1655,7 +1869,7 @@
     };
     grid.appendChild(addBtn);
 
-    document.getElementById("settings-modal").style.display = "flex";
+    document.getElementById("salary-presets-modal").style.display = "flex";
   }
 
   // Helper: append one custom-role row (name input + salary input + delete btn)
@@ -1702,7 +1916,7 @@
 
     saveUserRoleNames(newUserRoleNames);
     saveRoles(ROLES);
-    document.getElementById("settings-modal").style.display = "none";
+    document.getElementById("salary-presets-modal").style.display = "none";
     renderAttendees();
     updateStats();
   }
@@ -1740,23 +1954,17 @@
     document.getElementById("upgrade-modal").classList.remove("open");
     showToast("🎉 Access unlocked! Unlimited attendees enabled.");
     renderAttendees(); // refresh the limit bar
+    updateProLabel(); // Update PRO label in header
+    updateSettingsModal(); // Update subscription section
   }
 
   function showUpgradeModal() {
     document.getElementById("upgrade-modal").classList.add("open");
   }
 
-  // Admin bypass — visit /app?admin=mm_owner_2024 to unlock all features permanently
+  // Admin reset — visit /app?admin=reset to clear any locally-stored admin/paid flags (owner use)
   (function checkAdminKey() {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("admin") === "mm_owner_2024") {
-      localStorage.setItem("mm_admin", "true");
-      localStorage.setItem("mm_paid", "true");
-      history.replaceState({}, "", window.location.pathname);
-      showToast("🔑 Admin mode enabled — all features unlocked");
-      renderAttendees();
-    }
-    // ?admin=reset removes admin bypass
     if (params.get("admin") === "reset") {
       localStorage.removeItem("mm_admin");
       localStorage.removeItem("mm_paid");
@@ -1784,6 +1992,10 @@
   });
 
   // "Restore Access" — verify email against Stripe before unlocking
+  // Store current verification email and code
+  let currentVerificationEmail = "";
+  let currentVerificationCode = "";
+
   document.getElementById("restore-purchase-link").addEventListener("click", async function(e) {
     e.preventDefault();
     const emailInput = document.getElementById("restore-email-input");
@@ -1805,29 +2017,88 @@
       const res = await fetch("/api/verify-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, action: "check_only" }),
       });
       const data = await res.json();
 
       if (data.ok) {
-        msgEl.style.color = "var(--green)";
-        msgEl.textContent = "✅ Subscription verified!";
-        setTimeout(() => {
-          unlockPaid();
-          document.getElementById("restore-msg").textContent = "";
-        }, 800);
+        // Subscription exists — now require email verification
+        currentVerificationEmail = email;
+        // Generate a random 6-digit code (in production, this would be sent to user's email)
+        currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Show verification modal with the code displayed
+        const modal = document.getElementById("email-verification-modal");
+        document.getElementById("verify-email-display").textContent = email;
+        document.getElementById("verify-code-display").textContent = currentVerificationCode;
+        document.getElementById("verification-code-input").value = "";
+        document.getElementById("verification-msg").textContent = "";
+        modal.style.display = "flex";
+
+        msgEl.textContent = "";
+        this.disabled = false;
+        this.textContent = "✅ Restore Access";
       } else {
         msgEl.style.color = "var(--red)";
         msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
+        this.disabled = false;
+        this.textContent = "✅ Restore Access";
       }
     } catch {
       msgEl.style.color = "var(--red)";
       msgEl.textContent = "❌ Verification failed — please try again.";
+      this.disabled = false;
+      this.textContent = "✅ Restore Access";
     } finally {
       this.disabled = false;
       this.textContent = "✅ Restore Access";
     }
   });
+
+  // Email verification modal
+  document.getElementById("verify-cancel").addEventListener("click", () => {
+    document.getElementById("email-verification-modal").style.display = "none";
+    currentVerificationEmail = "";
+    currentVerificationCode = "";
+  });
+
+  document.getElementById("verify-submit").addEventListener("click", async () => {
+    const codeInput = document.getElementById("verification-code-input").value.trim();
+    const msgEl = document.getElementById("verification-msg");
+
+    if (!codeInput || codeInput !== currentVerificationCode) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "❌ Incorrect code. Please try again.";
+      return;
+    }
+
+    try {
+      // Verified by email code — now unlock access
+      msgEl.style.color = "var(--green)";
+      msgEl.textContent = "✅ Email verified!";
+
+      localStorage.setItem("mm_email", currentVerificationEmail);
+      setTimeout(() => {
+        document.getElementById("email-verification-modal").style.display = "none";
+        unlockPaid();
+        document.getElementById("restore-msg").textContent = "";
+      }, 800);
+    } catch (e) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "❌ Verification error. Please try again.";
+    }
+  });
+
+  // ── HTML escape helper — use for any user-controlled value injected into innerHTML ──
+  function esc(s) {
+    if (s === null || s === undefined) return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
 
   // ── State ──────────────────────────────────────────────────
   let attendees = [];  // { id, name, role }
@@ -1868,22 +2139,25 @@
       row.dataset.id = a.id;
       const initials = a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?";
       row.innerHTML = `
-        <div class="attendee-avatar">${initials}</div>
-        <input class="attendee-name" type="text" placeholder="Name" value="${a.name}" />
+        <div class="attendee-avatar">${esc(initials)}</div>
+        <input class="attendee-name" type="text" placeholder="Name" />
         <select class="role-select">
           ${Object.keys(ROLES).map(r =>
-            `<option value="${r}" ${r === a.role ? "selected" : ""}>${r}</option>`
+            `<option value="${esc(r)}" ${r === a.role ? "selected" : ""}>${esc(r)}</option>`
           ).join("")}
         </select>
         <input class="salary-input" type="number" placeholder="Annual $" min="0" step="1000"
-          value="${a.customSalary || ""}"
           style="display:${a.role === 'Custom' ? 'block' : 'none'};
             width:100px; background:var(--surface); border:1px solid var(--border);
             border-radius:6px; color:var(--text); font-size:12px; padding:4px 8px;
             outline:none;" />
         <button class="remove-btn" title="Remove">×</button>
-        <input class="attendee-email" type="email" placeholder="email (optional — for sending action items)" value="${a.email || ""}" />
+        <input class="attendee-email" type="email" placeholder="email (optional — for sending action items)" />
       `;
+      // Safely set input values via property assignment (not HTML interpolation) to prevent attribute injection
+      row.querySelector(".attendee-name").value = a.name || "";
+      row.querySelector(".salary-input").value = a.customSalary || "";
+      row.querySelector(".attendee-email").value = a.email || "";
       row.querySelector(".attendee-name").addEventListener("input", e => {
         a.name = e.target.value;
         row.querySelector(".attendee-avatar").textContent =
@@ -2312,15 +2586,15 @@
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="font-size:24px">📋</div>
             <div>
-              <h2 style="font-size:18px;font-weight:700">${data.t}</h2>
+              <h2 style="font-size:18px;font-weight:700">${esc(data.t)}</h2>
               <div style="font-size:12px;color:var(--muted)">${new Date(data.ts*1000).toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})} · ${fmtTime(data.d)} · $${data.c?.toFixed(2)}</div>
             </div>
           </div>
-          ${ratingLabel ? `<div style="font-size:13px;font-weight:600">${ratingLabel}</div>` : ""}
-          ${data.a?.length ? `<div><div class="section-label">Attendees</div><div style="font-size:13px;margin-top:6px;color:var(--muted)">${data.a.join(", ")}</div></div>` : ""}
-          ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.decisions}</div></div>` : ""}
-          ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.actions}</div></div>` : ""}
-          ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box">${d.aiSummary}</div></div>` : ""}
+          ${ratingLabel ? `<div style="font-size:13px;font-weight:600">${esc(ratingLabel)}</div>` : ""}
+          ${data.a?.length ? `<div><div class="section-label">Attendees</div><div style="font-size:13px;margin-top:6px;color:var(--muted)">${esc(data.a.join(", "))}</div></div>` : ""}
+          ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.decisions)}</div></div>` : ""}
+          ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.actions)}</div></div>` : ""}
+          ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box">${esc(d.aiSummary)}</div></div>` : ""}
           <div style="display:flex;justify-content:center;padding-top:8px;border-top:1px solid var(--border);">
             <a href="${location.origin}${location.pathname}" style="font-size:12px;color:var(--accent);text-decoration:none">⚡ Track your own meetings at MeetingMeter</a>
           </div>
@@ -2355,17 +2629,21 @@
       const attendeeNames = attendees.map(a => `${a.name || "Unnamed"} (${a.role})`).join(", ");
       const ratingLabel = currentDebrief.rating ? { productive: "Productive", mixed: "Mixed", wasted: "Time Wasted" }[currentDebrief.rating] : "Not rated";
 
-      const prompt = `You are a concise meeting assistant. Summarize this meeting in 3-4 bullet points (plain text, no markdown formatting, use • as bullet character).
+      const prompt = `You are a concise meeting assistant. Given the meeting details below, return STRICT JSON with three keys: "summary", "decisions", and "actions".
+
+- "summary": a 3-4 bullet executive summary (plain text, use • as the bullet character, no markdown). Focus on decisions and next steps. Be direct.
+- "decisions": a clean, summarized list of decisions made (plain text, use • as the bullet character, no markdown). Rewrite the raw notes into crisp, standalone decisions. If no decisions exist, return an empty string.
+- "actions": a clean, summarized list of action items (plain text, use • as the bullet character, no markdown). Each bullet should be a crisp, standalone task — rewrite the raw notes into clear, actionable items. Include owner and deadline if mentioned. If no actions exist, return an empty string.
+
+Return ONLY the JSON object, no prose, no code fences.
 
 Meeting: ${title}
 Duration: ${fmtTime(elapsedSeconds)}
 Cost: ${fmtMoneyPlain(costUSD)}
 Attendees: ${attendeeNames || "Not specified"}
 Rating: ${ratingLabel}
-Decisions made: ${currentDebrief.decisions || "None recorded"}
-Action items: ${currentDebrief.actions || "None recorded"}
-
-Write a crisp executive summary (3-4 bullets max). Focus on decisions and next steps. Be direct.`;
+Decisions made (raw notes): ${currentDebrief.decisions || "None recorded"}
+Action items (raw notes): ${currentDebrief.actions || "None recorded"}`;
 
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -2388,15 +2666,36 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
       }
 
       const data = await res.json();
-      const summary = data.content?.[0]?.text || "";
+      const raw = data.content?.[0]?.text || "";
+      let summary = raw, refinedDecisions = "", refinedActions = "";
+      try {
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+        summary = parsed.summary || "";
+        refinedDecisions = parsed.decisions || "";
+        refinedActions = parsed.actions || "";
+      } catch (_) { /* fall back to raw text as summary */ }
+
       currentDebrief.aiSummary = summary;
+      if (refinedDecisions) {
+        currentDebrief.decisions = refinedDecisions;
+        const decisionsEl = document.getElementById("debrief-decisions");
+        if (decisionsEl) decisionsEl.value = refinedDecisions;
+      }
+      if (refinedActions) {
+        currentDebrief.actions = refinedActions;
+        const actionsEl = document.getElementById("debrief-actions");
+        if (actionsEl) actionsEl.value = refinedActions;
+      }
 
       section.innerHTML = `
-        <div class="section-label">AI Summary</div>
-        <div class="ai-summary-box">${summary.replace(/</g,"&lt;")}</div>
+        <div class="section-label">Executive Summary</div>
+        <div class="ai-summary-box">${esc(summary)}</div>
+        ${refinedDecisions ? `<div class="section-label" style="margin-top:12px">Decisions Made</div><div class="ai-summary-box">${esc(refinedDecisions)}</div>` : ""}
+        ${refinedActions ? `<div class="section-label" style="margin-top:12px">Action Items</div><div class="ai-summary-box">${esc(refinedActions)}</div>` : ""}
       `;
     } catch (e) {
-      section.innerHTML = `<div style="color:var(--red);font-size:12px;padding:8px 0">⚠️ ${e.message}</div>`;
+      section.innerHTML = `<div style="color:var(--red);font-size:12px;padding:8px 0">⚠️ ${esc(e.message)}</div>`;
     } finally {
       btn.disabled = false;
     }
@@ -2540,8 +2839,9 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
   async function loadHistory() {
     try {
       const res = await fetch(`${API}/api/history`);
+      if (!res.ok) throw new Error(`History API returned ${res.status}`);
       const data = await res.json();
-      renderHistory(data);
+      renderHistory(Array.isArray(data) ? data : []);
     } catch (e) {
       // Fall back to localStorage
       const local = JSON.parse(localStorage.getItem("mm_history") || "[]");
@@ -2576,9 +2876,9 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
         const ratingText = d.rating ? RATING_LABEL[d.rating] : "";
         const summaryText = d.aiSummary || d.decisions || "";
         debriefHtml = `<div class="history-outcome">
-          ${ratingText ? `<div class="history-outcome-rating ${ratingClass}">${ratingText}</div>` : ""}
-          ${summaryText ? `<div style="white-space:pre-line">${summaryText}</div>` : ""}
-          ${d.actions && !d.aiSummary ? `<div style="margin-top:6px;color:var(--accent)">→ ${d.actions}</div>` : ""}
+          ${ratingText ? `<div class="history-outcome-rating ${esc(ratingClass)}">${esc(ratingText)}</div>` : ""}
+          ${summaryText ? `<div style="white-space:pre-line">${esc(summaryText)}</div>` : ""}
+          ${d.actions && !d.aiSummary ? `<div style="margin-top:6px;color:var(--accent)">→ ${esc(d.actions)}</div>` : ""}
         </div>`;
       }
 
@@ -2589,7 +2889,7 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="history-icon">📋</div>
           <div class="history-info">
-            <div class="history-title">${item.title}</div>
+            <div class="history-title editable-title" data-id="${esc(item.id)}" style="cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s;" title="Click to edit">${esc(item.title)}</div>
             <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
           </div>
           <div class="history-cost">${fmtMoneyPlain(item.total_cost)}</div>
@@ -2607,8 +2907,8 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
         ${!hasEmails ? `<div class="add-emails-row" id="add-emails-${item.id}" style="display:none;flex-direction:column;gap:6px;margin-top:8px;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
           <div style="font-size:11px;color:var(--muted);font-weight:600;">ADD ATTENDEE EMAILS TO SEND DEBRIEF</div>
           ${item.attendees.map((a, i) => `<div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${a.name ? a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() : "?"}</div>
-            <span style="font-size:12px;flex:0 0 90px;color:var(--text);">${a.name || "Unnamed"}</span>
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${a.name ? esc(a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()) : "?"}</div>
+            <span style="font-size:12px;flex:0 0 90px;color:var(--text);">${esc(a.name || "Unnamed")}</span>
             <input type="email" placeholder="email@example.com" data-attendee-idx="${i}" class="attendee-email-input" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;" />
           </div>`).join("")}
           <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
@@ -2628,6 +2928,71 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
           renderHistory(JSON.parse(localStorage.getItem("mm_history") || "[]"));
         }
       });
+
+      // Edit title — click to edit inline
+      const titleEl = card.querySelector(".editable-title");
+      if (titleEl) {
+        const activateEditMode = () => {
+          const currentTitle = titleEl.textContent;
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = currentTitle;
+          input.style.cssText = "background:var(--surface);border:2px solid var(--accent);border-radius:4px;padding:6px 10px;color:var(--text);font-size:14px;font-weight:600;outline:none;min-width:200px;flex:1;";
+
+          const wrapper = document.createElement("div");
+          wrapper.style.cssText = "display:flex;width:100%;";
+          wrapper.appendChild(input);
+
+          titleEl.replaceWith(wrapper);
+          input.focus();
+          input.select();
+
+          const saveTitle = async () => {
+            const newTitle = input.value.trim() || "Untitled Meeting";
+            const local = JSON.parse(localStorage.getItem("mm_history") || "[]");
+            const idx = local.findIndex(m => String(m.id) === String(item.id));
+            if (idx !== -1) {
+              local[idx].title = newTitle;
+              localStorage.setItem("mm_history", JSON.stringify(local));
+              try {
+                await fetch(`${API}/api/history/${item.id}`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ title: newTitle })
+                });
+              } catch {}
+              item.title = newTitle;
+            }
+            const newTitleEl = document.createElement("div");
+            newTitleEl.className = "history-title editable-title";
+            newTitleEl.dataset.id = item.id;
+            newTitleEl.style.cssText = "cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s;";
+            newTitleEl.textContent = newTitle;
+            newTitleEl.title = "Click to edit";
+            wrapper.replaceWith(newTitleEl);
+            newTitleEl.addEventListener("click", activateEditMode);
+          };
+
+          const cancelEdit = () => {
+            const newTitleEl = document.createElement("div");
+            newTitleEl.className = "history-title editable-title";
+            newTitleEl.dataset.id = item.id;
+            newTitleEl.style.cssText = "cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s;";
+            newTitleEl.textContent = currentTitle;
+            newTitleEl.title = "Click to edit";
+            wrapper.replaceWith(newTitleEl);
+            newTitleEl.addEventListener("click", activateEditMode);
+          };
+
+          input.addEventListener("blur", saveTitle);
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") saveTitle();
+            if (e.key === "Escape") cancelEdit();
+          });
+        };
+
+        titleEl.addEventListener("click", activateEditMode);
+      }
 
       // Email button — send debrief or prompt for emails
       const emailBtn = card.querySelector(".email-btn");
@@ -2754,16 +3119,18 @@ Write a crisp executive summary (3-4 bullets max). Focus on decisions and next s
           try {
             const d = item.debrief || {};
             const attendeeNames = item.attendees.map(a => `${a.name} (${a.role})`).join(", ");
-            const prompt = `Summarize this meeting in 3-4 bullet points (plain text, use • as bullet).
+            const prompt = `Return STRICT JSON with three keys: "summary", "decisions", and "actions".
+- "summary": 3-4 bullet executive summary (plain text, use • as bullet, no markdown).
+- "decisions": summarized decisions as clean bullets (use •, no markdown). Rewrite raw notes into crisp, standalone decisions. Empty string if none.
+- "actions": summarized action items as clean bullets (use •, no markdown). Rewrite raw notes into crisp, standalone tasks with owner/deadline if mentioned. Empty string if none.
+Return ONLY the JSON, no prose, no code fences.
 
 Meeting: ${item.title}
 Duration: ${fmtTime(item.duration_seconds)}
 Cost: $${item.total_cost?.toFixed(2)}
 Attendees: ${attendeeNames}
-Decisions: ${d.decisions || "None recorded"}
-Action items: ${d.actions || "None recorded"}
-
-Be concise and direct.`;
+Decisions (raw notes): ${d.decisions || "None recorded"}
+Action items (raw notes): ${d.actions || "None recorded"}`;
 
             const res = await fetch("https://api.anthropic.com/v1/messages", {
               method: "POST",
@@ -2778,21 +3145,29 @@ Be concise and direct.`;
 
             if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
             const data = await res.json();
-            const summary = data.content?.[0]?.text || "";
+            const raw = data.content?.[0]?.text || "";
+            let summary = raw, refinedDecisions = "", refinedActions = "";
+            try {
+              const jsonMatch = raw.match(/\{[\s\S]*\}/);
+              const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+              summary = parsed.summary || "";
+              refinedDecisions = parsed.decisions || "";
+              refinedActions = parsed.actions || "";
+            } catch (_) { /* fall back to raw text as summary */ }
 
-            // Save summary back to localStorage
+            // Save summary + refined decisions/actions back to localStorage
             const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
             const idx = history.findIndex(m => String(m.id) === String(item.id));
             if (idx !== -1) {
               if (!history[idx].debrief) history[idx].debrief = {};
               history[idx].debrief.aiSummary = summary;
+              if (refinedDecisions) history[idx].debrief.decisions = refinedDecisions;
+              if (refinedActions) history[idx].debrief.actions = refinedActions;
               localStorage.setItem("mm_history", JSON.stringify(history));
             }
 
-            // Update card immediately
-            aiBtn.closest(".history-actions").insertAdjacentHTML("beforebegin",
-              `<div class="history-outcome"><div>${summary.replace(/</g,"&lt;")}</div></div>`);
-            aiBtn.remove();
+            // Re-render history so the refined summary and actions both appear
+            renderHistory();
             showToast("✅ AI Summary generated");
           } catch(e) {
             showToast("⚠️ " + e.message);
@@ -2833,14 +3208,14 @@ Be concise and direct.`;
           overlay.innerHTML = `
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <h2 style="font-size:16px;font-weight:700;">📋 ${item.title}</h2>
+                <h2 style="font-size:16px;font-weight:700;">📋 ${esc(item.title)}</h2>
                 <button onclick="this.closest('#debrief-overlay').remove()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">×</button>
               </div>
               <div style="font-size:12px;color:var(--muted)">${new Date(item.timestamp*1000).toLocaleString()} · ${fmtTime(item.duration_seconds)} · ${fmtMoneyPlain(item.total_cost)}</div>
-              ${d.rating ? `<div class="history-outcome-rating ${d.rating}" style="font-size:11px;font-weight:700;text-transform:uppercase">${{ productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating]}</div>` : ""}
-              ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.decisions}</div></div>` : ""}
-              ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${d.actions}</div></div>` : ""}
-              ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box" style="margin-top:6px">${d.aiSummary}</div></div>` : ""}
+              ${d.rating ? `<div class="history-outcome-rating ${esc(d.rating)}" style="font-size:11px;font-weight:700;text-transform:uppercase">${{ productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating]}</div>` : ""}
+              ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.decisions)}</div></div>` : ""}
+              ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.actions)}</div></div>` : ""}
+              ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box" style="margin-top:6px">${esc(d.aiSummary)}</div></div>` : ""}
             </div>`;
           document.body.appendChild(overlay);
           overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
@@ -2936,6 +3311,66 @@ Be concise and direct.`;
   }
 
   // ── Toast notification ─────────────────────────────────────
+  // Fallback paste-emails modal — used when Zoom/calendar can't auto-fetch invitees.
+  // Accepts any mix of "Name <email@x.com>", "email@x.com", comma/newline/space separated.
+  function openPasteEmailsModal(topic, onSubmit) {
+    const overlay = document.createElement("div");
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;display:flex;align-items:center;justify-content:center;padding:16px;";
+    overlay.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;width:460px;max-width:100%;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <h3 style="font-size:16px;font-weight:700;">📧 Add Attendee Emails</h3>
+          <button class="paste-emails-close" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;">×</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.5;">
+          Zoom's free tier doesn't expose invitee emails via API. Paste them here and we'll add them to "${esc(topic || "your meeting")}".
+        </p>
+        <textarea class="paste-emails-input" rows="5" placeholder="Alice Chen <alice@company.com>
+bob@company.com, sara@company.com
+james@client.com"
+          style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:vertical;"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+          <button class="paste-emails-skip btn btn-ghost" style="font-size:13px;padding:9px 16px;">Skip</button>
+          <button class="paste-emails-submit btn btn-primary" style="font-size:13px;padding:9px 16px;">Add Attendees</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const textarea = overlay.querySelector(".paste-emails-input");
+    setTimeout(() => textarea.focus(), 50);
+
+    const close = () => overlay.remove();
+    overlay.querySelector(".paste-emails-close").addEventListener("click", close);
+    overlay.querySelector(".paste-emails-skip").addEventListener("click", close);
+    overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+
+    overlay.querySelector(".paste-emails-submit").addEventListener("click", () => {
+      const raw = textarea.value || "";
+      const parsed = [];
+      const seen = new Set();
+      // Split on newlines/commas/semicolons, then parse each entry
+      raw.split(/[\n,;]+/).forEach(chunk => {
+        const s = chunk.trim();
+        if (!s) return;
+        // Match "Name <email>" or bare email
+        const m = s.match(/^\s*(?:"?([^"<]+?)"?\s*)?<?([^\s<>,;]+@[^\s<>,;]+)>?\s*$/);
+        if (!m) return;
+        const name  = (m[1] || "").trim();
+        const email = (m[2] || "").trim();
+        const key = email.toLowerCase();
+        if (!email || seen.has(key)) return;
+        seen.add(key);
+        parsed.push({ name, email });
+      });
+      if (parsed.length === 0) {
+        showToast("⚠️ No valid emails found");
+        return;
+      }
+      close();
+      onSubmit(parsed);
+    });
+  }
+
   function showToast(msg, duration = 3500) {
     let t = document.getElementById("mm-toast");
     if (!t) {
@@ -3077,11 +3512,11 @@ Be concise and direct.`;
   });
 
   // ── Mock/Demo Mode ────────────────────────────────────────
-  // Auto-enable demo mode when NOT running on localhost (i.e. Vercel staging)
-  // Also enable via ?demo query param or localStorage flag
+  // Demo mode is OFF by default in production.
+  // Only enable via ?demo query param or localStorage flag (for testing).
   const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   const ZOOM_ENABLED = true; // enabled on all environments
-  let DEMO_MODE = !isLocalhost || localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
+  let DEMO_MODE = localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
 
   if (DEMO_MODE) {
     console.log("🎬 MeetingMeter running in DEMO MODE (no backend required)");
@@ -3193,6 +3628,113 @@ Sent via MeetingMeter · meetingmeter.tech`;
   document.getElementById("integrations-cancel").addEventListener("click", () => {
     document.getElementById("integrations-modal").style.display = "none";
   });
+
+  // Account Settings modal handlers
+  document.getElementById("account-settings-btn").addEventListener("click", () => {
+    updateSettingsModal();
+    document.getElementById("settings-modal").style.display = "flex";
+  });
+
+  document.getElementById("settings-modal-close").addEventListener("click", () => {
+    document.getElementById("settings-modal").style.display = "none";
+  });
+
+  document.getElementById("upgrade-btn-settings").addEventListener("click", () => {
+    document.getElementById("settings-modal").style.display = "none";
+    showUpgradeModal();
+  });
+
+  document.getElementById("manage-subscription-btn").addEventListener("click", async () => {
+    const email = localStorage.getItem("mm_email") || "";
+    if (!email) {
+      showToast("⚠️ Email not found. Please try the restore purchase option in the upgrade modal.");
+      return;
+    }
+
+    // Require email verification before accessing customer portal
+    currentVerificationEmail = email;
+    currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const modal = document.getElementById("email-verification-modal");
+    document.getElementById("verify-email-display").textContent = email;
+    document.getElementById("verify-code-display").textContent = currentVerificationCode;
+    document.getElementById("verification-code-input").value = "";
+    document.getElementById("verification-msg").textContent = "";
+    modal.style.display = "flex";
+
+    // Update verify button to handle portal access
+    const verifyBtn = document.getElementById("verify-submit");
+    const originalHandler = verifyBtn.onclick;
+    verifyBtn.onclick = async () => {
+      const codeInput = document.getElementById("verification-code-input").value.trim();
+      const msgEl = document.getElementById("verification-msg");
+
+      if (!codeInput || codeInput !== currentVerificationCode) {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ Incorrect code. Please try again.";
+        return;
+      }
+
+      try {
+        msgEl.style.color = "var(--green)";
+        msgEl.textContent = "⏳ Opening Stripe portal…";
+
+        const res = await fetch("/api/customer-portal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        if (data.url) {
+          document.getElementById("email-verification-modal").style.display = "none";
+          window.open(data.url, "_blank");
+        } else {
+          msgEl.style.color = "var(--red)";
+          msgEl.textContent = "❌ Could not create portal session.";
+        }
+      } catch (e) {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ Error opening portal.";
+      }
+    };
+  });
+
+  function updateSettingsModal() {
+    const paid = isPaid();
+    const subscriptionInfo = document.getElementById("subscription-info");
+    const subscriptionFree = document.getElementById("subscription-free");
+    const accountPlan = document.getElementById("account-plan");
+    const accountEmail = document.getElementById("account-email");
+    const subscriptionBilling = document.getElementById("subscription-billing");
+
+    accountEmail.textContent = localStorage.getItem("mm_email") || "—";
+
+    if (paid) {
+      subscriptionInfo.style.display = "block";
+      subscriptionFree.style.display = "none";
+      accountPlan.textContent = "PRO";
+      accountPlan.style.color = "var(--accent)";
+      subscriptionBilling.textContent = "Monthly (Stripe)";
+    } else {
+      subscriptionInfo.style.display = "none";
+      subscriptionFree.style.display = "block";
+      accountPlan.textContent = "Free";
+      accountPlan.style.color = "var(--text)";
+    }
+  }
+
+  function updateProLabel() {
+    const proLabel = document.getElementById("integrations-pro-label");
+    if (isPaid()) {
+      proLabel.style.display = "inline-block";
+    } else {
+      proLabel.style.display = "none";
+    }
+  }
+
+  // Call on init and whenever payment status changes
+  updateProLabel();
+  updateSettingsModal();
 
   function updateIntegrationStatus() {
     const slackBadge = document.getElementById("slack-status-badge");
@@ -3353,7 +3895,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
               const dur   = m.duration ? `${m.duration} min` : "";
               return `<button class="zoom-meeting-item" data-id="${m.id}" data-topic="${encodeURIComponent(m.topic||"Zoom Meeting")}" data-duration="${m.duration||0}"
                 style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:left;cursor:pointer;color:var(--text);display:flex;flex-direction:column;gap:4px;">
-                <div style="font-size:14px;font-weight:600;">${m.topic || "Zoom Meeting"}</div>
+                <div style="font-size:14px;font-weight:600;">${esc(m.topic || "Zoom Meeting")}</div>
                 <div style="font-size:12px;color:var(--muted);">${start}${dur ? " · " + dur : ""}</div>
               </button>`;
             }).join("")}
@@ -3383,35 +3925,100 @@ Sent via MeetingMeter · meetingmeter.tech`;
           overlay.remove();
           showToast(`✅ Loaded "${topic}" from Zoom`);
 
-          // Try to fetch registrant emails in background
+          // Helper: derive a display name from an email like "first.last@x.com" -> "First Last"
+          const nameFromEmail = (email) => {
+            const prefix = (email.split("@")[0] || "").split("+")[0];
+            const parts  = prefix.split(".").filter(Boolean);
+            return parts.length
+              ? parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(" ")
+              : (prefix.charAt(0).toUpperCase() + prefix.slice(1));
+          };
+
+          // Helper: upsert an attendee by email (or by name if no email)
+          const upsertAttendee = (name, email) => {
+            if (!email && !name) return false;
+            let match = email ? attendees.find(a => a.email && a.email.toLowerCase() === email.toLowerCase()) : null;
+            if (!match && name) {
+              match = attendees.find(a => a.name && a.name.toLowerCase() === name.toLowerCase());
+            }
+            if (match) {
+              if (email) match.email = email;
+              if (!match.name && name) match.name = name;
+            } else {
+              attendees.push({ id: Date.now().toString() + Math.random(), name: name || nameFromEmail(email), role: "Mid-level", email: email || "", customSalary: 0 });
+            }
+            return true;
+          };
+
+          // Step 1 — Zoom registrants / invitees
+          let emailsAdded = 0;
+          let zoomTopic = topic, zoomStart = "";
           try {
             const regRes = await fetch(`/api/zoom/registrants?access_token=${encodeURIComponent(token.access_token)}&meeting_id=${encodeURIComponent(meetingId)}`);
             if (regRes.ok) {
               const regData = await regRes.json();
+              zoomTopic = regData.topic || topic;
+              zoomStart = regData.start_time || "";
               const registrants = regData.registrants || [];
-              if (registrants.length > 0) {
-                // Match registrants to attendees by name, or add as new attendees with emails
-                registrants.forEach(reg => {
-                  const fullName = `${reg.first_name || ""} ${reg.last_name || ""}`.trim();
-                  const email    = reg.email || "";
-                  if (!email) return;
+              registrants.forEach(reg => {
+                const fullName = `${reg.first_name || ""} ${reg.last_name || ""}`.trim();
+                const email    = reg.email || "";
+                if (!email) return;
+                if (upsertAttendee(fullName || nameFromEmail(email), email)) emailsAdded++;
+              });
+            }
+          } catch(e) { /* non-fatal */ }
 
-                  // Try to match existing attendee by name
-                  const match = attendees.find(a => a.name && a.name.toLowerCase() === fullName.toLowerCase());
-                  if (match) {
-                    match.email = email;
-                  } else if (fullName) {
-                    // Add as new attendee
-                    attendees.push({ id: Date.now().toString() + Math.random(), name: fullName, role: "Mid-level", email, customSalary: 0 });
-                  }
+          // Step 2 — Fallback to Google Calendar when Zoom returned no emails
+          // (Zoom free-tier accounts don't expose meeting_invitees via API, but the same meeting
+          //  typically appears on the user's calendar with full attendee emails.)
+          if (emailsAdded === 0 && integrationsConfig.gcal_ics_url) {
+            try {
+              const calRes = await fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(integrationsConfig.gcal_ics_url)}`);
+              if (calRes.ok) {
+                const calData = await calRes.json();
+                const events = calData.events || [];
+                const zoomStartTs = zoomStart ? Math.floor(new Date(zoomStart).getTime() / 1000) : null;
+                const normTopic = (zoomTopic || "").toLowerCase().trim();
+
+                // Match by: exact-ish title, OR start time within 10 min
+                const match = events.find(ev => {
+                  const evTitle = (ev.summary || "").toLowerCase().trim();
+                  const titleMatch = evTitle && normTopic && (evTitle.includes(normTopic) || normTopic.includes(evTitle));
+                  const timeMatch = zoomStartTs && ev.start_ts && Math.abs(ev.start_ts - zoomStartTs) < 600;
+                  return titleMatch || timeMatch;
                 });
+
+                if (match && Array.isArray(match.attendees) && match.attendees.length) {
+                  match.attendees.forEach(a => {
+                    const name  = typeof a === "string" ? a : (a.name || "");
+                    const email = typeof a === "string" ? "" : (a.email || "");
+                    if (!email && !name) return;
+                    if (upsertAttendee(name || nameFromEmail(email), email)) emailsAdded++;
+                  });
+                }
+              }
+            } catch(e) { /* non-fatal */ }
+          }
+
+          if (emailsAdded > 0) {
+            renderAttendees();
+            updateStats();
+            showToast(`📧 ${emailsAdded} attendee${emailsAdded > 1 ? "s" : ""} imported`);
+          } else {
+            // Guaranteed fallback — Zoom free-tier accounts don't expose invitees via API,
+            // and calendar matching can miss. Let the user paste emails once and we'll parse them.
+            openPasteEmailsModal(zoomTopic || topic, (parsed) => {
+              let added = 0;
+              parsed.forEach(({ name, email }) => {
+                if (upsertAttendee(name || (email ? nameFromEmail(email) : ""), email)) added++;
+              });
+              if (added > 0) {
                 renderAttendees();
                 updateStats();
-                showToast(`📧 ${registrants.length} attendee email${registrants.length > 1 ? "s" : ""} loaded from Zoom`);
+                showToast(`📧 ${added} attendee${added > 1 ? "s" : ""} added`);
               }
-            }
-          } catch(e) {
-            // Silently fail — registrants are a bonus, not required
+            });
           }
         });
       });
@@ -3485,10 +4092,16 @@ Sent via MeetingMeter · meetingmeter.tech`;
         await new Promise(r => setTimeout(r, 800));
         showToast("✅ Calendar URL test successful (demo)");
       } else {
-        const res = await fetch(`${API}/api/calendar-events`);
+        const icsUrl = document.getElementById("gcal-ics-input")?.value.trim() || integrationsConfig.gcal_ics_url || "";
+        if (!icsUrl) {
+          showToast("⚠️ Enter a calendar URL first");
+          return;
+        }
+        const res = await fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(icsUrl)}`);
         if (res.ok) {
-          const events = await res.json();
-          showToast(`✅ Found ${events.length} upcoming events`);
+          const data = await res.json();
+          const events = Array.isArray(data.events) ? data.events : [];
+          showToast(`✅ Found ${events.length} upcoming event${events.length === 1 ? "" : "s"}`);
         } else {
           showToast("⚠️ Calendar URL test failed");
         }
@@ -3515,9 +4128,23 @@ Sent via MeetingMeter · meetingmeter.tech`;
     }
 
     try {
-      const res = await fetch(`${API}/api/calendar-events`);
+      const icsUrl = integrationsConfig.gcal_ics_url || "";
+      if (!icsUrl) return [];
+      const res = await fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(icsUrl)}`);
       if (res.ok) {
-        return await res.json();
+        const data = await res.json();
+        // Backend returns { ok, events } — normalize to frontend shape
+        if (data.events) {
+          return data.events.map(e => ({
+            title: e.summary,
+            start: new Date(e.start_ts * 1000),
+            duration_minutes: e.duration_min,
+            attendees: (e.attendees || []).map(a =>
+              typeof a === "string" ? { name: a, email: "" } : { name: a.name || "", email: a.email || "" }
+            ),
+          }));
+        }
+        return [];
       }
     } catch (e) {
       console.error("Failed to load calendar events", e);
@@ -3852,7 +4479,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
         <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Most Expensive</div>
           <div style="font-size:18px;font-weight:800;color:#f87171;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sym}${toCurrentCurrency(mostExp.total_cost || 0).toFixed(2)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${mostExp.title || "Untitled"}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(mostExp.title || "Untitled")}</div>
         </div>
       </div>`;
 
@@ -3871,7 +4498,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
           return `<div class="report-meeting-row">
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-                <span class="report-meeting-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.title || "Untitled"}</span>
+                <span class="report-meeting-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.title || "Untitled")}</span>
                 <span class="report-meeting-cost">${sym}${toCurrentCurrency(m.total_cost || 0).toFixed(2)}</span>
               </div>
               <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">

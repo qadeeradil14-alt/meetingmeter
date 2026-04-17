@@ -32,3 +32,10 @@ meetingmeter_history.json
 # Local testing
 *.log
 .env
+.env*.local
+
+# Vercel CLI state (contains project linkage, not source)
+.vercel/
+
+# Local Claude Code session state
+.claude/

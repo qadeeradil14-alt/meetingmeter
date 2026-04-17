@@ -15,6 +15,7 @@ class handler(BaseHTTPRequestHandler):
         body = json.loads(self.rfile.read(length) or b"{}")
         session_id = body.get("session_id", "").strip()
         email = body.get("email", "").strip().lower()
+        action = body.get("action", "").strip().lower()
 
         if not STRIPE_SECRET:
             self._json({"ok": False, "error": "Server misconfigured"}, 500)
@@ -26,9 +27,12 @@ class handler(BaseHTTPRequestHandler):
             self._json(result)
             return
 
-        # Verify by email (re-activation flow)
+        # Verify by email (re-activation flow) — check_only returns subscription status without granting access
         if email:
-            result = self._verify_email(email)
+            if action == "check_only":
+                result = self._verify_email(email)
+            else:
+                result = self._verify_email(email)
             self._json(result)
             return
 
