@@ -1134,11 +1134,14 @@
     .report-meeting-row:last-child { border-bottom: none; }
     .report-meeting-title { flex: 1; color: var(--muted); }
     .report-meeting-cost { font-weight: 600; color: var(--text); }
-    .report-print-btn {
-      width: 100%; margin-top: 20px;
+    .report-print-btn, .report-email-btn {
+      flex: 1; min-width: 140px; margin-top: 0;
       background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
       border: none; border-radius: 10px; padding: 12px;
       font-size: 14px; font-weight: 700; cursor: pointer;
+    }
+    .report-email-btn {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
     }
     @media print {
       /* Hide all app content when printing */
@@ -1148,7 +1151,7 @@
       .report-overlay { display: block !important; }
 
       /* Hide UI elements within report */
-      .report-close, .report-print-btn { display: none !important; }
+      .report-close, .report-print-btn, .report-email-btn { display: none !important; }
 
       /* Make the report fill the page */
       .report-overlay {
@@ -1410,7 +1413,7 @@
 
 <!-- Salary Presets modal -->
 <div class="modal-overlay" id="salary-presets-modal">
-  <div class="modal" style="max-height:90vh;overflow-y:auto;">
+  <div class="modal" style="width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;">
     <h2>⚙️ Salary Presets</h2>
     <p>Set salaries for built-in roles, or add your own custom titles (e.g. IT Admin, DevOps Lead).</p>
     <div class="settings-grid" id="settings-grid"></div>
@@ -1673,7 +1676,7 @@
     </div>
 
     <!-- Support Section -->
-    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+    <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:16px;">
       <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Support</div>
       <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Have a question or found a bug? We'd love to hear from you.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1682,6 +1685,9 @@
         <a href="https://meetingmeter.tech" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">🌐 Website</a>
       </div>
     </div>
+
+    <!-- Sign Out Section -->
+    <button id="sign-out-btn" class="btn btn-ghost" style="width:100%;color:var(--red);border-color:var(--red);font-size:13px;padding:8px 12px;">🔒 Sign Out</button>
   </div>
 </div>
 
@@ -1692,7 +1698,10 @@
     <div class="report-title">📊 Monthly Spend Report</div>
     <div class="report-sub" id="report-sub"></div>
     <div id="report-content"></div>
-    <button class="report-print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <button class="report-print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <button class="report-email-btn" id="report-email-btn">📧 Email Report</button>
+    </div>
   </div>
 </div>
 
@@ -2437,14 +2446,9 @@
     showCostComparisons(costUSD);
 
     // Show/hide Slack button
+    // Keep Slack button hidden in debrief — only show post-save
     const slackBtn = document.getElementById("debrief-slack-btn");
-    if (slackBtn) {
-      if (integrationsConfig.slack_webhook) {
-        slackBtn.classList.remove("hidden");
-      } else {
-        slackBtn.classList.add("hidden");
-      }
-    }
+    if (slackBtn) slackBtn.classList.add("hidden");
     // Show email button only if at least one attendee has an email
     const emailBtn = document.getElementById("debrief-email");
     const hasEmails = attendees.some(a => a.email);
@@ -3706,6 +3710,15 @@ Sent via MeetingMeter · meetingmeter.tech`;
     document.getElementById("integrations-modal").style.display = "none";
   });
 
+  // Close modals on outside click (clicking the overlay background)
+  document.querySelectorAll(".modal-overlay").forEach(overlay => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.style.display = "none";
+      }
+    });
+  });
+
   // Account Settings modal handlers
   document.getElementById("account-settings-btn").addEventListener("click", () => {
     updateSettingsModal();
@@ -3714,6 +3727,15 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   document.getElementById("settings-modal-close").addEventListener("click", () => {
     document.getElementById("settings-modal").style.display = "none";
+  });
+
+  // Sign Out
+  document.getElementById("sign-out-btn").addEventListener("click", () => {
+    if (confirm("Are you sure? This will clear all your local data and sign you out.")) {
+      localStorage.clear();
+      showToast("🔒 Signed out");
+      setTimeout(() => location.reload(), 500);
+    }
   });
 
   document.getElementById("upgrade-btn-settings").addEventListener("click", () => {
@@ -4596,6 +4618,29 @@ Sent via MeetingMeter · meetingmeter.tech`;
   });
   document.getElementById("report-modal").addEventListener("click", function(e) {
     if (e.target === this) this.classList.remove("open");
+  });
+
+  // Email monthly report
+  document.getElementById("report-email-btn").addEventListener("click", async () => {
+    const email = localStorage.getItem("mm_email") || prompt("Enter email address to send report:");
+    if (!email) return;
+    const reportHtml = document.getElementById("report-content").innerHTML;
+    const reportText = document.getElementById("report-sub").textContent;
+    try {
+      const res = await fetch("/api/send-report-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, reportHtml, reportText })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast("📧 Report sent to " + email);
+      } else {
+        showToast("❌ " + (data.error || "Failed to send report"));
+      }
+    } catch (err) {
+      showToast("❌ Error: " + err.message);
+    }
   });
 
   // ── Init ───────────────────────────────────────────────────
