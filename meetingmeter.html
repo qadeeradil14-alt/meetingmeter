@@ -781,12 +781,13 @@
       top: calc(100% + 4px);
       left: 0;
       right: 0;
+      max-height: 320px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       z-index: 50;
-      overflow: hidden;
+      overflow-y: auto;
       display: none;
     }
     .calendar-dropdown.open { display: block; }
@@ -3772,6 +3773,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
     const accountPlan = document.getElementById("account-plan");
     const accountEmail = document.getElementById("account-email");
     const subscriptionBilling = document.getElementById("subscription-billing");
+    const signOutBtn = document.getElementById("sign-out-btn");
 
     accountEmail.textContent = localStorage.getItem("mm_email") || "—";
 
@@ -3779,6 +3781,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
       subscriptionInfo.style.display = "block";
       subscriptionFree.style.display = "none";
       subscriptionBilling.textContent = "Monthly (Stripe)";
+      if (signOutBtn) signOutBtn.style.display = "block";
 
       const until = localStorage.getItem("mm_paid_until");
       const expiresRow = document.getElementById("subscription-expires-row");
@@ -3801,6 +3804,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
       subscriptionFree.style.display = "block";
       accountPlan.textContent = "Free";
       accountPlan.style.color = "var(--text)";
+      if (signOutBtn) signOutBtn.style.display = "none";
     }
   }
 
