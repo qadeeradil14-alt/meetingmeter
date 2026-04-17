@@ -3733,8 +3733,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // Sign Out
   document.getElementById("sign-out-btn").addEventListener("click", () => {
-    if (confirm("Are you sure? This will clear all your local data and sign you out.")) {
+    if (confirm("Are you sure? You'll be signed out (integrations will be saved for next login).")) {
+      // Save integrations before clearing
+      const integrations = localStorage.getItem("mm_integrations");
       localStorage.clear();
+      // Restore integrations so they persist across logout/login
+      if (integrations) localStorage.setItem("mm_integrations", integrations);
       showToast("🔒 Signed out");
       setTimeout(() => location.reload(), 500);
     }
