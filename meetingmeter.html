@@ -1633,6 +1633,10 @@
           <span style="color:var(--muted);font-size:13px;">Billing</span>
           <span style="color:var(--text);font-size:13px;font-weight:500;" id="subscription-billing">—</span>
         </div>
+        <div id="subscription-expires-row" style="display:none;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
+          <span style="color:var(--muted);font-size:13px;">Access until</span>
+          <span style="font-size:13px;font-weight:500;" id="subscription-expires">—</span>
+        </div>
         <button class="btn btn-ghost" id="manage-subscription-btn" style="width:100%;margin-top:8px;font-size:13px;padding:8px 12px;">Manage Subscription in Stripe →</button>
       </div>
       <div id="subscription-free" style="display:none;">
@@ -3752,9 +3756,24 @@ Sent via MeetingMeter · meetingmeter.tech`;
     if (paid) {
       subscriptionInfo.style.display = "block";
       subscriptionFree.style.display = "none";
-      accountPlan.textContent = "PRO";
-      accountPlan.style.color = "var(--accent)";
       subscriptionBilling.textContent = "Monthly (Stripe)";
+
+      const until = localStorage.getItem("mm_paid_until");
+      const expiresRow = document.getElementById("subscription-expires-row");
+      const expiresEl = document.getElementById("subscription-expires");
+      if (until) {
+        const d = new Date(parseInt(until) * 1000);
+        const dateStr = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        const isExpiringSoon = (parseInt(until) * 1000 - Date.now()) < 7 * 24 * 60 * 60 * 1000;
+        expiresEl.textContent = dateStr;
+        expiresEl.style.color = isExpiringSoon ? "var(--orange, #f59e0b)" : "var(--text)";
+        expiresRow.style.display = "flex";
+        accountPlan.textContent = isExpiringSoon ? "PRO · expires soon" : "PRO";
+      } else {
+        expiresRow.style.display = "none";
+        accountPlan.textContent = "PRO";
+      }
+      accountPlan.style.color = "var(--accent)";
     } else {
       subscriptionInfo.style.display = "none";
       subscriptionFree.style.display = "block";
