@@ -1742,6 +1742,27 @@
   </div>
 </div>
 
+<!-- Card Verification Modal (for Manage Subscription) -->
+<div class="modal-overlay" id="card-verify-modal" style="display:none;">
+  <div class="modal" style="width:420px;max-width:95vw;">
+    <h2>🔒 Verify Your Card</h2>
+    <p style="color:var(--muted);font-size:13px;margin:12px 0;">
+      To manage your subscription, please confirm the last 4 digits of the card you used to subscribe. Only the cardholder knows this.
+    </p>
+    <div style="margin:16px 0;">
+      <div class="section-label">Last 4 digits of card</div>
+      <input type="text" id="card-last4-input" placeholder="••••"
+        inputmode="numeric" pattern="[0-9]*" maxlength="4"
+        style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;outline:none;text-align:center;letter-spacing:6px;font-weight:600;" />
+    </div>
+    <div id="card-verify-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="card-verify-cancel">Cancel</button>
+      <button class="btn btn-primary" id="card-verify-submit">Continue</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -3588,22 +3609,64 @@ Sent via MeetingMeter · meetingmeter.tech`;
       showToast("⚠️ Email not found. Please try the restore purchase option in the upgrade modal.");
       return;
     }
+    // Open card verification modal — require last 4 digits before opening Stripe portal
+    document.getElementById("card-last4-input").value = "";
+    document.getElementById("card-verify-msg").textContent = "";
+    document.getElementById("card-verify-modal").style.display = "flex";
+    setTimeout(() => document.getElementById("card-last4-input").focus(), 100);
+  });
 
-    showToast("⏳ Opening Stripe customer portal…");
+  // Card verification cancel
+  document.getElementById("card-verify-cancel").addEventListener("click", () => {
+    document.getElementById("card-verify-modal").style.display = "none";
+  });
+
+  // Card verification submit — verify last4, then open Stripe portal
+  document.getElementById("card-verify-submit").addEventListener("click", async function() {
+    const email = localStorage.getItem("mm_email") || "";
+    const last4 = document.getElementById("card-last4-input").value.trim();
+    const msgEl = document.getElementById("card-verify-msg");
+
+    if (!/^\d{4}$/.test(last4)) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "Please enter exactly 4 digits.";
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = "Verifying…";
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Verifying card…";
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
       const res = await fetch("/api/customer-portal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, last4 }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
+
       if (data.url) {
+        document.getElementById("card-verify-modal").style.display = "none";
         window.open(data.url, "_blank");
       } else {
-        showToast("⚠️ Could not create portal session. Contact support.");
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ " + (data.error || "Verification failed.");
       }
-    } catch (e) {
-      showToast("⚠️ Error opening portal. Please try again or contact support@meetingmeter.tech");
+    } catch (err) {
+      clearTimeout(timeoutId);
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = err.name === "AbortError"
+        ? "❌ Request timed out. Please try again."
+        : "❌ Error verifying card. Please try again.";
+    } finally {
+      this.disabled = false;
+      this.textContent = "Continue";
     }
   });
 

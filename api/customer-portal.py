@@ -34,6 +34,7 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length)) if length else {}
         email = (body.get("email") or "").strip().lower()
+        last4 = (body.get("last4") or "").strip()
 
         if not email:
             self._json(400, {"ok": False, "error": "Email required"})
@@ -46,9 +47,28 @@ class handler(BaseHTTPRequestHandler):
                 self._json(404, {"ok": False, "error": "No subscription found for that email"})
                 return
 
-            customer_id = customers["data"][0]["id"]
+            customer = customers["data"][0]
+            customer_id = customer["id"]
 
-            # Create portal session
+            # Step 1 (no last4): Just acknowledge customer exists, frontend will prompt for last4
+            if not last4:
+                self._json(200, {"ok": True, "needs_verification": True})
+                return
+
+            # Step 2: Verify last4 matches customer's saved card(s)
+            payment_methods = stripe_get("payment_methods", {"customer": customer_id, "type": "card", "limit": 10})
+            valid_last4 = False
+            for pm in payment_methods.get("data", []):
+                card = pm.get("card", {})
+                if card.get("last4") == last4:
+                    valid_last4 = True
+                    break
+
+            if not valid_last4:
+                self._json(403, {"ok": False, "error": "Last 4 digits don't match the card on file"})
+                return
+
+            # Last4 verified — create portal session
             session = stripe_post("billing_portal/sessions", {
                 "customer": customer_id,
                 "return_url": "https://meetingmeter.tech/app"
