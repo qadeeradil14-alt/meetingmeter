@@ -13,6 +13,7 @@ Flow:
 
 Stateless — no DB required. Challenge is short-lived (10 min).
 """
+from __future__ import annotations
 import os
 import json
 import time
@@ -22,6 +23,7 @@ import base64
 import secrets
 import urllib.request
 import urllib.parse
+import urllib.error
 from http.server import BaseHTTPRequestHandler
 
 STRIPE_SECRET = os.environ.get("STRIPE_SECRET_KEY", "").strip()

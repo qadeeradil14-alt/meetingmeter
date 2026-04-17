@@ -9,6 +9,7 @@ Input: { email, code, challenge }
 
 On success, returns { ok: true }.
 """
+from __future__ import annotations
 import os
 import json
 import time

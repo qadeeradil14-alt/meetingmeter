@@ -2012,7 +2012,14 @@
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      const data = await res.json();
+      // Try to parse JSON — if server returned HTML (e.g. 500 error page), show raw text
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = `❌ Server error (${res.status}): ${text.slice(0, 200)}`;
+        return false;
+      }
       if (data.ok && data.challenge) {
         ecChallenge = data.challenge;
         return true;
@@ -2026,7 +2033,7 @@
       msgEl.style.color = "var(--red)";
       msgEl.textContent = err.name === "AbortError"
         ? "❌ Request timed out. Please try again."
-        : "❌ Error sending code. Please try again.";
+        : "❌ " + (err.message || "Error sending code. Please try again.");
       return false;
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = originalBtnText; }
