@@ -1938,12 +1938,21 @@
   const FREE_ATTENDEE_LIMIT = 3;
 
   function isPaid() {
-    return localStorage.getItem("mm_paid") === "true" ||
-           localStorage.getItem("mm_admin") === "true";
+    if (localStorage.getItem("mm_admin") === "true") return true;
+    if (localStorage.getItem("mm_paid") !== "true") return false;
+    // Check subscription expiry if we have a period_end stored
+    const until = localStorage.getItem("mm_paid_until");
+    if (until && Date.now() > parseInt(until) * 1000) {
+      localStorage.removeItem("mm_paid");
+      localStorage.removeItem("mm_paid_until");
+      return false;
+    }
+    return true;
   }
 
   function unlockPaid() {
     localStorage.setItem("mm_paid", "true");
+    if (ecPeriodEnd) localStorage.setItem("mm_paid_until", String(ecPeriodEnd));
     document.getElementById("upgrade-modal").classList.remove("open");
     showToast("🎉 Access unlocked! Unlimited attendees enabled.");
     renderAttendees(); // refresh the limit bar
@@ -1961,6 +1970,7 @@
     if (params.get("admin") === "reset") {
       localStorage.removeItem("mm_admin");
       localStorage.removeItem("mm_paid");
+      localStorage.removeItem("mm_paid_until");
       history.replaceState({}, "", window.location.pathname);
       showToast("🔒 Admin mode cleared");
       renderAttendees();
@@ -1989,6 +1999,7 @@
   let ecEmail = "";        // which email is being verified
   let ecChallenge = "";    // signed token returned by backend (proves code was issued)
   let ecPurpose = "";      // "restore" or "manage" — decides post-verify action
+  let ecPeriodEnd = 0;     // Stripe current_period_end (unix seconds) for access expiry
 
   function openEmailCodeModal(email, purpose) {
     ecEmail = email;
@@ -2021,6 +2032,7 @@
       }
       if (data.ok && data.challenge) {
         ecChallenge = data.challenge;
+        ecPeriodEnd = data.period_end || 0;
         return true;
       } else {
         msgEl.style.color = "var(--red)";

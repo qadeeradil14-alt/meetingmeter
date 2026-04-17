@@ -45,8 +45,8 @@ def sign_challenge(email: str, code: str, exp: int) -> str:
     return f"{b64u(payload)}.{b64u(sig)}"
 
 
-def stripe_has_active_sub(email: str) -> bool:
-    """Return True if Stripe has at least one active subscription for this email."""
+def stripe_get_active_sub(email: str) -> tuple[bool, int]:
+    """Return (has_active_sub, current_period_end) for the email's Stripe subscription."""
     creds = base64.b64encode(f"{STRIPE_SECRET}:".encode()).decode()
     url = "https://api.stripe.com/v1/customers?email=" + urllib.parse.quote(email) + "&limit=5"
     req = urllib.request.Request(url, headers={"Authorization": f"Basic {creds}"})
@@ -59,8 +59,9 @@ def stripe_has_active_sub(email: str) -> bool:
         with urllib.request.urlopen(sub_req, timeout=10) as sub_resp:
             subs = json.loads(sub_resp.read())
         if subs.get("data"):
-            return True
-    return False
+            period_end = subs["data"][0].get("current_period_end", 0)
+            return True, period_end
+    return False, 0
 
 
 def send_email_via_resend(to_email: str, code: str) -> tuple[bool, str]:
@@ -116,7 +117,7 @@ class handler(BaseHTTPRequestHandler):
 
         # 1. Check that the email has an active subscription
         try:
-            has_sub = stripe_has_active_sub(email)
+            has_sub, period_end = stripe_get_active_sub(email)
         except Exception as e:
             self._json({"ok": False, "error": f"Stripe lookup failed: {str(e)}"}, 502)
             return
@@ -138,8 +139,8 @@ class handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": f"Could not send email: {err}"}, 502)
             return
 
-        # 5. Return challenge to frontend
-        self._json({"ok": True, "challenge": challenge})
+        # 5. Return challenge + period_end to frontend
+        self._json({"ok": True, "challenge": challenge, "period_end": period_end})
 
     def do_OPTIONS(self):
         self.send_response(200)
