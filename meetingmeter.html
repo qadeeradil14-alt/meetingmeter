@@ -1991,8 +1991,7 @@
     if (e.target === this) this.classList.remove("open");
   });
 
-  // "Restore Access" — verify email against Stripe before unlocking
-  // Store current verification email and code
+  // "Restore Access" — verify email against Stripe, unlock if active subscription found
   let currentVerificationEmail = "";
   let currentVerificationCode = "";
 
@@ -2017,75 +2016,28 @@
       const res = await fetch("/api/verify-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, action: "check_only" }),
+        body: JSON.stringify({ email }),
       });
       const data = await res.json();
 
       if (data.ok) {
-        // Subscription exists — now require email verification
-        currentVerificationEmail = email;
-        // Generate a random 6-digit code (in production, this would be sent to user's email)
-        currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-        // Show verification modal with the code displayed
-        const modal = document.getElementById("email-verification-modal");
-        document.getElementById("verify-email-display").textContent = email;
-        document.getElementById("verify-code-display").textContent = currentVerificationCode;
-        document.getElementById("verification-code-input").value = "";
-        document.getElementById("verification-msg").textContent = "";
-        modal.style.display = "flex";
-
-        msgEl.textContent = "";
-        this.disabled = false;
-        this.textContent = "✅ Restore Access";
+        msgEl.style.color = "var(--green)";
+        msgEl.textContent = "✅ Subscription verified!";
+        localStorage.setItem("mm_email", email);
+        setTimeout(() => {
+          unlockPaid();
+          document.getElementById("restore-msg").textContent = "";
+        }, 800);
       } else {
         msgEl.style.color = "var(--red)";
         msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
-        this.disabled = false;
-        this.textContent = "✅ Restore Access";
       }
     } catch {
       msgEl.style.color = "var(--red)";
       msgEl.textContent = "❌ Verification failed — please try again.";
-      this.disabled = false;
-      this.textContent = "✅ Restore Access";
     } finally {
       this.disabled = false;
       this.textContent = "✅ Restore Access";
-    }
-  });
-
-  // Email verification modal
-  document.getElementById("verify-cancel").addEventListener("click", () => {
-    document.getElementById("email-verification-modal").style.display = "none";
-    currentVerificationEmail = "";
-    currentVerificationCode = "";
-  });
-
-  document.getElementById("verify-submit").addEventListener("click", async () => {
-    const codeInput = document.getElementById("verification-code-input").value.trim();
-    const msgEl = document.getElementById("verification-msg");
-
-    if (!codeInput || codeInput !== currentVerificationCode) {
-      msgEl.style.color = "var(--red)";
-      msgEl.textContent = "❌ Incorrect code. Please try again.";
-      return;
-    }
-
-    try {
-      // Verified by email code — now unlock access
-      msgEl.style.color = "var(--green)";
-      msgEl.textContent = "✅ Email verified!";
-
-      localStorage.setItem("mm_email", currentVerificationEmail);
-      setTimeout(() => {
-        document.getElementById("email-verification-modal").style.display = "none";
-        unlockPaid();
-        document.getElementById("restore-msg").textContent = "";
-      }, 800);
-    } catch (e) {
-      msgEl.style.color = "var(--red)";
-      msgEl.textContent = "❌ Verification error. Please try again.";
     }
   });
 
@@ -3651,52 +3603,22 @@ Sent via MeetingMeter · meetingmeter.tech`;
       return;
     }
 
-    // Require email verification before accessing customer portal
-    currentVerificationEmail = email;
-    currentVerificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const modal = document.getElementById("email-verification-modal");
-    document.getElementById("verify-email-display").textContent = email;
-    document.getElementById("verify-code-display").textContent = currentVerificationCode;
-    document.getElementById("verification-code-input").value = "";
-    document.getElementById("verification-msg").textContent = "";
-    modal.style.display = "flex";
-
-    // Update verify button to handle portal access
-    const verifyBtn = document.getElementById("verify-submit");
-    const originalHandler = verifyBtn.onclick;
-    verifyBtn.onclick = async () => {
-      const codeInput = document.getElementById("verification-code-input").value.trim();
-      const msgEl = document.getElementById("verification-msg");
-
-      if (!codeInput || codeInput !== currentVerificationCode) {
-        msgEl.style.color = "var(--red)";
-        msgEl.textContent = "❌ Incorrect code. Please try again.";
-        return;
+    showToast("⏳ Opening Stripe customer portal…");
+    try {
+      const res = await fetch("/api/customer-portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.open(data.url, "_blank");
+      } else {
+        showToast("⚠️ Could not create portal session. Contact support.");
       }
-
-      try {
-        msgEl.style.color = "var(--green)";
-        msgEl.textContent = "⏳ Opening Stripe portal…";
-
-        const res = await fetch("/api/customer-portal", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        if (data.url) {
-          document.getElementById("email-verification-modal").style.display = "none";
-          window.open(data.url, "_blank");
-        } else {
-          msgEl.style.color = "var(--red)";
-          msgEl.textContent = "❌ Could not create portal session.";
-        }
-      } catch (e) {
-        msgEl.style.color = "var(--red)";
-        msgEl.textContent = "❌ Error opening portal.";
-      }
-    };
+    } catch (e) {
+      showToast("⚠️ Error opening portal. Please try again or contact support@meetingmeter.tech");
+    }
   });
 
   function updateSettingsModal() {
