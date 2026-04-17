@@ -1742,6 +1742,27 @@
   </div>
 </div>
 
+<!-- Restore Access — Last 4 Card Digits Modal -->
+<div class="modal-overlay" id="restore-last4-modal" style="display:none;">
+  <div class="modal" style="width:420px;max-width:95vw;">
+    <h2>🔒 Verify It's You</h2>
+    <p style="color:var(--muted);font-size:13px;margin:12px 0;">
+      We found a subscription with that email. To confirm it's yours, please enter the last 4 digits of the card you subscribed with.
+    </p>
+    <div style="margin:16px 0;">
+      <div class="section-label">Last 4 digits of card</div>
+      <input type="text" id="restore-last4-input" placeholder="••••"
+        inputmode="numeric" pattern="[0-9]*" maxlength="4"
+        style="width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;outline:none;text-align:center;letter-spacing:6px;font-weight:600;" />
+    </div>
+    <div id="restore-last4-msg" style="font-size:12px;margin:8px 0;min-height:18px;text-align:center;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="restore-last4-cancel">Cancel</button>
+      <button class="btn btn-primary" id="restore-last4-submit">Verify</button>
+    </div>
+  </div>
+</div>
+
 <!-- Card Verification Modal (for Manage Subscription) -->
 <div class="modal-overlay" id="card-verify-modal" style="display:none;">
   <div class="modal" style="width:420px;max-width:95vw;">
@@ -1982,9 +2003,8 @@
     if (e.target === this) this.classList.remove("open");
   });
 
-  // "Restore Access" — verify email against Stripe, unlock if active subscription found
-  let currentVerificationEmail = "";
-  let currentVerificationCode = "";
+  // "Restore Access" — email + last4 card digits required to unlock
+  let restoreEmail = "";
 
   document.getElementById("restore-purchase-link").addEventListener("click", async function(e) {
     e.preventDefault();
@@ -2003,7 +2023,6 @@
     msgEl.style.color = "var(--muted)";
     msgEl.textContent = "Verifying with Stripe…";
 
-    // Add 20-second timeout so fetch doesn't hang forever
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
@@ -2015,21 +2034,21 @@
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
-      }
-
       const data = await res.json();
 
-      if (data.ok) {
+      if (data.needs_last4) {
+        // Email has a subscription — prompt for last4 card digits to prove ownership
+        restoreEmail = email;
+        msgEl.textContent = "";
+        document.getElementById("restore-last4-input").value = "";
+        document.getElementById("restore-last4-msg").textContent = "";
+        document.getElementById("restore-last4-modal").style.display = "flex";
+        setTimeout(() => document.getElementById("restore-last4-input").focus(), 100);
+      } else if (data.ok) {
         msgEl.style.color = "var(--green)";
         msgEl.textContent = "✅ Subscription verified!";
         localStorage.setItem("mm_email", email);
-        setTimeout(() => {
-          unlockPaid();
-          document.getElementById("restore-msg").textContent = "";
-        }, 800);
+        setTimeout(() => { unlockPaid(); document.getElementById("restore-msg").textContent = ""; }, 800);
       } else {
         msgEl.style.color = "var(--red)";
         msgEl.textContent = "❌ " + (data.error || "No active subscription found for that email.");
@@ -2037,14 +2056,71 @@
     } catch (err) {
       clearTimeout(timeoutId);
       msgEl.style.color = "var(--red)";
-      if (err.name === "AbortError") {
-        msgEl.textContent = "❌ Request timed out. Please try again.";
-      } else {
-        msgEl.textContent = "❌ " + (err.message || "Verification failed — please try again.");
-      }
+      msgEl.textContent = err.name === "AbortError"
+        ? "❌ Request timed out. Please try again."
+        : "❌ " + (err.message || "Verification failed — please try again.");
     } finally {
       this.disabled = false;
       this.textContent = "✅ Restore Access";
+    }
+  });
+
+  // Restore-last4 modal handlers
+  document.getElementById("restore-last4-cancel").addEventListener("click", () => {
+    document.getElementById("restore-last4-modal").style.display = "none";
+    restoreEmail = "";
+  });
+
+  document.getElementById("restore-last4-submit").addEventListener("click", async function() {
+    const last4 = document.getElementById("restore-last4-input").value.trim();
+    const msgEl = document.getElementById("restore-last4-msg");
+
+    if (!/^\d{4}$/.test(last4)) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "Please enter exactly 4 digits.";
+      return;
+    }
+
+    this.disabled = true;
+    this.textContent = "Verifying…";
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Checking card…";
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+    try {
+      const res = await fetch("/api/verify-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: restoreEmail, last4 }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const data = await res.json();
+
+      if (data.ok) {
+        msgEl.style.color = "var(--green)";
+        msgEl.textContent = "✅ Verified!";
+        localStorage.setItem("mm_email", restoreEmail);
+        setTimeout(() => {
+          document.getElementById("restore-last4-modal").style.display = "none";
+          unlockPaid();
+          document.getElementById("restore-msg").textContent = "";
+        }, 800);
+      } else {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = "❌ " + (data.error || "Verification failed.");
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = err.name === "AbortError"
+        ? "❌ Request timed out."
+        : "❌ Verification error.";
+    } finally {
+      this.disabled = false;
+      this.textContent = "Verify";
     }
   });
 

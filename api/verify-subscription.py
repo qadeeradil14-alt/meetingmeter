@@ -15,7 +15,7 @@ class handler(BaseHTTPRequestHandler):
         body = json.loads(self.rfile.read(length) or b"{}")
         session_id = body.get("session_id", "").strip()
         email = body.get("email", "").strip().lower()
-        action = body.get("action", "").strip().lower()
+        last4 = body.get("last4", "").strip()
 
         if not STRIPE_SECRET:
             self._json({"ok": False, "error": "Server misconfigured"}, 500)
@@ -27,16 +27,57 @@ class handler(BaseHTTPRequestHandler):
             self._json(result)
             return
 
-        # Verify by email (re-activation flow) — check_only returns subscription status without granting access
+        # Verify by email + last4 card digits
         if email:
-            if action == "check_only":
+            if not last4:
+                # Step 1: check email has a subscription (but don't unlock)
                 result = self._verify_email(email)
-            else:
-                result = self._verify_email(email)
+                if result.get("ok"):
+                    # Email is known — ask for last4 to prove ownership
+                    self._json({"ok": False, "needs_last4": True})
+                    return
+                self._json(result)
+                return
+
+            # Step 2: verify last4 matches the card on file
+            if not self._verify_last4(email, last4):
+                self._json({"ok": False, "error": "Last 4 digits don't match the card on file"})
+                return
+
+            # Last4 matched — confirm subscription still active
+            result = self._verify_email(email)
             self._json(result)
             return
 
         self._json({"ok": False, "error": "Provide session_id or email"}, 400)
+
+    def _verify_last4(self, email, last4):
+        try:
+            import base64
+            creds = base64.b64encode(f"{STRIPE_SECRET}:".encode()).decode()
+
+            # Find customer
+            url = "https://api.stripe.com/v1/customers?email=" + urllib.parse.quote(email) + "&limit=5"
+            req = urllib.request.Request(url)
+            req.add_header("Authorization", f"Basic {creds}")
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                customers = json.loads(resp.read())
+
+            for customer in customers.get("data", []):
+                cid = customer["id"]
+                # Check payment methods for this customer
+                pm_url = f"https://api.stripe.com/v1/payment_methods?customer={cid}&type=card&limit=10"
+                pm_req = urllib.request.Request(pm_url)
+                pm_req.add_header("Authorization", f"Basic {creds}")
+                with urllib.request.urlopen(pm_req, timeout=10) as pm_resp:
+                    pms = json.loads(pm_resp.read())
+                for pm in pms.get("data", []):
+                    card = pm.get("card", {})
+                    if card.get("last4") == last4:
+                        return True
+            return False
+        except Exception:
+            return False
 
     def _verify_session(self, session_id):
         try:
