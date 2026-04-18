@@ -1280,6 +1280,20 @@
   </div>
 </header>
 
+<div id="already-pro-banner" style="display:none;background:linear-gradient(90deg,#f4f3ff,#eef0ff);border-bottom:1px solid var(--border);padding:10px 20px;">
+  <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;font-size:14px;color:#333;">
+    <span style="font-weight:600;color:#7c6af7;">✨ Already Pro?</span>
+    <span style="color:#555;">Restore your access on this device:</span>
+    <input type="email" id="already-pro-email" placeholder="you@example.com"
+      style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:13px;min-width:220px;outline:none;color:#222;" />
+    <button id="already-pro-btn"
+      style="background:#7c6af7;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;">
+      Send Code
+    </button>
+    <span id="already-pro-msg" style="font-size:12px;color:var(--muted);"></span>
+  </div>
+</div>
+
 <div class="app">
 
   <!-- LEFT: Setup -->
@@ -1981,6 +1995,7 @@
     renderAttendees(); // refresh the limit bar
     updateProLabel(); // Update PRO label in header
     updateSettingsModal(); // Update subscription section
+    if (typeof updateAlreadyProBanner === "function") updateAlreadyProBanner();
   }
 
   function showUpgradeModal() {
@@ -2073,6 +2088,39 @@
       if (btn) { btn.disabled = false; btn.textContent = originalBtnText; }
     }
   }
+
+  // "Already Pro?" top banner — visible only to free users
+  function updateAlreadyProBanner() {
+    const banner = document.getElementById("already-pro-banner");
+    if (!banner) return;
+    banner.style.display = isPaid() ? "none" : "block";
+  }
+  updateAlreadyProBanner();
+
+  document.getElementById("already-pro-btn").addEventListener("click", async function() {
+    const emailInput = document.getElementById("already-pro-email");
+    const msgEl = document.getElementById("already-pro-msg");
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email || !email.includes("@")) {
+      msgEl.style.color = "var(--red)";
+      msgEl.textContent = "Please enter a valid email.";
+      return;
+    }
+    const originalText = this.textContent;
+    this.disabled = true;
+    this.textContent = "Sending…";
+    msgEl.style.color = "var(--muted)";
+    msgEl.textContent = "Sending code to your inbox…";
+    const sent = await sendCodeTo(email, msgEl, this, originalText);
+    if (sent) {
+      msgEl.style.color = "var(--green)";
+      msgEl.textContent = "✅ Code sent!";
+      openEmailCodeModal(email, "restore");
+    }
+  });
+  document.getElementById("already-pro-email").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("already-pro-btn").click();
+  });
 
   // "Restore Access" — send code, then open modal
   document.getElementById("restore-purchase-link").addEventListener("click", async function(e) {
