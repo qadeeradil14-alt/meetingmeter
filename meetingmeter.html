@@ -1131,12 +1131,15 @@
       .logo-icon { width: 28px; height: 28px; font-size: 14px; }
 
       .app { grid-template-columns: 1fr; min-height: auto; }
-      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 18px; overflow-y: visible; }
+      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 14px; overflow-y: visible; }
       .right-panel { padding: 22px 16px 28px; gap: 20px; }
 
       /* Section header row holding Meeting Title + header action buttons becomes a stacked layout */
-      .left-panel .section-label > div { width: 100%; }
-      .header-action-btn { font-size: 12px !important; padding: 8px 10px !important; height: 38px; flex: 1 1 calc(50% - 4px); min-width: 0; }
+      .left-panel .section-label { margin-bottom: 6px; }
+      .left-panel .section-label > div { width: 100%; gap: 6px !important; }
+      .header-action-btn { font-size: 12px !important; padding: 7px 10px !important; height: 36px; flex: 1 1 calc(50% - 3px); min-width: 0; }
+      #meeting-title { margin-top: 2px; }
+      .duration-target-row { margin-top: 8px; }
 
       .cost-number { font-size: clamp(52px, 14vw, 90px) !important; }
       .cost-cents { font-size: clamp(24px, 6vw, 36px); }
@@ -1396,16 +1399,31 @@
     /* Free attendee counter pill */
     .attendee-limit-bar {
       display: flex; align-items: center; justify-content: space-between;
-      margin-top: 6px; margin-bottom: 2px;
+      margin-top: 8px; margin-bottom: 2px;
       font-size: 11px; color: var(--muted);
     }
-    .attendee-limit-dots { display: flex; gap: 4px; }
+    .attendee-limit-dots { display: flex; gap: 5px; align-items: center; }
     .limit-dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: var(--border); transition: background 0.2s;
     }
     .limit-dot.filled { background: var(--accent); }
-    .limit-dot.locked { background: rgba(124,106,247,0.25); border: 1px dashed rgba(124,106,247,0.4); }
+    .limit-dot.empty { background: rgba(124,106,247,0.18); }
+    .limit-upgrade-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: linear-gradient(135deg, rgba(124,106,247,0.18), rgba(167,139,250,0.12));
+      border: 1px solid rgba(124,106,247,0.35);
+      color: var(--accent);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+      padding: 3px 9px; border-radius: 999px;
+      cursor: pointer; text-transform: uppercase;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .limit-upgrade-pill:hover {
+      background: linear-gradient(135deg, rgba(124,106,247,0.3), rgba(167,139,250,0.22));
+      transform: translateY(-1px);
+    }
+    .limit-upgrade-pill svg { width: 10px; height: 10px; }
   </style>
 </head>
 <body>
@@ -1633,18 +1651,13 @@
     </div>
 
     <div id="debrief-cost-comparisons"></div>
-    <div id="debrief-ai-section"></div>
 
     <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
       <button class="btn btn-ghost" id="debrief-discard">Discard</button>
-      <button class="btn btn-ghost" id="debrief-skip">Save Without Debrief</button>
-      <button class="btn-slack hidden" id="debrief-slack-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zm1.271 0a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zm2.521-10.123a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zm0 1.271a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zm10.122 2.521a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zm-1.268 0a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zm-2.523 10.122a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zm0-1.268a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
-        Post to Slack
-      </button>
-      <button class="btn-ai" id="debrief-generate">✨ AI Summary</button>
-      <button class="btn btn-ghost" id="debrief-email" style="display:none">📧 Email to Attendees</button>
       <button class="btn btn-primary" id="debrief-save">Save Meeting</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:-4px;">
+      Save first — then use ✨ AI Summary, 📧 Email, or 💬 Slack on the saved meeting card.
     </div>
   </div>
 </div>
@@ -2495,9 +2508,12 @@
       const count = attendees.length;
       limitBar.style.display = "flex";
       limitText.textContent = `${count} / ${FREE_ATTENDEE_LIMIT} free`;
-      limitDots.innerHTML = Array.from({ length: FREE_ATTENDEE_LIMIT }, (_, i) =>
-        `<div class="limit-dot ${i < count ? "filled" : ""}"></div>`
-      ).join("") + `<div class="limit-dot locked" title="Upgrade to add more">🔒</div>`;
+      const dotsHtml = Array.from({ length: FREE_ATTENDEE_LIMIT }, (_, i) =>
+        `<div class="limit-dot ${i < count ? "filled" : "empty"}"></div>`
+      ).join("");
+      limitDots.innerHTML = `${dotsHtml}<button class="limit-upgrade-pill" id="limit-upgrade-pill" title="Upgrade to Pro"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 9V7a5 5 0 0 0-10 0v2H5v13h14V9h-2zm-8-2a3 3 0 1 1 6 0v2H9V7z"/></svg>Pro</button>`;
+      const pill = document.getElementById("limit-upgrade-pill");
+      if (pill) pill.addEventListener("click", (e) => { e.preventDefault(); showUpgradeModal(); });
       addBtn.textContent = count >= FREE_ATTENDEE_LIMIT ? "🔒 Upgrade to Add More" : "+ Add Attendee";
     } else {
       limitBar.style.display = "none";
@@ -2713,7 +2729,6 @@
     currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
     document.getElementById("debrief-decisions").value = "";
     document.getElementById("debrief-actions").value = "";
-    document.getElementById("debrief-ai-section").innerHTML = "";
     document.querySelectorAll(".rating-btn").forEach(b => b.className = "rating-btn");
 
     const costUSD = totalPerSecond() * elapsedSeconds;
@@ -2721,45 +2736,8 @@
     document.getElementById("debrief-cost").textContent = fmtMoneyPlain(costUSD);
     showCostComparisons(costUSD);
 
-    // Show/hide Slack button
-    // Keep Slack button hidden in debrief — only show post-save
-    const slackBtn = document.getElementById("debrief-slack-btn");
-    if (slackBtn) slackBtn.classList.add("hidden");
-    // Show email button only if at least one attendee has an email
-    const emailBtn = document.getElementById("debrief-email");
-    const hasEmails = attendees.some(a => a.email);
-    emailBtn.style.display = hasEmails ? "inline-flex" : "none";
-
     document.getElementById("debrief-modal").style.display = "flex";
   }
-
-  document.getElementById("debrief-email").addEventListener("click", () => {
-    const title     = document.getElementById("meeting-title").value || "Untitled Meeting";
-    const costUSD   = totalPerSecond() * elapsedSeconds;
-    const decisions = document.getElementById("debrief-decisions").value.trim();
-    const actions   = document.getElementById("debrief-actions").value.trim();
-    const aiSummary = currentDebrief.aiSummary || "";
-    const ratingLabel = currentDebrief.rating
-      ? { productive: "✅ Productive", mixed: "🤔 Mixed", wasted: "❌ Time Wasted" }[currentDebrief.rating]
-      : "";
-
-    const summaryBlock = buildEmailSummary(aiSummary, decisions, actions);
-
-    const template = integrationsConfig.email_template || DEFAULT_EMAIL_TEMPLATE;
-    const body = template
-      .replace(/{{title}}/g,    title)
-      .replace(/{{date}}/g,     new Date().toLocaleDateString("en-US", { weekday:"long", year:"numeric", month:"long", day:"numeric" }))
-      .replace(/{{duration}}/g, fmtTime(elapsedSeconds))
-      .replace(/{{cost}}/g,     fmtMoneyPlain(costUSD))
-      .replace(/{{rating}}/g,   ratingLabel ? `  ·  ${ratingLabel}` : "")
-      .replace(/{{summary}}/g,  summaryBlock);
-
-    const emails = attendees.filter(a => a.email).map(a => a.email).join(",");
-    triggerMailto(emails, `Meeting Debrief: ${title}`, body);
-    // Close debrief modal after sending
-    document.getElementById("save-modal").style.display = "none";
-    showToast("📧 Debrief sent to attendees");
-  });
 
   document.querySelectorAll(".rating-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -2961,122 +2939,12 @@
     } catch(e) { console.error("Invalid share link", e); }
   }
 
-  document.getElementById("debrief-generate").addEventListener("click", async () => {
-    if (!isPaid()) { showUpgradeModal(); return; }
-    // Always re-read from localStorage in case it was saved after page load
-    const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
-    if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
-    const key = integrationsConfig.claude_api_key || "";
-    if (!key) {
-      showToast("⚠️ Add your Claude API key in Integrations first");
-      return;
-    }
-    currentDebrief.decisions = document.getElementById("debrief-decisions").value.trim();
-    currentDebrief.actions   = document.getElementById("debrief-actions").value.trim();
-
-    const section = document.getElementById("debrief-ai-section");
-    section.innerHTML = `<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span>Generating summary…</span></div>`;
-
-    const btn = document.getElementById("debrief-generate");
-    btn.disabled = true;
-
-    try {
-      const title = document.getElementById("meeting-title").value || "Untitled Meeting";
-      const costUSD = totalPerSecond() * elapsedSeconds;
-      const attendeeNames = attendees.map(a => `${a.name || "Unnamed"} (${a.role})`).join(", ");
-      const ratingLabel = currentDebrief.rating ? { productive: "Productive", mixed: "Mixed", wasted: "Time Wasted" }[currentDebrief.rating] : "Not rated";
-
-      const prompt = `You are a concise meeting assistant. Given the meeting details below, return STRICT JSON with three keys: "summary", "decisions", and "actions".
-
-- "summary": a 3-4 bullet executive summary (plain text, use • as the bullet character, no markdown). Focus on decisions and next steps. Be direct.
-- "decisions": a clean, summarized list of decisions made (plain text, use • as the bullet character, no markdown). Rewrite the raw notes into crisp, standalone decisions. If no decisions exist, return an empty string.
-- "actions": a clean, summarized list of action items (plain text, use • as the bullet character, no markdown). Each bullet should be a crisp, standalone task — rewrite the raw notes into clear, actionable items. Include owner and deadline if mentioned. If no actions exist, return an empty string.
-
-Return ONLY the JSON object, no prose, no code fences.
-
-Meeting: ${title}
-Duration: ${fmtTime(elapsedSeconds)}
-Cost: ${fmtMoneyPlain(costUSD)}
-Attendees: ${attendeeNames || "Not specified"}
-Rating: ${ratingLabel}
-Decisions made (raw notes): ${currentDebrief.decisions || "None recorded"}
-Action items (raw notes): ${currentDebrief.actions || "None recorded"}`;
-
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": key,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 300,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error?.message || `HTTP ${res.status}`);
-      }
-
-      const data = await res.json();
-      const raw = data.content?.[0]?.text || "";
-      let summary = raw, refinedDecisions = "", refinedActions = "";
-      try {
-        const jsonMatch = raw.match(/\{[\s\S]*\}/);
-        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
-        summary = parsed.summary || "";
-        refinedDecisions = parsed.decisions || "";
-        refinedActions = parsed.actions || "";
-      } catch (_) { /* fall back to raw text as summary */ }
-
-      currentDebrief.aiSummary = summary;
-      if (refinedDecisions) {
-        currentDebrief.decisions = refinedDecisions;
-        const decisionsEl = document.getElementById("debrief-decisions");
-        if (decisionsEl) decisionsEl.value = refinedDecisions;
-      }
-      if (refinedActions) {
-        currentDebrief.actions = refinedActions;
-        const actionsEl = document.getElementById("debrief-actions");
-        if (actionsEl) actionsEl.value = refinedActions;
-      }
-
-      section.innerHTML = `
-        <div class="section-label">Executive Summary</div>
-        <div class="ai-summary-box">${esc(summary)}</div>
-        ${refinedDecisions ? `<div class="section-label" style="margin-top:12px">Decisions Made</div><div class="ai-summary-box">${esc(refinedDecisions)}</div>` : ""}
-        ${refinedActions ? `<div class="section-label" style="margin-top:12px">Action Items</div><div class="ai-summary-box">${esc(refinedActions)}</div>` : ""}
-      `;
-    } catch (e) {
-      section.innerHTML = `<div style="color:var(--red);font-size:12px;padding:8px 0">⚠️ ${esc(e.message)}</div>`;
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
   document.getElementById("debrief-save").addEventListener("click", async () => {
     currentDebrief.decisions = document.getElementById("debrief-decisions").value.trim();
     currentDebrief.actions   = document.getElementById("debrief-actions").value.trim();
     document.getElementById("debrief-modal").style.display = "none";
-    checkEmailBanner(elapsedSeconds, currentDebrief);
     await saveMeeting(currentDebrief);
-    // Prompt for emails if none set
-    const missingEmails = attendees.some(a => !a.email);
-    if (missingEmails) {
-      setTimeout(() => {
-        showToast("💡 Add attendee emails to send the debrief summary — click 📧 Email on the saved meeting", 6000);
-      }, 800);
-    }
-    resetAfterSave();
-  });
-
-  document.getElementById("debrief-skip").addEventListener("click", async () => {
-    document.getElementById("debrief-modal").style.display = "none";
-    await saveMeeting(null);
+    showToast("✅ Meeting saved — use ✨ AI Summary on the card to generate the summary", 5000);
     resetAfterSave();
   });
 
@@ -4597,8 +4465,9 @@ Sent via MeetingMeter · meetingmeter.tech`;
     document.getElementById("calendar-dropdown").classList.remove("open");
   }
 
-  // Post to Slack from debrief modal
-  document.getElementById("debrief-slack-btn").addEventListener("click", async () => {
+  // Post to Slack from debrief modal (button removed — no-op if not present)
+  const debriefSlackBtn = document.getElementById("debrief-slack-btn");
+  if (debriefSlackBtn) debriefSlackBtn.addEventListener("click", async () => {
     if (!isPaid()) { showUpgradeModal(); return; }
     if (!integrationsConfig.slack_webhook) return;
     const btn = document.getElementById("debrief-slack-btn");
@@ -4753,7 +4622,6 @@ Sent via MeetingMeter · meetingmeter.tech`;
         currentDebrief = { rating: null, decisions: "", actions: "", aiSummary: "" };
         document.getElementById("debrief-decisions").value = "";
         document.getElementById("debrief-actions").value = "";
-        document.getElementById("debrief-ai-section").innerHTML = "";
         // Load template attendees and title
         document.getElementById("meeting-title").value = tmpl.title;
         attendees = tmpl.attendees.map(a => ({ ...a, id: Date.now().toString() + Math.random().toString(36).slice(2) }));
