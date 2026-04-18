@@ -4496,24 +4496,25 @@ Sent via MeetingMeter · meetingmeter.tech`;
     try {
       const urls = [integrationsConfig.gcal_ics_url, integrationsConfig.apple_ics_url].filter(Boolean);
       if (!urls.length) return [];
-      // Fetch all calendars in parallel, merge and de-dupe by title+start
+      // Fetch all calendars in parallel, merge and de-dupe by title+start_ts
       const allEvents = (await Promise.all(urls.map(u =>
         fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(u)}`).then(r => r.ok ? r.json() : {})
       ))).flatMap(data => (data.events || []).map(e => ({
-        title: e.title || e.summary || "Untitled",
-        start: new Date(e.start || e.dtstart),
-        end: e.end ? new Date(e.end) : null,
-        duration_min: e.duration_min || Math.round(((new Date(e.end || e.dtend)) - (new Date(e.start || e.dtstart))) / 60000) || 60,
-        attendees: e.attendees || [],
-        id: e.uid || null,
+        title:            e.summary || e.title || "Untitled",
+        start:            new Date(e.start_ts * 1000),
+        start_ts:         e.start_ts,
+        duration_minutes: e.duration_min || 60,
+        attendees:        (e.attendees || []).map(a =>
+          typeof a === "string" ? { name: a, email: "" } : { name: a.name || "", email: a.email || "" }
+        ),
       })));
       const seen = new Set();
       const deduped = allEvents.filter(e => {
-        const key = `${e.title}|${e.start}`;
+        const key = `${e.title}|${e.start_ts}`;
         if (seen.has(key)) return false;
         seen.add(key); return true;
       });
-      deduped.sort((a, b) => a.start - b.start);
+      deduped.sort((a, b) => a.start_ts - b.start_ts);
       return deduped;
     } catch (err) {
       console.error("Failed to load calendar events", err);
