@@ -136,6 +136,43 @@
       #already-pro-email { min-width: 0; flex: 1 1 160px; }
     }
 
+    /* ── Today strip: compact live tally ── */
+    .today-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: linear-gradient(90deg, rgba(124,106,247,0.08), rgba(167,139,250,0.04));
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .today-strip-label {
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .today-strip-stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .today-strip-stat strong {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: -0.01em;
+    }
+    .today-strip-sep { color: var(--border); }
+    @media (max-width: 480px) {
+      .today-strip { padding: 9px 12px; gap: 6px; font-size: 11px; }
+      .today-strip-stat strong { font-size: 12px; }
+    }
+
     /* ── Planned duration input + overtime bar ── */
     .duration-target-row {
       display: flex;
@@ -1467,6 +1504,16 @@
 
   <!-- LEFT: Setup -->
   <div class="left-panel">
+
+    <!-- Today strip: live tally of today's tracked meetings -->
+    <div class="today-strip" id="today-strip" style="display:none;">
+      <span class="today-strip-label">📅 Today</span>
+      <span class="today-strip-stat"><strong id="today-count">0</strong> <span>meetings</span></span>
+      <span class="today-strip-sep">·</span>
+      <span class="today-strip-stat"><strong id="today-cost">$0</strong> <span>spent</span></span>
+      <span class="today-strip-sep">·</span>
+      <span class="today-strip-stat"><strong id="today-duration">0m</strong> <span>tracked</span></span>
+    </div>
 
     <div>
       <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
@@ -3082,7 +3129,30 @@
 
   const RATING_LABEL = { productive: "✅ Productive", mixed: "🤔 Mixed", wasted: "❌ Time Wasted" };
 
+  // ── Today strip: count/cost/duration for meetings saved today ──
+  function updateTodayStrip(items) {
+    const strip = document.getElementById("today-strip");
+    if (!strip) return;
+    const list = items || JSON.parse(localStorage.getItem("mm_history") || "[]");
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
+    const todays = list.filter(m => (m.timestamp || 0) >= startOfDay);
+    if (todays.length === 0) {
+      strip.style.display = "none";
+      return;
+    }
+    const totalCost = todays.reduce((s, m) => s + (m.total_cost || 0), 0);
+    const totalSec  = todays.reduce((s, m) => s + (m.duration_seconds || 0), 0);
+    const mins = Math.round(totalSec / 60);
+    const durStr = mins >= 60 ? `${Math.floor(mins/60)}h ${mins%60}m` : `${mins}m`;
+    document.getElementById("today-count").textContent = todays.length;
+    document.getElementById("today-cost").textContent = fmtMoneyPlain(totalCost);
+    document.getElementById("today-duration").textContent = durStr;
+    strip.style.display = "flex";
+  }
+
   function renderHistory(items) {
+    updateTodayStrip(items);
     const list = document.getElementById("history-list");
     if (!items || items.length === 0) {
       list.innerHTML = `<div class="empty-state">No meetings saved yet.</div>`;
@@ -3487,6 +3557,7 @@ Action items (raw notes): ${d.actions || "None recorded"}`;
     updateCostDisplay();
     updateBreakdown();
     updateStats();
+    updateTodayStrip();
   });
 
   function currencySymbol() { return CURRENCIES[currentCurrency].symbol; }
