@@ -4510,7 +4510,8 @@ Sent via MeetingMeter · meetingmeter.tech`;
       })));
       const seen = new Set();
       const deduped = allEvents.filter(e => {
-        const key = `${e.title}|${e.start_ts}`;
+        // Round to nearest minute to catch near-duplicate cross-calendar entries
+        const key = `${e.title}|${Math.round(e.start_ts / 60)}`;
         if (seen.has(key)) return false;
         seen.add(key); return true;
       });
