@@ -136,6 +136,97 @@
       #already-pro-email { min-width: 0; flex: 1 1 160px; }
     }
 
+    /* ── Planned duration input + overtime bar ── */
+    .duration-target-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .duration-target-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .duration-target-input-wrap {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px 10px 2px 8px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .duration-target-input-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+    #duration-input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      padding: 6px 4px;
+      width: 62px;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    #duration-input::-webkit-outer-spin-button,
+    #duration-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .duration-target-unit { font-size: 12px; color: var(--muted); }
+    .duration-target-hint { font-size: 11px; color: var(--muted); flex: 1; }
+
+    .duration-bar {
+      position: relative;
+      height: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: -6px 0 4px;
+    }
+    .duration-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #7c6af7, #a78bfa);
+      transition: width 0.9s linear, background 2s linear, box-shadow 2s linear;
+    }
+    .duration-bar.warn .duration-bar-fill {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    }
+    .duration-bar.danger .duration-bar-fill {
+      background: linear-gradient(90deg, #f87171, #ef4444);
+      box-shadow: 0 0 12px rgba(248,113,113,0.6);
+    }
+    .duration-bar.over .duration-bar-fill {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      box-shadow: 0 0 18px rgba(239,68,68,0.8);
+      animation: duration-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes duration-pulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.25); }
+    }
+    .duration-bar-label {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      mix-blend-mode: normal;
+      pointer-events: none;
+      text-shadow: 0 0 4px rgba(0,0,0,0.6);
+    }
+    .duration-bar.over .duration-bar-label,
+    .duration-bar.danger .duration-bar-label { color: #fff; }
+
     /* ── Layout ── */
     .app {
       display: grid;
@@ -1337,7 +1428,7 @@
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
     <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
-    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar"><span>🔗 Integrations</span><span id="integrations-pro-label" class="pro-label" style="display:none;">PRO</span></button>
+    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar">🔗 Integrations<span id="integrations-pro-label" class="pro-label" style="display:none;">PRO</span></button>
     <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
     <button class="settings-btn" id="account-settings-btn" title="Account & subscription">👤 Account</button>
   </div>
@@ -1398,6 +1489,14 @@
         </div>
       </div>
       <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
+      <div class="duration-target-row">
+        <label for="duration-input" class="duration-target-label">Planned Duration</label>
+        <div class="duration-target-input-wrap">
+          <input id="duration-input" type="number" min="1" max="480" step="1" placeholder="30" inputmode="numeric" />
+          <span class="duration-target-unit">min</span>
+        </div>
+        <span class="duration-target-hint">Bar turns red as you run over</span>
+      </div>
     </div>
 
     <div>
@@ -1432,6 +1531,11 @@
     </div>
 
     <div class="timer-display" id="timer-display">00:00:00</div>
+
+    <div class="duration-bar" id="duration-bar" style="display:none;">
+      <div class="duration-bar-fill" id="duration-bar-fill"></div>
+      <div class="duration-bar-label" id="duration-bar-label">0% of planned</div>
+    </div>
 
     <div class="stat-chips">
       <div class="stat-chip">
@@ -2481,6 +2585,56 @@
     });
   }
 
+  // ── Planned duration / overtime bar ──
+  let overtimeToastFired = false;
+  function getPlannedMinutes() {
+    const v = parseInt(document.getElementById("duration-input")?.value || "", 10);
+    return isNaN(v) || v <= 0 ? 0 : v;
+  }
+  function updateDurationBar() {
+    const bar = document.getElementById("duration-bar");
+    if (!bar) return;
+    const planned = getPlannedMinutes();
+    if (!planned) {
+      bar.style.display = "none";
+      bar.classList.remove("warn", "danger", "over");
+      overtimeToastFired = false;
+      return;
+    }
+    bar.style.display = "block";
+    const plannedSec = planned * 60;
+    const pct = (elapsedSeconds / plannedSec) * 100;
+    const fill = document.getElementById("duration-bar-fill");
+    const label = document.getElementById("duration-bar-label");
+    fill.style.width = Math.min(pct, 100) + "%";
+    bar.classList.remove("warn", "danger", "over");
+    if (pct >= 100) bar.classList.add("over");
+    else if (pct >= 90) bar.classList.add("danger");
+    else if (pct >= 75) bar.classList.add("warn");
+    if (pct >= 100) {
+      const over = elapsedSeconds - plannedSec;
+      label.textContent = `+${fmtTime(over)} over`;
+      if (!overtimeToastFired && typeof showToast === "function") {
+        showToast("⏰ Meeting is now running overtime");
+        overtimeToastFired = true;
+      }
+    } else {
+      label.textContent = `${Math.round(pct)}% of ${planned}m`;
+    }
+  }
+  document.addEventListener("DOMContentLoaded", () => {
+    const di = document.getElementById("duration-input");
+    if (di) di.addEventListener("input", updateDurationBar);
+  });
+  // Fallback in case DOMContentLoaded already fired (script is at end of body)
+  (function wireDurationInput() {
+    const di = document.getElementById("duration-input");
+    if (di && !di.dataset.wired) {
+      di.dataset.wired = "1";
+      di.addEventListener("input", updateDurationBar);
+    }
+  })();
+
   function startTimer() {
     timerInterval = setInterval(() => {
       elapsedSeconds++;
@@ -2488,6 +2642,7 @@
       updateCostDisplay();
       updateBreakdown();
       updateStats(); // Update live stat chips (attendees, burn rate, etc.)
+      updateDurationBar();
     }, 1000);
   }
 
@@ -2504,6 +2659,8 @@
     document.getElementById("pause-btn").classList.remove("hidden");
     document.getElementById("stop-btn").classList.remove("hidden");
     document.getElementById("running-indicator").classList.remove("hidden");
+    overtimeToastFired = false;
+    updateDurationBar();
     startTimer();
   });
 
@@ -2539,6 +2696,8 @@
     document.getElementById("pause-btn").textContent = "⏸ Pause";
     updateCostDisplay();
     updateBreakdown();
+    overtimeToastFired = false;
+    updateDurationBar();
   });
 
   document.getElementById("add-attendee-btn").addEventListener("click", addAttendee);
@@ -2974,6 +3133,10 @@ Action items (raw notes): ${currentDebrief.actions || "None recorded"}`;
     elapsedSeconds = 0; running = false; paused = false;
     attendees = [];
     document.getElementById("meeting-title").value = "";
+    const di = document.getElementById("duration-input");
+    if (di) di.value = "";
+    overtimeToastFired = false;
+    updateDurationBar();
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
     document.getElementById("pause-btn").classList.add("hidden");
@@ -3009,6 +3172,8 @@ Action items (raw notes): ${currentDebrief.actions || "None recorded"}`;
     document.getElementById("pause-btn").textContent = "⏸ Pause";
     updateCostDisplay();
     updateBreakdown();
+    overtimeToastFired = false;
+    updateDurationBar();
   }
 
   // Returns data for export — uses live state during a meeting,
@@ -4125,6 +4290,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
           if (duration) {
             const durationInput = document.getElementById("duration-input");
             if (durationInput) durationInput.value = duration;
+            if (typeof updateDurationBar === "function") updateDurationBar();
           }
 
           overlay.remove();
