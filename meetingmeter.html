@@ -1505,9 +1505,9 @@
   <!-- LEFT: Setup -->
   <div class="left-panel">
 
-    <!-- Today strip: live tally of today's tracked meetings -->
-    <div class="today-strip" id="today-strip" style="display:none;">
-      <span class="today-strip-label">📅 Today</span>
+    <!-- Today strip: live tally of today's / this week's / all-time meetings -->
+    <div class="today-strip" id="today-strip">
+      <span class="today-strip-label" id="today-strip-label-txt">📅 Today</span>
       <span class="today-strip-stat"><strong id="today-count">0</strong> <span>meetings</span></span>
       <span class="today-strip-sep">·</span>
       <span class="today-strip-stat"><strong id="today-cost">$0</strong> <span>spent</span></span>
@@ -3130,22 +3130,31 @@
   const RATING_LABEL = { productive: "✅ Productive", mixed: "🤔 Mixed", wasted: "❌ Time Wasted" };
 
   // ── Today strip: count/cost/duration for meetings saved today ──
+  // Always visible. Falls back to "This week" when today is empty, and
+  // to "All time" when this week is empty too.
   function updateTodayStrip(items) {
     const strip = document.getElementById("today-strip");
     if (!strip) return;
     const list = items || JSON.parse(localStorage.getItem("mm_history") || "[]");
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
+    const startOfWeek = startOfDay - (now.getDay() * 86400); // Sunday start
     const todays = list.filter(m => (m.timestamp || 0) >= startOfDay);
-    if (todays.length === 0) {
-      strip.style.display = "none";
-      return;
-    }
-    const totalCost = todays.reduce((s, m) => s + (m.total_cost || 0), 0);
-    const totalSec  = todays.reduce((s, m) => s + (m.duration_seconds || 0), 0);
+    const weeks  = list.filter(m => (m.timestamp || 0) >= startOfWeek);
+
+    let scope, bucket;
+    if (todays.length) { scope = "📅 Today"; bucket = todays; }
+    else if (weeks.length) { scope = "📅 This week"; bucket = weeks; }
+    else if (list.length) { scope = "📅 All time"; bucket = list; }
+    else { scope = "📅 Today"; bucket = []; }
+
+    const totalCost = bucket.reduce((s, m) => s + (m.total_cost || 0), 0);
+    const totalSec  = bucket.reduce((s, m) => s + (m.duration_seconds || 0), 0);
     const mins = Math.round(totalSec / 60);
     const durStr = mins >= 60 ? `${Math.floor(mins/60)}h ${mins%60}m` : `${mins}m`;
-    document.getElementById("today-count").textContent = todays.length;
+
+    document.getElementById("today-strip-label-txt").textContent = scope;
+    document.getElementById("today-count").textContent = bucket.length;
     document.getElementById("today-cost").textContent = fmtMoneyPlain(totalCost);
     document.getElementById("today-duration").textContent = durStr;
     strip.style.display = "flex";
