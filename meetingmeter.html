@@ -181,12 +181,12 @@
 
     .duration-bar {
       position: relative;
-      height: 10px;
+      height: 18px;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 999px;
       overflow: hidden;
-      margin: -6px 0 4px;
+      margin: 8px 0 0;
     }
     .duration-bar-fill {
       height: 100%;
@@ -214,15 +214,16 @@
     .duration-bar-label {
       position: absolute;
       top: 50%;
-      right: 10px;
+      left: 0;
+      right: 0;
       transform: translateY(-50%);
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--muted);
-      mix-blend-mode: normal;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-align: center;
       pointer-events: none;
-      text-shadow: 0 0 4px rgba(0,0,0,0.6);
+      text-shadow: 0 0 6px rgba(0,0,0,0.8);
     }
     .duration-bar.over .duration-bar-label,
     .duration-bar.danger .duration-bar-label { color: #fff; }
@@ -1515,6 +1516,10 @@
         </div>
         <span class="duration-target-hint">Bar turns red as you run over</span>
       </div>
+      <div class="duration-bar" id="duration-bar" style="display:none;">
+        <div class="duration-bar-fill" id="duration-bar-fill"></div>
+        <div class="duration-bar-label" id="duration-bar-label">0% of planned</div>
+      </div>
     </div>
 
     <div>
@@ -1549,11 +1554,6 @@
     </div>
 
     <div class="timer-display" id="timer-display">00:00:00</div>
-
-    <div class="duration-bar" id="duration-bar" style="display:none;">
-      <div class="duration-bar-fill" id="duration-bar-fill"></div>
-      <div class="duration-bar-label" id="duration-bar-label">0% of planned</div>
-    </div>
 
     <div class="stat-chips">
       <div class="stat-chip">
