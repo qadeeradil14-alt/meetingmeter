@@ -18,8 +18,6 @@
     { "src": "/api/send-verification-code", "dest": "/api/send-verification-code.py" },
     { "src": "/api/verify-code",            "dest": "/api/verify-code.py" },
     { "src": "/api/send-report-email",      "dest": "/api/send-report-email.py" },
-    { "src": "/api/auth/sign-in",           "dest": "/api/auth-sign-in.py" },
-    { "src": "/api/auth/profile",           "dest": "/api/auth-profile.py" },
     { "src": "/api/zoom/callback",          "dest": "/api/zoom/callback.js" },
     { "src": "/api/zoom/auth",              "dest": "/api/zoom/auth.js" },
     { "src": "/api/zoom/meetings",          "dest": "/api/zoom/meetings.js" },
