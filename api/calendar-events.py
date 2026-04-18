@@ -30,6 +30,9 @@ class handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "Missing ics_url parameter"}, 400)
             return
 
+        # webcal:// is identical to https:// — just a protocol hint for calendar apps
+        ics_url = ics_url.replace("webcal://", "https://").replace("webcal+ssl://", "https://")
+
         try:
             req = urllib.request.Request(ics_url)
             req.add_header("User-Agent", "MeetingMeter/1.0")

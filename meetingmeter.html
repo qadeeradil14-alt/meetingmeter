@@ -3951,7 +3951,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
   document.getElementById("integrations-save").addEventListener("click", () => {
     integrationsConfig.slack_webhook = document.getElementById("slack-webhook-input").value.trim();
     integrationsConfig.gcal_ics_url = document.getElementById("gcal-ics-input").value.trim();
-    integrationsConfig.apple_ics_url = document.getElementById("apple-ics-input").value.trim();
+    integrationsConfig.apple_ics_url = document.getElementById("apple-ics-input").value.trim().replace(/^webcal:\/\//i, "https://");
     integrationsConfig.claude_api_key = document.getElementById("claude-api-key-input").value.trim();
     integrationsConfig.email_template = document.getElementById("email-template-input").value;
     saveIntegrations();
