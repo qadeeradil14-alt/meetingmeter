@@ -60,7 +60,14 @@ class handler(BaseHTTPRequestHandler):
             dtstart  = self._field(block, "DTSTART")
             dtend    = self._field(block, "DTEND")
             location = self._field(block, "LOCATION")
+            description = self._field(block, "DESCRIPTION")
             attendees = self._attendees(block)
+
+            # Fall back to location or first line of description when summary is blank
+            if not summary and location:
+                summary = location
+            elif not summary and description:
+                summary = description.splitlines()[0][:60].strip()
 
             start_ts = self._parse_dt(dtstart)
             end_ts   = self._parse_dt(dtend)
