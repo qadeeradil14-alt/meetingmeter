@@ -4,6 +4,10 @@ import time
 import datetime
 import urllib.request
 import urllib.parse
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None
 
 
 class handler(BaseHTTPRequestHandler):
@@ -57,11 +61,12 @@ class handler(BaseHTTPRequestHandler):
             block = block[:end_idx]
 
             summary  = self._field(block, "SUMMARY")
-            dtstart  = self._field(block, "DTSTART")
-            dtend    = self._field(block, "DTEND")
             location = self._field(block, "LOCATION")
             description = self._field(block, "DESCRIPTION")
             attendees = self._attendees(block)
+
+            dtstart_params, dtstart_val = self._field_with_params(block, "DTSTART")
+            dtend_params,   dtend_val   = self._field_with_params(block, "DTEND")
 
             # Fall back to location or first line of description when summary is blank
             if not summary and location:
@@ -69,13 +74,13 @@ class handler(BaseHTTPRequestHandler):
             elif not summary and description:
                 summary = description.splitlines()[0][:60].strip()
 
-            start_ts = self._parse_dt(dtstart)
-            end_ts   = self._parse_dt(dtend)
+            start_ts = self._parse_dt(dtstart_val, dtstart_params)
+            end_ts   = self._parse_dt(dtend_val,   dtend_params)
 
             if not start_ts:
                 continue
-            # Events starting in the past hour or up to 7 days ahead
-            if start_ts < now - 3600 or start_ts > now + 7 * 86400:
+            # Events starting in the past 6 hours or up to 7 days ahead (tolerant of TZ skew)
+            if start_ts < now - 6 * 3600 or start_ts > now + 7 * 86400:
                 continue
 
             duration_min = int((end_ts - start_ts) / 60) if end_ts else 60
@@ -153,24 +158,57 @@ class handler(BaseHTTPRequestHandler):
                 capturing = False
         return "".join(result) if result else ""
 
-    def _parse_dt(self, val):
+    def _field_with_params(self, text, name):
+        """Return (params_string, value_string) for an ICS field, respecting line folding."""
+        lines = text.splitlines()
+        unfolded = []
+        for line in lines:
+            if line and line[0] in (" ", "\t") and unfolded:
+                unfolded[-1] += line[1:]
+            else:
+                unfolded.append(line)
+        for line in unfolded:
+            if line.startswith(name + ":") or line.startswith(name + ";"):
+                colon = line.find(":")
+                if colon == -1:
+                    return "", ""
+                return line[:colon], line[colon + 1:].strip()
+        return "", ""
+
+    def _parse_dt(self, val, params=""):
         if not val:
             return None
-        val = val.split(";")[-1]
-        val = val.replace("Z", "").replace("T", "").replace("-", "").replace(":", "")
+        is_utc = val.endswith("Z")
+        clean = val.replace("Z", "").replace("T", "").replace("-", "").replace(":", "")
+        tzid = ""
+        if params:
+            for p in params.split(";"):
+                if p.upper().startswith("TZID="):
+                    tzid = p[5:].strip().strip('"')
+                    break
         try:
-            if len(val) >= 14:
+            if len(clean) >= 14:
                 dt = datetime.datetime(
-                    int(val[0:4]), int(val[4:6]), int(val[6:8]),
-                    int(val[8:10]), int(val[10:12]), int(val[12:14])
+                    int(clean[0:4]), int(clean[4:6]), int(clean[6:8]),
+                    int(clean[8:10]), int(clean[10:12]), int(clean[12:14])
                 )
-                return dt.timestamp()
-            elif len(val) == 8:
-                dt = datetime.datetime(int(val[0:4]), int(val[4:6]), int(val[6:8]))
-                return dt.timestamp()
+            elif len(clean) == 8:
+                dt = datetime.datetime(int(clean[0:4]), int(clean[4:6]), int(clean[6:8]))
+            else:
+                return None
+
+            if is_utc:
+                return dt.replace(tzinfo=datetime.timezone.utc).timestamp()
+            if tzid and ZoneInfo:
+                try:
+                    return dt.replace(tzinfo=ZoneInfo(tzid)).timestamp()
+                except Exception:
+                    pass
+            # Floating / unknown-TZ: treat the wallclock AS UTC so it round-trips unchanged
+            # to the browser (which will display it in its own local TZ).
+            return dt.replace(tzinfo=datetime.timezone.utc).timestamp()
         except Exception:
-            pass
-        return None
+            return None
 
     def _json(self, data, status=200):
         body = json.dumps(data).encode()

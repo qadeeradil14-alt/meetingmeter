@@ -12,30 +12,49 @@
   <title>MeetingMeter</title>
   <style>
     :root {
-      --bg: #0f0f13;
-      --surface: #1a1a24;
-      --surface2: #22222f;
-      --border: #2e2e3e;
-      --text: #f0f0f5;
-      --muted: #7a7a9a;
-      --accent: #7c6af7;
-      --accent-glow: rgba(124,106,247,0.25);
-      --green: #34d399;
-      --red: #f87171;
-      --yellow: #fbbf24;
-      --gold: #f59e0b;
+      --bg: #091018;
+      --surface: rgba(17, 27, 39, 0.84);
+      --surface2: #162332;
+      --border: rgba(116, 187, 255, 0.14);
+      --text: #eef5fb;
+      --muted: #8ea6bd;
+      --accent: #78d6ff;
+      --accent-glow: rgba(120,214,255,0.22);
+      --green: #4ade80;
+      --red: #ff7d66;
+      --yellow: #f6b54d;
+      --gold: #ffd38f;
+      --amber: #f6b54d;
+      --shadow: 0 24px 60px rgba(0,0,0,0.24);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(120,214,255,0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(246,181,77,0.10), transparent 26%),
+        linear-gradient(180deg, #071019 0%, #091018 42%, #0d1520 100%);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
       min-height: 100vh;
       -webkit-tap-highlight-color: transparent;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior-y: contain;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(116,187,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(116,187,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.65), transparent 88%);
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* iOS safe-area insets so content isn't hidden by the notch / home indicator */
@@ -51,7 +70,9 @@
       justify-content: space-between;
       padding: 16px 28px;
       border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      background: rgba(7,11,16,0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
     }
 
     .logo {
@@ -65,18 +86,87 @@
 
     .logo-icon {
       width: 32px; height: 32px;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      border-radius: 8px;
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+      color: #091018;
+      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
+      box-shadow: 0 12px 28px rgba(246,181,77,0.22);
     }
 
     .tagline { color: var(--muted); font-size: 12px; }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .topbar-select,
+    .topbar-btn {
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid rgba(120,214,255,0.16);
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.06), rgba(255,255,255,0.015)),
+        rgba(13, 21, 31, 0.94);
+      color: var(--text2, #dbe6f2);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      transition: border-color 0.18s ease, transform 0.12s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .topbar-select {
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .topbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .topbar-btn:hover,
+    .topbar-select:hover,
+    .topbar-select:focus {
+      border-color: rgba(120,214,255,0.34);
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.09), rgba(255,255,255,0.03)),
+        rgba(15, 25, 36, 0.98);
+      color: var(--text);
+    }
+
+    .topbar-btn:active {
+      transform: translateY(1px);
+    }
+
+    .topbar-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(120,214,255,0.08);
+      color: var(--accent);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
     /* ── Already Pro? restore banner ── */
     #already-pro-banner {
       display: none;
-      background: linear-gradient(90deg, rgba(124,106,247,0.10), rgba(167,139,250,0.06));
+      background: linear-gradient(90deg, rgba(246,181,77,0.10), rgba(120,214,255,0.06));
       border-bottom: 1px solid var(--border);
       padding: 10px 28px;
     }
@@ -92,7 +182,7 @@
     }
     .already-pro-title {
       font-weight: 600;
-      color: var(--accent);
+      color: var(--amber);
       letter-spacing: 0.1px;
     }
     .already-pro-sub { color: var(--muted); }
@@ -113,10 +203,10 @@
       box-shadow: 0 0 0 3px var(--accent-glow);
     }
     #already-pro-btn {
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: #fff;
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+      color: #091018;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 7px 16px;
       font-size: 13px;
       font-weight: 600;
@@ -143,15 +233,18 @@
       gap: 8px;
       flex-wrap: wrap;
       padding: 10px 14px;
-      background: linear-gradient(90deg, rgba(124,106,247,0.08), rgba(167,139,250,0.04));
+      background:
+        linear-gradient(90deg, rgba(246,181,77,0.08), rgba(120,214,255,0.05)),
+        rgba(15, 24, 34, 0.8);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 16px;
       font-size: 12px;
       color: var(--muted);
+      box-shadow: var(--shadow);
     }
     .today-strip-label {
       font-weight: 700;
-      color: var(--accent);
+      color: var(--amber);
       letter-spacing: 0.02em;
       white-space: nowrap;
     }
@@ -191,9 +284,9 @@
     .duration-target-input-wrap {
       display: inline-flex;
       align-items: center;
-      background: var(--surface2);
+      background: rgba(17, 27, 39, 0.9);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 2px 10px 2px 8px;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
@@ -219,7 +312,7 @@
     .duration-bar {
       position: relative;
       height: 18px;
-      background: var(--surface2);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px solid var(--border);
       border-radius: 999px;
       overflow: hidden;
@@ -229,7 +322,7 @@
       height: 100%;
       width: 0%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #7c6af7, #a78bfa);
+      background: linear-gradient(90deg, var(--accent), var(--amber));
       transition: width 0.9s linear, background 2s linear, box-shadow 2s linear;
     }
     .duration-bar.warn .duration-bar-fill {
@@ -268,27 +361,86 @@
     /* ── Layout ── */
     .app {
       display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 0;
+      grid-template-columns: minmax(320px, 410px) minmax(0, 1fr);
+      gap: 22px;
       min-height: calc(100vh - 65px);
+      padding: 18px;
+      max-width: 1520px;
+      margin: 0 auto;
     }
 
     .left-panel {
-      border-right: 1px solid var(--border);
-      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       overflow-y: auto;
     }
 
     .right-panel {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: stretch;
       justify-content: flex-start;
-      padding: 32px 28px;
-      gap: 24px;
+      padding: 24px;
+      gap: 18px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .setup-card {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.05), rgba(255,255,255,0.01)),
+        rgba(17, 27, 39, 0.84);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .setup-card-compact {
+      padding: 16px 18px;
+    }
+
+    .live-stage {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      width: 100%;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.08), rgba(246,181,77,0.04)),
+        rgba(12, 20, 30, 0.82);
+      box-shadow: var(--shadow);
+    }
+
+    .live-stage-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .live-stage-title {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .live-stack {
+      width: 100%;
+      display: grid;
+      gap: 18px;
+      align-content: start;
     }
 
     /* ── Section labels ── */
@@ -296,18 +448,18 @@
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
+      letter-spacing: 0.12em;
+      color: var(--amber);
       margin-bottom: 10px;
     }
 
     /* ── Meeting title ── */
     #meeting-title {
       width: 100%;
-      background: var(--surface2);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
+      border-radius: 14px;
+      padding: 12px 14px;
       color: var(--text);
       font-size: 14px;
       outline: none;
@@ -324,11 +476,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--surface2);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
+      border-radius: 14px;
+      padding: 10px 12px;
       animation: slide-in 0.15s ease;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.14);
     }
 
     @keyframes slide-in {
@@ -339,7 +492,7 @@
     .attendee-avatar {
       width: 28px; height: 28px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      background: linear-gradient(135deg, var(--accent), var(--amber));
       display: flex; align-items: center; justify-content: center;
       font-size: 11px; font-weight: 700;
       flex-shrink: 0;
@@ -358,12 +511,12 @@
     .attendee-name::placeholder { color: var(--muted); }
 
     .role-select {
-      background: var(--surface);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 10px;
       color: var(--text);
       font-size: 11px;
-      padding: 3px 6px;
+      padding: 5px 8px;
       outline: none;
       cursor: pointer;
     }
@@ -399,9 +552,9 @@
       gap: 6px;
       width: 100%;
       padding: 9px 12px;
-      background: none;
+      background: rgba(255,255,255,0.02);
       border: 1px dashed var(--border);
-      border-radius: 8px;
+      border-radius: 14px;
       color: var(--muted);
       font-size: 13px;
       cursor: pointer;
@@ -414,7 +567,14 @@
     .cost-hero {
       text-align: center;
       width: 100%;
-      max-width: 500px;
+      max-width: none;
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.10), rgba(246,181,77,0.04)),
+        rgba(12, 20, 30, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 32px;
+      box-shadow: var(--shadow);
     }
 
     .cost-label {
@@ -422,7 +582,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--muted);
+      color: var(--amber);
       margin-bottom: 8px;
     }
 
@@ -432,13 +592,13 @@
       letter-spacing: -3px;
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      background: linear-gradient(135deg, #f59e0b, #fbbf24, #fde68a);
+      background: linear-gradient(135deg, var(--amber), var(--yellow), var(--gold));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       transition: transform 0.1s;
       text-shadow: none;
-      filter: drop-shadow(0 0 20px rgba(245,158,11,0.4));
+      filter: drop-shadow(0 0 20px rgba(246,181,77,0.28));
     }
 
     .cost-number.tick {
@@ -458,6 +618,10 @@
       letter-spacing: 4px;
       color: var(--text);
       opacity: 0.9;
+      padding: 10px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
     }
 
     /* ── Controls ── */
@@ -468,10 +632,10 @@
 
     .btn {
       padding: 12px 28px;
-      border-radius: 10px;
+      border-radius: 14px;
       font-size: 14px;
       font-weight: 600;
-      border: none;
+      border: 1px solid var(--border);
       cursor: pointer;
       transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
     }
@@ -480,13 +644,14 @@
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-primary {
-      background: linear-gradient(135deg, #7c6af7, #a78bfa);
-      color: white;
-      box-shadow: 0 4px 20px rgba(124,106,247,0.35);
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+      color: #091018;
+      border-color: transparent;
+      box-shadow: 0 10px 28px rgba(246,181,77,0.22);
     }
 
     .btn-primary:hover:not(:disabled) {
-      box-shadow: 0 6px 28px rgba(124,106,247,0.5);
+      box-shadow: 0 12px 30px rgba(246,181,77,0.28);
     }
 
     .btn-danger {
@@ -500,21 +665,22 @@
     }
 
     .btn-ghost {
-      background: var(--surface2);
+      background: rgba(17, 27, 39, 0.88);
       color: var(--text);
       border: 1px solid var(--border);
     }
 
-    .btn-ghost:hover:not(:disabled) { background: var(--border); }
+    .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
 
     /* ── Per-person breakdown ── */
     .breakdown {
       width: 100%;
-      max-width: 500px;
-      background: var(--surface);
+      max-width: none;
+      background: rgba(12, 20, 30, 0.82);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 22px;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }
 
     .breakdown-header {
@@ -533,7 +699,7 @@
       display: flex;
       align-items: center;
       padding: 10px 16px;
-      border-bottom: 1px solid #1e1e2a;
+      border-bottom: 1px solid rgba(116,187,255,0.08);
       gap: 10px;
     }
 
@@ -542,7 +708,7 @@
     .breakdown-avatar {
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      background: linear-gradient(135deg, var(--accent), var(--amber));
       display: flex; align-items: center; justify-content: center;
       font-size: 10px; font-weight: 700;
       flex-shrink: 0;
@@ -560,7 +726,12 @@
     /* ── History ── */
     .history-section {
       width: 100%;
-      max-width: 500px;
+      max-width: none;
+      background: rgba(12, 20, 30, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
     }
 
     .history-header {
@@ -573,9 +744,9 @@
     .history-list { display: flex; flex-direction: column; gap: 8px; }
 
     .history-card {
-      background: var(--surface);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 16px;
       padding: 12px 16px;
       display: flex;
       align-items: center;
@@ -585,8 +756,8 @@
 
     .history-icon {
       width: 36px; height: 36px;
-      background: var(--surface2);
-      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
@@ -629,9 +800,9 @@
       padding: 24px;
       color: var(--muted);
       font-size: 13px;
-      background: var(--surface);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px dashed var(--border);
-      border-radius: 10px;
+      border-radius: 16px;
     }
 
     /* ── Save modal ── */
@@ -643,22 +814,24 @@
     }
 
     .modal {
-      background: var(--surface);
+      background: rgba(12, 20, 30, 0.94);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 22px;
       padding: 28px;
       width: 380px;
       display: flex;
       flex-direction: column;
       gap: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
     }
 
     .modal h2 { font-size: 16px; font-weight: 700; }
     .modal p { font-size: 13px; color: var(--muted); line-height: 1.5; }
 
     .modal-summary {
-      background: var(--surface2);
-      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
       padding: 12px 16px;
       display: flex;
       justify-content: space-between;
@@ -675,21 +848,24 @@
       gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
+      width: 100%;
     }
 
     .stat-chip {
-      background: var(--surface);
+      background: rgba(17, 27, 39, 0.88);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px;
+      border-radius: 16px;
+      padding: 10px 16px;
       text-align: center;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.16);
+      flex: 1 1 150px;
     }
 
     .stat-chip-val {
       font-size: 18px;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
-      color: var(--accent);
+      color: var(--amber);
     }
 
     .stat-chip-lbl {
@@ -704,11 +880,11 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(52,211,153,0.1);
+      background: rgba(74,222,128,0.12);
       border: 1px solid rgba(52,211,153,0.3);
       color: var(--green);
-      border-radius: 20px;
-      padding: 4px 12px;
+      border-radius: 999px;
+      padding: 6px 12px;
       font-size: 12px;
       font-weight: 600;
     }
@@ -729,16 +905,16 @@
 
     /* ── Settings modal ── */
     .settings-btn {
-      background: none;
+      background: rgba(255,255,255,0.02);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       color: var(--muted);
       font-size: 16px;
-      padding: 5px 10px;
+      padding: 7px 12px;
       cursor: pointer;
-      transition: color 0.15s, border-color 0.15s;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
     }
-    .settings-btn:hover { color: var(--text); border-color: var(--accent); }
+    .settings-btn:hover { color: var(--text); border-color: var(--accent); background: rgba(255,255,255,0.04); }
 
     .header-action-btn {
       font-size: 13px !important;
@@ -753,8 +929,8 @@
 
     .pro-label {
       display: inline-block;
-      background: linear-gradient(135deg, var(--accent), #a78bfa);
-      color: var(--bg);
+      background: linear-gradient(135deg, var(--amber), var(--gold));
+      color: #091018;
       font-size: 9px;
       font-weight: 700;
       padding: 2px 6px;
@@ -1076,8 +1252,8 @@
     .debrief-textarea::placeholder { color: var(--muted); }
 
     .ai-summary-box {
-      background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(167,139,250,0.06));
-      border: 1px solid rgba(124,106,247,0.3); border-radius: 10px;
+      background: linear-gradient(135deg, rgba(120,214,255,0.08), rgba(246,181,77,0.06));
+      border: 1px solid rgba(120,214,255,0.22); border-radius: 12px;
       padding: 14px; font-size: 13px; line-height: 1.6; color: var(--text);
       white-space: pre-wrap; margin-top: 8px;
     }
@@ -1093,18 +1269,18 @@
     .ai-dot:nth-child(3) { animation-delay: 0.4s; }
 
     .btn-ai {
-      background: linear-gradient(135deg, rgba(124,106,247,0.2), rgba(167,139,250,0.15));
-      border: 1px solid rgba(124,106,247,0.4); border-radius: 8px;
-      color: var(--accent); font-size: 13px; font-weight: 600;
+      background: linear-gradient(135deg, rgba(120,214,255,0.14), rgba(246,181,77,0.1));
+      border: 1px solid rgba(120,214,255,0.24); border-radius: 10px;
+      color: var(--cyan); font-size: 13px; font-weight: 600;
       padding: 9px 16px; cursor: pointer; transition: all 0.15s;
     }
-    .btn-ai:hover { background: rgba(124,106,247,0.3); border-color: var(--accent); }
+    .btn-ai:hover { background: rgba(120,214,255,0.16); border-color: rgba(120,214,255,0.34); }
     .btn-ai:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .history-outcome {
       margin-top: 8px; padding: 8px 10px;
-      background: rgba(124,106,247,0.06);
-      border: 1px solid rgba(124,106,247,0.15);
+      background: rgba(120,214,255,0.06);
+      border: 1px solid rgba(120,214,255,0.14);
       border-radius: 6px; font-size: 11px; color: var(--muted); line-height: 1.5;
     }
     .history-outcome-rating {
@@ -1127,7 +1303,7 @@
     .history-action-btn.email-btn:hover { border-color: var(--green); color: var(--green); }
     .history-action-btn.reload-btn:hover { border-color: var(--accent); color: var(--accent); }
     .history-action-btn.sent { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
-    .integration-icon.claude { background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); }
+    .integration-icon.claude { background: rgba(120,214,255,0.12); border: 1px solid rgba(120,214,255,0.24); }
 
     /* ── Cost comparisons ── */
     .cost-comparisons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
@@ -1164,13 +1340,17 @@
     @media (max-width: 768px) {
       header { padding: 10px 14px; gap: 8px; flex-wrap: wrap; position: sticky; top: 0; z-index: 90; }
       header .tagline { display: none; }
-      header > div:last-child { gap: 6px; flex-wrap: wrap; }
+      .header-actions { gap: 6px; width: 100%; justify-content: flex-start; }
       .logo { font-size: 16px; }
       .logo-icon { width: 28px; height: 28px; font-size: 14px; }
+      .topbar-btn, .topbar-select { min-height: 38px; }
+      .topbar-btn { padding: 0 12px; }
 
       .app { grid-template-columns: 1fr; min-height: auto; }
-      .left-panel { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; gap: 14px; overflow-y: visible; }
+      .left-panel { padding: 0; gap: 14px; overflow-y: visible; }
       .right-panel { padding: 22px 16px 28px; gap: 20px; }
+      .setup-card { padding: 16px; }
+      .live-stage { padding: 18px 14px; }
 
       /* Section header row holding Meeting Title + header action buttons becomes a stacked layout */
       .left-panel .section-label { margin-bottom: 6px; }
@@ -1233,7 +1413,9 @@
 
     @media (max-width: 480px) {
       header { padding: 10px 12px; }
-      header .settings-btn span { display: none; }
+      .topbar-btn span:last-child { display: none; }
+      .topbar-btn .topbar-icon { margin-right: 0; }
+      .topbar-btn { padding: 0 11px; }
       .header-action-btn { flex: 1 1 calc(50% - 3px); font-size: 11px !important; padding: 8px 6px !important; }
       .stat-chip-val { font-size: 14px; }
       .report-box { padding: 20px 16px; border-radius: 12px; }
@@ -1273,7 +1455,7 @@
       padding: 9px 12px; cursor: pointer; font-size: 13px;
       transition: background 0.15s;
     }
-    .template-item:hover { background: rgba(124,106,247,0.1); }
+    .template-item:hover { background: rgba(120,214,255,0.08); }
     .template-item-name { flex: 1; }
     .template-item-count { font-size: 11px; color: var(--muted); margin-right: 6px; }
     .template-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
@@ -1289,8 +1471,8 @@
     }
     .template-save-row input:focus { border-color: var(--accent); }
     .template-save-row button {
-      background: var(--accent); border: none; border-radius: 6px;
-      color: white; font-size: 11px; font-weight: 700; padding: 5px 10px;
+      background: linear-gradient(135deg, var(--amber), var(--gold)); border: none; border-radius: 8px;
+      color: #091018; font-size: 11px; font-weight: 700; padding: 5px 10px;
       cursor: pointer; white-space: nowrap;
     }
 
@@ -1303,9 +1485,13 @@
     }
     .report-overlay.open { display: flex; }
     .report-box {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; padding: 32px; width: 100%; max-width: 620px;
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.06), rgba(255,255,255,0.015)),
+        rgba(13, 21, 31, 0.96);
+      border: 1px solid rgba(120,214,255,0.16);
+      border-radius: 20px; padding: 32px; width: 100%; max-width: 620px;
       position: relative; margin: auto;
+      box-shadow: var(--shadow);
     }
     .report-close {
       position: absolute; top: 14px; right: 16px;
@@ -1317,8 +1503,8 @@
     .report-month { margin-bottom: 20px; }
     .report-month-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; background: rgba(124,106,247,0.1);
-      border: 1px solid rgba(124,106,247,0.2); border-radius: 8px;
+      padding: 10px 14px; background: rgba(120,214,255,0.08);
+      border: 1px solid rgba(120,214,255,0.18); border-radius: 12px;
       margin-bottom: 8px;
     }
     .report-month-name { font-size: 15px; font-weight: 700; }
@@ -1333,12 +1519,14 @@
     .report-meeting-cost { font-weight: 600; color: var(--text); }
     .report-print-btn, .report-email-btn {
       flex: 1; min-width: 140px; margin-top: 0;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
-      border: none; border-radius: 10px; padding: 12px;
+      background: linear-gradient(135deg, var(--amber), var(--gold)); color: #091018;
+      border: none; border-radius: 12px; padding: 12px;
       font-size: 14px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 10px 24px rgba(246,181,77,0.18);
     }
     .report-email-btn {
-      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      background: linear-gradient(135deg, rgba(120,214,255,0.96), #8be4ff);
+      color: #091018;
     }
     @media print {
       /* Hide all app content when printing */
@@ -1386,9 +1574,12 @@
     }
     .upgrade-overlay.open { display: flex; }
     .upgrade-box {
-      background: #13131e; border: 1px solid rgba(124,106,247,0.35);
-      border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 520px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(124,106,247,0.12);
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.08), rgba(255,255,255,0.015)),
+        rgba(13, 21, 31, 0.98);
+      border: 1px solid rgba(120,214,255,0.18);
+      border-radius: 24px; padding: 36px 32px; width: 100%; max-width: 520px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 60px rgba(120,214,255,0.08);
       position: relative; text-align: center;
     }
     .upgrade-lock { font-size: 36px; margin-bottom: 12px; }
@@ -1401,12 +1592,12 @@
       transition: border-color 0.2s;
     }
     .upgrade-plan.best {
-      border-color: rgba(124,106,247,0.5);
-      background: linear-gradient(135deg, rgba(124,106,247,0.08), var(--surface));
+      border-color: rgba(246,181,77,0.34);
+      background: linear-gradient(135deg, rgba(246,181,77,0.08), var(--surface));
     }
     .upgrade-plan-badge {
       position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
+      background: linear-gradient(135deg, var(--amber), var(--gold)); color: #091018;
       font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px;
       text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
     }
@@ -1416,17 +1607,17 @@
     .upgrade-plan-cadence { font-size: 11px; color: var(--muted); margin: 4px 0 14px; }
     .btn-upgrade-buy {
       display: block; width: 100%;
-      background: linear-gradient(135deg, #7c6af7, #a78bfa); color: white;
-      border: none; border-radius: 8px; padding: 10px 0;
+      background: linear-gradient(135deg, var(--amber), var(--gold)); color: #091018;
+      border: none; border-radius: 10px; padding: 10px 0;
       font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 16px rgba(124,106,247,0.35);
+      box-shadow: 0 10px 24px rgba(246,181,77,0.24);
       transition: transform 0.15s, box-shadow 0.2s;
     }
-    .btn-upgrade-buy:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,106,247,0.5); }
+    .btn-upgrade-buy:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(246,181,77,0.34); }
     .upgrade-restore {
       font-size: 12px; color: var(--muted);
     }
-    .upgrade-restore a { color: var(--accent-light, #a78bfa); text-decoration: none; }
+    .upgrade-restore a { color: var(--cyan); text-decoration: none; }
     .upgrade-restore a:hover { text-decoration: underline; }
     .upgrade-close-btn {
       position: absolute; top: 14px; right: 16px;
@@ -1446,19 +1637,19 @@
       background: var(--border); transition: background 0.2s;
     }
     .limit-dot.filled { background: var(--accent); }
-    .limit-dot.empty { background: rgba(124,106,247,0.18); }
+    .limit-dot.empty { background: rgba(120,214,255,0.16); }
     .limit-upgrade-pill {
       display: inline-flex; align-items: center; gap: 5px;
-      background: linear-gradient(135deg, rgba(124,106,247,0.18), rgba(167,139,250,0.12));
-      border: 1px solid rgba(124,106,247,0.35);
-      color: var(--accent);
+      background: linear-gradient(135deg, rgba(246,181,77,0.18), rgba(120,214,255,0.08));
+      border: 1px solid rgba(246,181,77,0.28);
+      color: var(--amber);
       font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
       padding: 3px 9px; border-radius: 999px;
       cursor: pointer; text-transform: uppercase;
       transition: background 0.15s, transform 0.1s;
     }
     .limit-upgrade-pill:hover {
-      background: linear-gradient(135deg, rgba(124,106,247,0.3), rgba(167,139,250,0.22));
+      background: linear-gradient(135deg, rgba(246,181,77,0.28), rgba(120,214,255,0.14));
       transform: translateY(-1px);
     }
     .limit-upgrade-pill svg { width: 10px; height: 10px; }
@@ -1472,9 +1663,8 @@
     MeetingMeter
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
-  <div style="display:flex;gap:8px;align-items:center">
-    <select id="currency-select" style="background:var(--surface2);border:1px solid var(--border);
-      border-radius:8px;color:var(--text);font-size:13px;padding:5px 10px;cursor:pointer;outline:none;">
+  <div class="header-actions">
+    <select id="currency-select" class="topbar-select">
       <option value="USD">🇺🇸 USD $</option>
       <option value="GBP">🇬🇧 GBP £</option>
       <option value="EUR">🇪🇺 EUR €</option>
@@ -1483,10 +1673,23 @@
       <option value="INR">🇮🇳 INR ₹</option>
       <option value="JPY">🇯🇵 JPY ¥</option>
     </select>
-    <button class="settings-btn" id="export-btn" title="Export meeting report">📄 Export</button>
-    <button class="settings-btn" id="integrations-btn" title="Configure Slack & Calendar">🔗 Integrations<span id="integrations-pro-label" class="pro-label" style="display:none;">PRO</span></button>
-    <button class="settings-btn" id="settings-btn" title="Edit salary presets">⚙️ Salary Presets</button>
-    <button class="settings-btn" id="account-settings-btn" title="Account & subscription">👤 Account</button>
+    <button class="topbar-btn" id="export-btn" title="Export meeting report">
+      <span class="topbar-icon">📄</span>
+      <span>Export</span>
+    </button>
+    <button class="topbar-btn" id="integrations-btn" title="Configure Slack & Calendar">
+      <span class="topbar-icon">🔗</span>
+      <span>Integrations</span>
+      <span id="integrations-pro-label" class="pro-label" style="display:none;">PRO</span>
+    </button>
+    <button class="topbar-btn" id="settings-btn" title="Edit salary presets">
+      <span class="topbar-icon">⚙️</span>
+      <span>Salary Presets</span>
+    </button>
+    <button class="topbar-btn" id="account-settings-btn" title="Account & subscription">
+      <span class="topbar-icon">👤</span>
+      <span>Account</span>
+    </button>
   </div>
 </header>
 
@@ -1515,7 +1718,7 @@
       <span class="today-strip-stat"><strong id="today-duration">0m</strong> <span>tracked</span></span>
     </div>
 
-    <div>
+    <div class="setup-card">
       <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         Meeting Title
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -1536,12 +1739,21 @@
             </div>
           </div>
           <div class="calendar-picker" id="calendar-picker-wrap">
-            <button class="settings-btn header-action-btn" id="load-calendar-btn" title="Load from Google or Apple Calendar">
-              📅 From Calendar
+            <button class="settings-btn header-action-btn" id="load-calendar-btn" title="Load from Google Calendar">
+              📅 From Google
             </button>
             <div class="calendar-dropdown" id="calendar-dropdown">
-              <div class="calendar-dropdown-header">Upcoming Events (Next 7 Days)</div>
+              <div class="calendar-dropdown-header">Google · Upcoming Events (Next 7 Days)</div>
               <div id="calendar-events-list"><div class="calendar-empty">Loading…</div></div>
+            </div>
+          </div>
+          <div class="calendar-picker" id="apple-picker-wrap">
+            <button class="settings-btn header-action-btn" id="load-apple-btn" title="Load from Apple Calendar">
+               From Apple
+            </button>
+            <div class="calendar-dropdown" id="apple-dropdown">
+              <div class="calendar-dropdown-header">Apple · Upcoming Events (Next 7 Days)</div>
+              <div id="apple-events-list"><div class="calendar-empty">Loading…</div></div>
             </div>
           </div>
           <button class="settings-btn header-action-btn" id="load-zoom-btn" title="Load from Zoom"
@@ -1569,7 +1781,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="setup-card">
       <div class="section-label">Attendees</div>
       <div class="attendee-list" id="attendee-list"></div>
       <div class="attendee-limit-bar" id="attendee-limit-bar" style="display:none">
@@ -1581,7 +1793,7 @@
       </button>
     </div>
 
-    <div>
+    <div class="setup-card setup-card-compact">
       <div class="section-label">Total Rate</div>
       <div style="font-size:13px;color:var(--muted)" id="rate-summary">Add attendees to see rate</div>
     </div>
@@ -1591,64 +1803,71 @@
   <!-- RIGHT: Timer + Cost -->
   <div class="right-panel">
 
-    <div id="running-indicator" class="running-pill hidden">
-      <div class="running-dot"></div> Meeting in progress
-    </div>
-
-    <div class="cost-hero">
-      <div class="cost-label">Meeting Cost</div>
-      <div class="cost-number" id="cost-display">$0<span class="cost-cents">.00</span></div>
-    </div>
-
-    <div class="timer-display" id="timer-display">00:00:00</div>
-
-    <div class="stat-chips">
-      <div class="stat-chip">
-        <div class="stat-chip-val" id="stat-attendees">0</div>
-        <div class="stat-chip-lbl">Attendees</div>
-      </div>
-      <div class="stat-chip">
-        <div class="stat-chip-val" id="stat-rate">$0/min</div>
-        <div class="stat-chip-lbl">Burn Rate</div>
-      </div>
-      <div class="stat-chip">
-        <div class="stat-chip-val" id="stat-hourly">$0/hr</div>
-        <div class="stat-chip-lbl">Hourly Cost</div>
-      </div>
-    </div>
-
-    <div class="controls">
-      <button class="btn btn-primary" id="start-btn">▶ Start</button>
-      <button class="btn btn-ghost hidden" id="pause-btn">⏸ Pause</button>
-      <button class="btn btn-danger hidden" id="stop-btn">■ Stop & Save</button>
-      <button class="btn btn-ghost hidden" id="reset-btn">↺ Reset</button>
-    </div>
-
-    <!-- Per-person breakdown -->
-    <div class="breakdown" id="breakdown-card">
-      <div class="breakdown-header">
-        <span>Per Person</span>
-        <span>Cost So Far</span>
-      </div>
-      <div id="breakdown-body"></div>
-    </div>
-
-    <!-- Insights -->
-    <div id="insights-section" class="hidden"></div>
-
-    <!-- History -->
-    <div class="history-section">
-      <div class="history-header">
-        <div class="section-label" style="margin:0">Past Meetings</div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-ghost" id="monthly-report-btn"
-            style="padding:4px 10px;font-size:11px">📊 Monthly Report</button>
-          <button class="btn btn-ghost" id="clear-history-btn"
-            style="padding:4px 10px;font-size:11px">Clear All</button>
+    <div class="live-stage">
+      <div class="live-stage-header">
+        <div class="live-stage-title">Live Meeting Workspace</div>
+        <div id="running-indicator" class="running-pill hidden">
+          <div class="running-dot"></div> Meeting in progress
         </div>
       </div>
-      <div class="history-list" id="history-list">
-        <div class="empty-state">No meetings saved yet.</div>
+
+      <div class="cost-hero">
+        <div class="cost-label">Meeting Cost</div>
+        <div class="cost-number" id="cost-display">$0<span class="cost-cents">.00</span></div>
+      </div>
+
+      <div class="timer-display" id="timer-display">00:00:00</div>
+
+      <div class="stat-chips">
+        <div class="stat-chip">
+          <div class="stat-chip-val" id="stat-attendees">0</div>
+          <div class="stat-chip-lbl">Attendees</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-val" id="stat-rate">$0/min</div>
+          <div class="stat-chip-lbl">Burn Rate</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-chip-val" id="stat-hourly">$0/hr</div>
+          <div class="stat-chip-lbl">Hourly Cost</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="start-btn">▶ Start</button>
+        <button class="btn btn-ghost hidden" id="pause-btn">⏸ Pause</button>
+        <button class="btn btn-danger hidden" id="stop-btn">■ Stop & Save</button>
+        <button class="btn btn-ghost hidden" id="reset-btn">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="live-stack">
+      <!-- Per-person breakdown -->
+      <div class="breakdown" id="breakdown-card">
+        <div class="breakdown-header">
+          <span>Per Person</span>
+          <span>Cost So Far</span>
+        </div>
+        <div id="breakdown-body"></div>
+      </div>
+
+      <!-- Insights -->
+      <div id="insights-section" class="hidden"></div>
+
+      <!-- History -->
+      <div class="history-section">
+        <div class="history-header">
+          <div class="section-label" style="margin:0">Past Meetings</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" id="monthly-report-btn"
+              style="padding:4px 10px;font-size:11px">📊 Monthly Report</button>
+            <button class="btn btn-ghost" id="clear-history-btn"
+              style="padding:4px 10px;font-size:11px">Clear All</button>
+          </div>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="empty-state">No meetings saved yet.</div>
+        </div>
       </div>
     </div>
 
@@ -1735,7 +1954,7 @@
     <div>
       <h2>🔗 Integrations</h2>
       <p style="margin-top:6px">Connect MeetingMeter to Slack, Google Calendar, or Apple Calendar. Credentials are stored locally on your device.</p>
-      <div style="background:rgba(124,106,247,0.1);border:1px solid var(--accent);border-radius:8px;padding:12px;margin-top:12px;font-size:13px;color:var(--text);">
+      <div style="background:linear-gradient(135deg, rgba(120,214,255,0.1), rgba(246,181,77,0.08));border:1px solid rgba(120,214,255,0.2);border-radius:12px;padding:12px;margin-top:12px;font-size:13px;color:var(--text);">
         <strong>💾 Your integrations persist after logout</strong><br/>
         Logging out does <strong>not</strong> erase your integration settings. They'll be available when you log back in on this device. If sharing this device, manually clear browser data to remove them.
       </div>
@@ -1809,7 +2028,7 @@
       <div class="integration-block-header">
         <div class="integration-icon claude">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#7c6af7"/>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#78d6ff"/>
           </svg>
         </div>
         <div>
@@ -1948,9 +2167,9 @@
       <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Support</div>
       <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Have a question or found a bug? We'd love to hear from you.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="https://twitter.com/meetingmeterapp" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">𝕏 Twitter</a>
-        <a href="mailto:support@meetingmeter.tech" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">📧 Email</a>
-        <a href="https://meetingmeter.tech" target="_blank" rel="noopener" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">🌐 Website</a>
+        <button onclick="showToast('🐦 Twitter — Coming Soon!')" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;">𝕏 Twitter</button>
+        <a href="mailto:support@meetingmeter.tech" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">📧 Contact Us</a>
+        <button onclick="showToast('🌐 Website — Coming Soon!')" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;">🌐 Website</button>
       </div>
     </div>
 
@@ -1969,6 +2188,33 @@
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
       <button class="report-print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
       <button class="report-email-btn" id="report-email-btn">📧 Email Report</button>
+    </div>
+    <!-- Email prompt row — shown when Email Report is clicked -->
+    <div id="report-email-row" style="display:none;margin-top:12px;padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+      <!-- TO row -->
+      <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px;letter-spacing:.05em;">SEND REPORT TO</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+        <input id="report-email-input" type="email" placeholder="you@example.com"
+          style="flex:1;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;" />
+        <button id="report-add-cc-btn" title="Add CC recipients"
+          style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;cursor:pointer;white-space:nowrap;transition:all .2s;">
+          + CC
+        </button>
+        <button id="report-email-send-btn"
+          style="padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;">
+          Send ✉️
+        </button>
+      </div>
+      <!-- CC rows — collapsed by default -->
+      <div id="report-cc-section" style="display:none;margin-bottom:6px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;letter-spacing:.05em;">CC</div>
+        <div id="report-cc-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+        <button id="report-add-cc-more-btn"
+          style="margin-top:6px;padding:5px 10px;border-radius:7px;border:1px dashed var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;">
+          + Add another CC
+        </button>
+      </div>
+      <div id="report-email-msg" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
     </div>
   </div>
 </div>
@@ -2534,9 +2780,14 @@
             `<option value="${esc(r)}" ${r === a.role ? "selected" : ""}>${esc(r)}</option>`
           ).join("")}
         </select>
+        <input class="custom-title-input" type="text" placeholder="Job title"
+          style="display:${a.role === 'Custom' ? 'block' : 'none'};
+            width:90px; background:var(--surface); border:1px solid var(--border);
+            border-radius:6px; color:var(--text); font-size:12px; padding:4px 8px;
+            outline:none;" />
         <input class="salary-input" type="number" placeholder="Annual $" min="0" step="1000"
           style="display:${a.role === 'Custom' ? 'block' : 'none'};
-            width:100px; background:var(--surface); border:1px solid var(--border);
+            width:90px; background:var(--surface); border:1px solid var(--border);
             border-radius:6px; color:var(--text); font-size:12px; padding:4px 8px;
             outline:none;" />
         <button class="remove-btn" title="Remove">×</button>
@@ -2544,6 +2795,7 @@
       `;
       // Safely set input values via property assignment (not HTML interpolation) to prevent attribute injection
       row.querySelector(".attendee-name").value = a.name || "";
+      row.querySelector(".custom-title-input").value = a.customTitle || "";
       row.querySelector(".salary-input").value = a.customSalary || "";
       row.querySelector(".attendee-email").value = a.email || "";
       row.querySelector(".attendee-name").addEventListener("input", e => {
@@ -2554,8 +2806,13 @@
       });
       row.querySelector(".role-select").addEventListener("change", e => {
         a.role = e.target.value;
-        const salInput = row.querySelector(".salary-input");
-        salInput.style.display = a.role === "Custom" ? "block" : "none";
+        const isCustom = a.role === "Custom";
+        row.querySelector(".salary-input").style.display = isCustom ? "block" : "none";
+        row.querySelector(".custom-title-input").style.display = isCustom ? "block" : "none";
+        updateStats();
+      });
+      row.querySelector(".custom-title-input").addEventListener("input", e => {
+        a.customTitle = e.target.value.trim();
         updateStats();
       });
       row.querySelector(".salary-input").addEventListener("input", e => {
@@ -2661,7 +2918,7 @@
         <div class="breakdown-avatar">${initials}</div>
         <div>
           <div class="breakdown-name">${a.name || "Unnamed"}</div>
-          <div class="breakdown-role">${a.role} · ${fmtMoneyPlain(attendeePerSecond(a)*60)}/min</div>
+          <div class="breakdown-role">${a.role === "Custom" && a.customTitle ? a.customTitle : a.role} · ${fmtMoneyPlain(attendeePerSecond(a)*60)}/min</div>
         </div>
         <div class="breakdown-cost">${fmtMoneyPlain(cost)}</div>
       `;
@@ -2875,8 +3132,8 @@
       const lastStop = Math.max(raw.lastIndexOf(". "), raw.lastIndexOf(".\n"));
       safeBody = (lastStop > 200 ? raw.substring(0, lastStop + 1) : raw) + "\n\n[Note: summary truncated — full details saved in MeetingMeter]";
     }
-    // _blank keeps the current app tab open — opens email client or Gmail in a new tab
-    window.open(`mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`, "_blank");
+    // Use location.href for mailto — never blocked by popup blockers
+    window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`;
   }
 
   // ── Send debrief email helper ──────────────────────────────
@@ -3367,6 +3624,9 @@
             localStorage.setItem("mm_history", JSON.stringify(stored));
           }
           sendDebriefEmail({ ...item, attendees: updatedAttendees });
+          // Close the row after sending
+          const row = card.querySelector(`#add-emails-${item.id}`);
+          if (row) setTimeout(() => { row.style.display = "none"; }, 400);
         });
       }
 
@@ -3450,11 +3710,15 @@
           try {
             const d = item.debrief || {};
             const attendeeNames = item.attendees.map(a => `${a.name} (${a.role})`).join(", ");
-            const prompt = `Return STRICT JSON with three keys: "summary", "decisions", and "actions".
-- "summary": 3-4 bullet executive summary (plain text, use • as bullet, no markdown).
-- "decisions": summarized decisions as clean bullets (use •, no markdown). Rewrite raw notes into crisp, standalone decisions. Empty string if none.
-- "actions": summarized action items as clean bullets (use •, no markdown). Rewrite raw notes into crisp, standalone tasks with owner/deadline if mentioned. Empty string if none.
-Return ONLY the JSON, no prose, no code fences.
+            const prompt = `You are a precise meeting summarizer. Return STRICT JSON with three keys: "summary", "decisions", "actions".
+
+CRITICAL RULES — violating any of these is a failure:
+• Preserve every specific name, person, location, building number, deadline, and assignment exactly as written in the raw notes. Do NOT generalize (e.g. never write "members assigned to buildings" when the notes say "Hewad → Building 21, Rishad → Building 22").
+• Use • as bullet character. No markdown bold/italic. No code fences.
+• "summary": concise bullets covering what was discussed and decided. Include enough detail that someone not in the meeting understands exactly what happened.
+• "decisions": one bullet per decision, preserving owners and specifics (who decided what, which location, which system, by when).
+• "actions": one bullet per task, format as "Owner: task (deadline if given)". If no clear owner, write "Team:". Empty string if no actions.
+• Return ONLY the JSON object, nothing else.
 
 Meeting: ${item.title}
 Duration: ${fmtTime(item.duration_seconds)}
@@ -3471,7 +3735,7 @@ Action items (raw notes): ${d.actions || "None recorded"}`;
                 "anthropic-version": "2023-06-01",
                 "anthropic-dangerous-direct-browser-access": "true",
               },
-              body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 300, messages: [{ role: "user", content: prompt }] }),
+              body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1024, messages: [{ role: "user", content: prompt }] }),
             });
 
             if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
@@ -3763,7 +4027,7 @@ james@client.com"
       snap.forEach(a => {
         const salaryUSD = a.role === "Custom" ? a.customSalary : ROLES[a.role];
         const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
-        csv += (a.name || "Unnamed") + "," + a.role + "," + sym + Math.round(toCurrentCurrency(salaryUSD)) + "," + sym + personCost.toFixed(2) + "\n";
+        csv += (a.name || "Unnamed") + "," + (a.role === "Custom" && a.customTitle ? a.customTitle : a.role) + "," + sym + Math.round(toCurrentCurrency(salaryUSD)) + "," + sym + personCost.toFixed(2) + "\n";
       });
       const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
@@ -3807,7 +4071,7 @@ james@client.com"
       const rows = snap.map(a => {
         const personCost = toCurrentCurrency(attendeePerSecond(a) * seconds);
         const rate = toCurrentCurrency(attendeePerSecond(a) * 60);
-        return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role}</td>
+        return `<tr><td>${a.name||"Unnamed"}</td><td>${a.role === "Custom" && a.customTitle ? a.customTitle : a.role}</td>
           <td>${sym}${rate.toFixed(2)}/min</td><td><strong>${sym}${personCost.toFixed(2)}</strong></td></tr>`;
       }).join("");
       const html = `<!DOCTYPE html><html><head><title>${title} — Cost Report</title>
@@ -3986,11 +4250,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
   // Sign Out
   document.getElementById("sign-out-btn").addEventListener("click", () => {
     if (confirm("Are you sure? You'll be signed out (integrations will be saved for next login).")) {
-      // Save integrations before clearing
-      const integrations = localStorage.getItem("mm_integrations");
+      // Preserve these keys across sign-out — user preferences, not session data
+      const keep = ["mm_integrations", "mm_salary_presets", "mm_user_roles", "mm_currency"];
+      const preserved = {};
+      keep.forEach(k => { const v = localStorage.getItem(k); if (v) preserved[k] = v; });
       localStorage.clear();
-      // Restore integrations so they persist across logout/login
-      if (integrations) localStorage.setItem("mm_integrations", integrations);
+      Object.entries(preserved).forEach(([k, v]) => localStorage.setItem(k, v));
       showToast("🔒 Signed out");
       setTimeout(() => location.reload(), 500);
     }
@@ -4460,7 +4725,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
   });
 
   document.getElementById("apple-test-btn").addEventListener("click", async () => {
-    const icsUrl = document.getElementById("apple-ics-input").value.trim();
+    const icsUrl = document.getElementById("apple-ics-input").value.trim().replace(/^webcal:\/\//i, "https://").replace(/^webcal\+ssl:\/\//i, "https://");
     if (!icsUrl) { showToast("⚠️ Enter an Apple Calendar webcal URL first"); return; }
     const btn = document.getElementById("apple-test-btn");
     btn.disabled = true; btn.textContent = "Testing…";
@@ -4480,8 +4745,8 @@ Sent via MeetingMeter · meetingmeter.tech`;
     }
   });
 
-  // Load calendar events for the picker
-  async function loadCalendarEvents() {
+  // Load calendar events for a specific source: "google" or "apple"
+  async function loadCalendarEvents(source = "google") {
     if (DEMO_MODE) {
       return [
         { title: "Team Standup", start: new Date(Date.now() + 3600000), duration_minutes: 15,
@@ -4494,10 +4759,9 @@ Sent via MeetingMeter · meetingmeter.tech`;
     }
 
     try {
-      const urls = [integrationsConfig.gcal_ics_url, integrationsConfig.apple_ics_url].filter(Boolean);
-      if (!urls.length) return [];
-      // Fetch all calendars in parallel, merge and de-dupe by title+start_ts
-      const allEvents = (await Promise.all(urls.map(u =>
+      const url = source === "apple" ? integrationsConfig.apple_ics_url : integrationsConfig.gcal_ics_url;
+      if (!url) return [];
+      const allEvents = (await Promise.all([url].map(u =>
         fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(u)}`).then(r => r.ok ? r.json() : {})
       ))).flatMap(data => (data.events || []).map(e => ({
         title:            e.summary || e.title || "Untitled",
@@ -4508,6 +4772,9 @@ Sent via MeetingMeter · meetingmeter.tech`;
           typeof a === "string" ? { name: a, email: "" } : { name: a.name || "", email: a.email || "" }
         ),
       })));
+      // Drop untitled / placeholder events entirely — they're noise (no-summary ICS blocks)
+      // Keep ALL events — even without a SUMMARY, the backend already falls back to
+      // location/description, and users have asked to see everything.
       const seen = new Set();
       const deduped = allEvents.filter(e => {
         // Round to nearest minute to catch near-duplicate cross-calendar entries
@@ -4523,34 +4790,31 @@ Sent via MeetingMeter · meetingmeter.tech`;
     }
   }
 
-  // Calendar picker button
-  document.getElementById("load-calendar-btn").addEventListener("click", async (e) => {
-    e.stopPropagation();
+  // Shared calendar picker handler — renders upcoming events from a specific source
+  async function openCalendarPicker({ source, btnId, pickerId, listId, missingMsg }) {
     if (!isPaid()) { showUpgradeModal(); return; }
-    if (!DEMO_MODE && !integrationsConfig.gcal_ics_url && !integrationsConfig.apple_ics_url) {
-      showToast("⚠️ Connect Google or Apple Calendar in Integrations first");
-      return;
-    }
+    const urlConfigured = source === "apple" ? integrationsConfig.apple_ics_url : integrationsConfig.gcal_ics_url;
+    if (!DEMO_MODE && !urlConfigured) { showToast(missingMsg); return; }
 
-    const picker = document.getElementById("calendar-dropdown");
-    const btn = document.getElementById("load-calendar-btn");
+    const picker = document.getElementById(pickerId);
+    const btn = document.getElementById(btnId);
 
-    if (picker.classList.contains("open")) {
-      picker.classList.remove("open");
-      return;
-    }
+    if (picker.classList.contains("open")) { picker.classList.remove("open"); return; }
 
-    // Open dropdown immediately with a loading state inside it (no button text change = no layout shift)
-    const list = document.getElementById("calendar-events-list");
+    // Close the other calendar dropdown so only one opens at a time
+    ["calendar-dropdown", "apple-dropdown"].forEach(id => {
+      if (id !== pickerId) document.getElementById(id)?.classList.remove("open");
+    });
+
+    const list = document.getElementById(listId);
     list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center;">Loading events…</div>';
     picker.classList.add("open");
     positionDropdown(picker, btn);
     btn.disabled = true;
 
     try {
-      const events = await loadCalendarEvents();
+      const events = await loadCalendarEvents(source);
       list.innerHTML = "";
-
       if (events.length === 0) {
         list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;">No upcoming events</div>';
       } else {
@@ -4559,27 +4823,81 @@ Sent via MeetingMeter · meetingmeter.tech`;
           item.style.cssText = "padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.2s";
           const duration = event.duration_minutes || 60;
           const start = new Date(event.start);
-          const timeStr = start.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-          item.textContent = `${event.title} — ${timeStr} (${duration}m)`;
-          item.onclick = () => selectCalendarEvent(event);
+          const end = new Date(start.getTime() + duration * 60000);
+          const now = new Date();
+          const sameDay = start.toDateString() === now.toDateString();
+          const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
+          const isTomorrow = start.toDateString() === tomorrow.toDateString();
+          const dayLabel = sameDay ? "Today"
+                        : isTomorrow ? "Tomorrow"
+                        : start.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          const fmt = (d) => d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+          const displayTitle = (event.title || "Untitled").trim();
+          item.textContent = `${displayTitle} — ${dayLabel}, ${fmt(start)} – ${fmt(end)}`;
+          const doSelect = (ev) => {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            console.log("[MeetingMeter] Calendar event clicked:", event);
+            selectCalendarEvent(event);
+          };
+          // Use mousedown so focus/blur interference can't swallow the click
+          item.addEventListener("mousedown", doSelect);
+          item.addEventListener("click", doSelect);
           item.onmouseover = () => item.style.background = "var(--surface2)";
           item.onmouseout = () => item.style.background = "none";
           list.appendChild(item);
         });
       }
-      // Reposition in case height changed
       positionDropdown(picker, btn);
     } catch (err) {
       list.innerHTML = '<div style="padding:12px;color:var(--red);font-size:13px;">⚠️ ' + err.message + '</div>';
     } finally {
       btn.disabled = false;
     }
+  }
+
+  document.getElementById("load-calendar-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openCalendarPicker({
+      source: "google", btnId: "load-calendar-btn", pickerId: "calendar-dropdown",
+      listId: "calendar-events-list", missingMsg: "⚠️ Connect Google Calendar in Integrations first",
+    });
+  });
+
+  document.getElementById("load-apple-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openCalendarPicker({
+      source: "apple", btnId: "load-apple-btn", pickerId: "apple-dropdown",
+      listId: "apple-events-list", missingMsg: "⚠️ Connect Apple Calendar in Integrations first",
+    });
   });
 
   function selectCalendarEvent(event) {
-    document.getElementById("meeting-title").value = event.title;
+    // Close dropdowns FIRST so the user immediately sees the form update
+    document.getElementById("calendar-dropdown")?.classList.remove("open");
+    document.getElementById("apple-dropdown")?.classList.remove("open");
 
-    if (event.attendees && event.attendees.length > 0) {
+    const title = (event && (event.title || event.summary)) || "Untitled";
+    const titleEl = document.getElementById("meeting-title");
+    if (titleEl) {
+      titleEl.value = title;
+      titleEl.dispatchEvent(new Event("input", { bubbles: true }));
+      // Visible confirmation: scroll into view + flash border
+      titleEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      const prevBoxShadow = titleEl.style.boxShadow;
+      const prevBorder = titleEl.style.border;
+      titleEl.style.boxShadow = "0 0 0 3px rgba(124,92,255,0.55)";
+      titleEl.style.border = "1px solid var(--accent)";
+      setTimeout(() => { titleEl.style.boxShadow = prevBoxShadow; titleEl.style.border = prevBorder; }, 1200);
+    }
+
+    // Pre-fill planned duration too, so "Load" visibly populates more of the form
+    const durEl = document.getElementById("duration-input");
+    if (durEl && event && event.duration_minutes) {
+      durEl.value = String(event.duration_minutes);
+      durEl.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    if (event && event.attendees && event.attendees.length > 0) {
       attendees = event.attendees.map(a => ({
         id: Date.now().toString() + Math.random(),
         name: a.name || "",
@@ -4589,12 +4907,10 @@ Sent via MeetingMeter · meetingmeter.tech`;
       }));
       renderAttendees();
       updateStats();
-      showToast(`✓ Loaded "${event.title}" · ${event.attendees.length} attendees auto-filled`);
+      showToast(`✓ Loaded "${title}" · ${event.attendees.length} attendees auto-filled`);
     } else {
-      showToast(`✓ Loaded "${event.title}"`);
+      showToast(`✓ Loaded "${title}"`);
     }
-
-    document.getElementById("calendar-dropdown").classList.remove("open");
   }
 
   // Post to Slack from debrief modal (button removed — no-op if not present)
@@ -4805,15 +5121,19 @@ Sent via MeetingMeter · meetingmeter.tech`;
   document.addEventListener("click", () => {
     document.getElementById("template-dropdown").classList.remove("open");
     document.getElementById("calendar-dropdown").classList.remove("open");
+    document.getElementById("apple-dropdown")?.classList.remove("open");
   });
   document.getElementById("template-dropdown").addEventListener("click", e => e.stopPropagation());
   document.getElementById("calendar-dropdown").addEventListener("click", e => e.stopPropagation());
+  document.getElementById("apple-dropdown")?.addEventListener("click", e => e.stopPropagation());
   // Reposition dropdowns on window resize/scroll
   window.addEventListener("resize", () => {
     const tdd = document.getElementById("template-dropdown");
     const cdd = document.getElementById("calendar-dropdown");
+    const add = document.getElementById("apple-dropdown");
     if (tdd.classList.contains("open")) positionDropdown(tdd, document.getElementById("template-btn"));
     if (cdd.classList.contains("open")) positionDropdown(cdd, document.getElementById("load-calendar-btn"));
+    if (add && add.classList.contains("open")) positionDropdown(add, document.getElementById("load-apple-btn"));
   });
 
   // Save current meeting as template
@@ -4826,7 +5146,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
       id: Date.now().toString(),
       name,
       title: document.getElementById("meeting-title").value || name,
-      attendees: attendees.map(a => ({ name: a.name, role: a.role, customSalary: a.customSalary, email: a.email })),
+      attendees: attendees.map(a => ({ name: a.name, role: a.role, customSalary: a.customSalary, customTitle: a.customTitle || "", email: a.email })),
     });
     localStorage.setItem("mm_templates", JSON.stringify(custom));
     document.getElementById("template-name-input").value = "";
@@ -4863,17 +5183,17 @@ Sent via MeetingMeter · meetingmeter.tech`;
     // Summary cards
     const summaryHtml = `
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
-        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+        <div style="background:linear-gradient(135deg, rgba(120,214,255,0.08), rgba(255,255,255,0.02));border:1px solid rgba(120,214,255,0.18);border-radius:12px;padding:14px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Total Spent</div>
           <div style="font-size:26px;font-weight:800;color:var(--gold);">${sym}${toCurrentCurrency(grandTotal).toFixed(2)}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">${sortedKeys.length} month${sortedKeys.length !== 1 ? "s" : ""}</div>
         </div>
-        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+        <div style="background:linear-gradient(135deg, rgba(120,214,255,0.08), rgba(255,255,255,0.02));border:1px solid rgba(120,214,255,0.18);border-radius:12px;padding:14px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Meetings Tracked</div>
           <div style="font-size:26px;font-weight:800;">${grandCount}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtTime(grandSecs)} total time</div>
         </div>
-        <div style="background:rgba(124,106,247,0.1);border:1px solid rgba(124,106,247,0.25);border-radius:10px;padding:14px;">
+        <div style="background:linear-gradient(135deg, rgba(120,214,255,0.08), rgba(255,255,255,0.02));border:1px solid rgba(120,214,255,0.18);border-radius:12px;padding:14px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Avg Cost / Meeting</div>
           <div style="font-size:26px;font-weight:800;">${sym}${toCurrentCurrency(avgPerMtg).toFixed(2)}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtTime(Math.round(grandSecs / grandCount))} avg duration</div>
@@ -4904,7 +5224,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
                 <span class="report-meeting-cost">${sym}${toCurrentCurrency(m.total_cost || 0).toFixed(2)}</span>
               </div>
               <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
-                <div style="height:100%;width:${barW}%;background:linear-gradient(90deg,#7c6af7,#a78bfa);border-radius:2px;"></div>
+                <div style="height:100%;width:${barW}%;background:linear-gradient(90deg,var(--cyan),var(--amber));border-radius:2px;"></div>
               </div>
               <div style="font-size:10px;color:var(--muted);margin-top:2px;">${fmtTime(m.duration_seconds)} · ${m.attendees?.length || 0} attendees</div>
             </div>
@@ -4941,26 +5261,103 @@ Sent via MeetingMeter · meetingmeter.tech`;
     if (e.target === this) this.classList.remove("open");
   });
 
-  // Email monthly report
-  document.getElementById("report-email-btn").addEventListener("click", async () => {
-    const email = localStorage.getItem("mm_email") || prompt("Enter email address to send report:");
-    if (!email) return;
+  // Email monthly report — show inline prompt with optional CC
+  function addCcField(value = "") {
+    const list = document.getElementById("report-cc-list");
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:6px;align-items:center;";
+    row.innerHTML = `
+      <input type="email" placeholder="cc@example.com" value="${value}"
+        style="flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;" />
+      <button style="padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--red);font-size:13px;cursor:pointer;line-height:1;" title="Remove">×</button>
+    `;
+    row.querySelector("button").addEventListener("click", () => row.remove());
+    list.appendChild(row);
+  }
+
+  document.getElementById("report-email-btn").addEventListener("click", () => {
+    const row = document.getElementById("report-email-row");
+    const input = document.getElementById("report-email-input");
+    const msg = document.getElementById("report-email-msg");
+
+    if (row.style.display !== "none") { row.style.display = "none"; return; }
+
+    // Pre-fill To: verified email → first attendee email → blank
+    const knownEmail = localStorage.getItem("mm_email") || "";
+    if (!knownEmail) {
+      const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+      const allEmails = [...new Set(history.flatMap(m => (m.attendees || []).map(a => a.email).filter(Boolean)))];
+      input.value = allEmails[0] || "";
+    } else {
+      input.value = knownEmail;
+    }
+
+    // Reset CC section
+    document.getElementById("report-cc-section").style.display = "none";
+    document.getElementById("report-cc-list").innerHTML = "";
+    msg.textContent = "";
+    row.style.display = "block";
+    setTimeout(() => input.focus(), 50);
+  });
+
+  // Toggle CC section
+  document.getElementById("report-add-cc-btn").addEventListener("click", () => {
+    const section = document.getElementById("report-cc-section");
+    const isOpen = section.style.display !== "none";
+    section.style.display = isOpen ? "none" : "block";
+    if (!isOpen && document.getElementById("report-cc-list").children.length === 0) addCcField();
+  });
+
+  // Add another CC field
+  document.getElementById("report-add-cc-more-btn").addEventListener("click", () => addCcField());
+
+  document.getElementById("report-email-send-btn").addEventListener("click", async () => {
+    const input = document.getElementById("report-email-input");
+    const msg = document.getElementById("report-email-msg");
+    const sendBtn = document.getElementById("report-email-send-btn");
+    const toEmail = input.value.trim();
+    if (!toEmail || !toEmail.includes("@")) {
+      msg.style.color = "var(--red)";
+      msg.textContent = "Please enter a valid To email address.";
+      return;
+    }
+
+    // Collect CC emails
+    const ccEmails = [...document.getElementById("report-cc-list").querySelectorAll("input")]
+      .map(i => i.value.trim()).filter(e => e && e.includes("@"));
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending…";
+    msg.style.color = "var(--muted)";
+    msg.textContent = "";
+
     const reportHtml = document.getElementById("report-content").innerHTML;
     const reportText = document.getElementById("report-sub").textContent;
+    const allRecipients = [toEmail, ...ccEmails];
+
     try {
       const res = await fetch("/api/send-report-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, reportHtml, reportText })
+        body: JSON.stringify({ email: toEmail, cc: ccEmails, reportHtml, reportText })
       });
       const data = await res.json();
       if (data.ok) {
-        showToast("📧 Report sent to " + email);
+        const label = allRecipients.length > 1 ? `${toEmail} + ${ccEmails.length} CC` : toEmail;
+        msg.style.color = "var(--green)";
+        msg.textContent = `✅ Report sent to ${label}`;
+        showToast(`📧 Report sent to ${label}`);
+        setTimeout(() => { document.getElementById("report-email-row").style.display = "none"; }, 2500);
       } else {
-        showToast("❌ " + (data.error || "Failed to send report"));
+        msg.style.color = "var(--red)";
+        msg.textContent = "❌ " + (data.error || "Failed to send report");
       }
     } catch (err) {
-      showToast("❌ Error: " + err.message);
+      msg.style.color = "var(--red)";
+      msg.textContent = "❌ " + err.message;
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Send ✉️";
     }
   });
 

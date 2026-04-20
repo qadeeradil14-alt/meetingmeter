@@ -15,6 +15,8 @@ class handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}")
         email = body.get("email", "").strip().lower()
+        cc_raw = body.get("cc", [])
+        cc = [e.strip().lower() for e in (cc_raw if isinstance(cc_raw, list) else [cc_raw]) if e and "@" in str(e)]
         report_html = body.get("reportHtml", "")
         report_text = body.get("reportText", "")
 
@@ -30,6 +32,7 @@ class handler(BaseHTTPRequestHandler):
         email_body = {
             "from": f"MeetingMeter <{FROM_EMAIL}>",
             "to": [email],
+            **({"cc": cc} if cc else {}),
             "subject": f"Your Monthly Meeting Report - {report_text}",
             "html": f"""
             <div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:900px;margin:0 auto;padding:24px;">

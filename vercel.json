@@ -3,6 +3,7 @@
   "builds": [
     { "src": "meetingmeter.html",           "use": "@vercel/static" },
     { "src": "index.html",                  "use": "@vercel/static" },
+    { "src": "landing.html",                "use": "@vercel/static" },
     { "src": "google6511461603d34f80.html", "use": "@vercel/static" },
     { "src": "sitemap.xml",                 "use": "@vercel/static" },
     { "src": "robots.txt",                  "use": "@vercel/static" },
@@ -25,9 +26,10 @@
     { "src": "/google6511461603d34f80.html","dest": "/google6511461603d34f80.html" },
     { "src": "/sitemap.xml",                "dest": "/sitemap.xml" },
     { "src": "/robots.txt",                 "dest": "/robots.txt" },
+    { "src": "/landing",                    "dest": "/landing.html" },
     { "src": "/app",                        "dest": "/meetingmeter.html" },
     { "src": "/staging",                    "dest": "/meetingmeter.html" },
-    { "src": "/",                           "dest": "/index.html" }
+    { "src": "/",                           "dest": "/landing.html" }
   ],
   "redirects": [
     {
