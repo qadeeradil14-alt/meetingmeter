@@ -3033,11 +3033,11 @@
     });
   }
 
-  function compactDebriefLine(text, maxLen = 180) {
+  function compactDebriefLine(text, maxLen = 260) {
     if (!text) return "";
     const candidates = String(text)
       .replace(/\r/g, "")
-      .split(/\n|•|-/)
+      .split(/\n+|(?:^|\n)\s*[•*-]\s+/)
       .map(part => part.replace(/\s+/g, " ").trim())
       .filter(Boolean);
     if (candidates.length === 0) return "";
