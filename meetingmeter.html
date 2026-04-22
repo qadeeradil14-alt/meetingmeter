@@ -5440,6 +5440,9 @@ Sent via AgendaBurn · agendaburn.com`;
       durEl.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
+    // Always clear attendee data from the previous meeting first.
+    // If the imported event has attendees, auto-fill them.
+    // If it doesn't, leave a single blank row so the user can add the right people manually.
     if (event && event.attendees && event.attendees.length > 0) {
       attendees = event.attendees.map(a => ({
         id: Date.now().toString() + Math.random(),
@@ -5450,9 +5453,16 @@ Sent via AgendaBurn · agendaburn.com`;
       }));
       renderAttendees();
       updateStats();
+      updateCostDisplay();
+      updateBreakdown();
       showToast(`✓ Loaded "${title}" · ${event.attendees.length} attendees auto-filled`);
     } else {
-      showToast(`✓ Loaded "${title}"`);
+      attendees = [{ id: Date.now().toString(), name: "", role: "Mid-level", customSalary: 0, email: "" }];
+      renderAttendees();
+      updateStats();
+      updateCostDisplay();
+      updateBreakdown();
+      showToast(`✓ Loaded "${title}" · previous attendees cleared`);
     }
   }
 
