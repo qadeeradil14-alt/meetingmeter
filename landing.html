@@ -2,45 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#091018" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AgendaBurn" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
 
   <!-- Bing Webmaster Verification -->
   <meta name="msvalidate.01" content="9EB1CC58A6CC624483407D928677614A" />
 
   <!-- Primary SEO -->
-  <title>MeetingMeter | Real-Time Meeting Cost Tracker & AI Action Items</title>
+  <title>AgendaBurn — Free Real-Time Meeting Cost Tracker</title>
   <meta name="description" content="Stop wasting money on unproductive meetings. Track burn rates in real-time with pizza/coffee metrics and get AI-generated summaries instantly." />
   <meta name="keywords" content="meeting cost calculator, real-time meeting cost calculator, free meeting cost tool, meeting ROI calculator, meeting timer with cost, how much does a meeting cost, meeting productivity software, reduce meeting costs, meeting budget tracker, salary meeting calculator" />
-  <meta name="author" content="MeetingMeter" />
+  <meta name="author" content="AgendaBurn" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-  <link rel="canonical" href="https://meetingmeter.tech/" />
+  <link rel="canonical" href="https://agendaburn.com/" />
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://meetingmeter.tech/" />
-  <meta property="og:title" content="MeetingMeter — Free Real-Time Meeting Cost Calculator" />
+  <meta property="og:url" content="https://agendaburn.com/" />
+  <meta property="og:title" content="AgendaBurn — Free Real-Time Meeting Cost Calculator" />
   <meta property="og:description" content="Watch the dollar amount tick up live as your meeting runs. Add attendees by role and salary. Free forever for small teams. Pro unlocks Slack, Calendar, PDF export and more." />
-  <meta property="og:site_name" content="MeetingMeter" />
-  <meta property="og:image" content="https://meetingmeter.tech/og-image.png" />
+  <meta property="og:site_name" content="AgendaBurn" />
+  <meta property="og:image" content="https://agendaburn.com/og-image.png" />
   <meta property="og:locale" content="en_US" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@meetingmeter" />
-  <meta name="twitter:title" content="MeetingMeter — Free Real-Time Meeting Cost Calculator" />
+  <meta name="twitter:site" content="@agendaburn" />
+  <meta name="twitter:title" content="AgendaBurn — Free Real-Time Meeting Cost Calculator" />
   <meta name="twitter:description" content="Add attendees, hit Start, watch the cost tick up live. See exactly what every meeting costs your company. Free forever." />
-  <meta name="twitter:image" content="https://meetingmeter.tech/og-image.png" />
+  <meta name="twitter:image" content="https://agendaburn.com/og-image.png" />
 
   <!-- Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "MeetingMeter",
+    "name": "AgendaBurn",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "description": "Real-time meeting cost calculator. Add attendees by role and salary, start the timer, and watch the dollar cost tick up live.",
-    "url": "https://meetingmeter.tech/",
+    "url": "https://agendaburn.com/",
     "offers": [
       { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free Forever" },
       { "@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Pro Monthly", "billingDuration": "P1M" },
@@ -54,10 +62,22 @@
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
-      { "@type": "Question", "name": "How does MeetingMeter calculate meeting costs?",
-        "acceptedAnswer": { "@type": "Answer", "text": "MeetingMeter calculates the real-time cost of a meeting by taking each attendee's annual salary, converting it to a per-second rate, and multiplying by the elapsed meeting time." } },
-      { "@type": "Question", "name": "Is MeetingMeter free to use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. MeetingMeter is free forever for teams of up to 3 attendees. Pro plans start at $4.99/month." } }
+      { "@type": "Question", "name": "How does AgendaBurn calculate meeting costs?",
+        "acceptedAnswer": { "@type": "Answer", "text": "AgendaBurn calculates the real-time cost of a meeting by taking each attendee's annual salary, converting it to a per-second rate, and multiplying by the elapsed meeting time. As the timer runs, the total dollar cost updates every second." } },
+      { "@type": "Question", "name": "Is AgendaBurn free to use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. AgendaBurn is free forever for teams of up to 3 attendees with unlimited meetings. Pro plans start at $4.99/month and unlock Google Calendar sync, Slack integration, AI summaries, PDF export, and more." } },
+      { "@type": "Question", "name": "How much does the average meeting cost a company?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Studies show the average 1-hour meeting with 6 attendees costs between $300–$800 depending on seniority. Unnecessary meetings cost US businesses over $37 billion per year. AgendaBurn makes this cost visible in real time so teams can decide if a meeting is worth having." } },
+      { "@type": "Question", "name": "Does AgendaBurn store my salary data?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No. All salary data and meeting history are stored locally in your browser using localStorage. Nothing is sent to AgendaBurn's servers. Your data stays completely private on your own device." } },
+      { "@type": "Question", "name": "Can I connect AgendaBurn to Google Calendar?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. AgendaBurn Pro includes Google Calendar and Apple Calendar integration. You can load upcoming events directly into the meeting timer with one click, auto-filling the title, duration, and attendees." } },
+      { "@type": "Question", "name": "Does AgendaBurn work with Slack?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. With AgendaBurn Pro, you can post a meeting summary — including total cost, duration, attendees, and AI-generated action items — directly to any Slack channel via webhook." } },
+      { "@type": "Question", "name": "What is a good cost per meeting?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A good rule of thumb is that a meeting should generate value equal to at least 3x its cost. A 30-minute standup for 5 people at average salaries costs around $75–$150. If it doesn't produce decisions or alignment worth that amount, it should be shortened or eliminated." } },
+      { "@type": "Question", "name": "How can I reduce meeting costs?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The most effective ways to reduce meeting costs are: 1) Show the live cost to all attendees using a tool like AgendaBurn to create urgency, 2) Set a hard time limit with a visible timer, 3) Only invite essential attendees — removing one senior person can cut costs by 20%, 4) Replace status update meetings with async tools like Slack or Notion." } }
     ]
   }
   </script>
@@ -227,13 +247,13 @@
 
     .hero-counter {
       font-family: var(--mono);
-      font-size: clamp(68px, 14vw, 168px);
+      font-size: clamp(72px, 11vw, 128px);
       font-weight: 700;
       letter-spacing: -0.04em;
       line-height: 1;
       color: var(--amber);
       font-variant-numeric: tabular-nums;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       text-shadow: 0 0 40px rgba(246,181,77,0.12);
     }
 
@@ -294,6 +314,40 @@
       font-size: 13px; color: var(--muted); font-weight: 400;
     }
     .hero-note strong { color: var(--muted2); font-weight: 500; }
+
+    .hero-proof-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+      max-width: 560px;
+    }
+
+    .hero-proof-chip {
+      padding: 14px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.06), rgba(255,255,255,0.015)),
+        rgba(12, 20, 30, 0.76);
+      border: 1px solid rgba(116,187,255,0.12);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.16);
+    }
+
+    .hero-proof-chip strong {
+      display: block;
+      font-size: 17px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-proof-chip span {
+      display: block;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted2);
+    }
 
     .hero-ai-banner {
       margin-top: 22px;
@@ -382,6 +436,12 @@
       border: 1px solid rgba(116,187,255,0.18);
       box-shadow: var(--shadow);
       overflow: hidden;
+      animation: heroFloat 9s ease-in-out infinite;
+    }
+
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
 
     .preview-shell::after {
@@ -656,7 +716,7 @@
 
     .preview-chart-area {
       fill: rgba(120,214,255,0.12);
-      transition: d 0.8s ease, opacity 0.5s ease;
+      transition: d 0.3s ease, opacity 0.3s ease;
     }
 
     .preview-chart-line {
@@ -666,13 +726,13 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(0 0 10px rgba(120,214,255,0.22));
-      transition: d 0.8s ease;
+      transition: d 0.3s ease;
     }
 
     .preview-chart-dot {
       fill: var(--amber);
       filter: drop-shadow(0 0 8px rgba(246,181,77,0.35));
-      transition: cx 0.8s ease, cy 0.8s ease, r 0.25s ease, opacity 0.25s ease;
+      transition: cx 0.3s ease, cy 0.3s ease, r 0.15s ease, opacity 0.15s ease;
     }
 
     .preview-chart-dot.is-live {
@@ -1269,6 +1329,56 @@
     }
     .trust-item::before { content: "✓"; color: var(--amber); font-size: 11px; }
 
+    /* ══════════════════ FAQ ══════════════════ */
+    .faq-list { display: flex; flex-direction: column; gap: 0; }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .faq-q:hover { color: var(--amber); }
+    .faq-q[aria-expanded="true"] { color: var(--amber); }
+
+    .faq-icon {
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: transform 0.25s;
+      line-height: 1;
+    }
+    .faq-q[aria-expanded="true"] .faq-icon {
+      transform: rotate(45deg);
+      color: var(--amber);
+    }
+
+    .faq-a {
+      display: none;
+      padding: 0 0 20px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted2);
+      max-width: 620px;
+    }
+    .faq-a.open { display: block; }
+
     /* ══════════════════ CONTACT ══════════════════ */
     .contact-wrap { max-width: 520px; margin: 0 auto; }
 
@@ -1362,7 +1472,7 @@
     .footer-copy { font-size: 12px; color: var(--muted); }
 
     /* ══════════════════ SCROLL FADE ══════════════════ */
-    .fi { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fi { opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s ease; }
     .fi.in { opacity: 1; transform: translateY(0); }
 
     /* ══════════════════ RESPONSIVE ══════════════════ */
@@ -1469,7 +1579,7 @@
       .section { padding: 64px 16px; }
       .hero::before { inset: 78px 8px 16px; border-radius: 26px; }
       .hero-inner { padding: 14px; gap: 22px; }
-      .hero-counter { font-size: clamp(56px, 18vw, 88px); }
+      .hero-counter { font-size: clamp(42px, 13vw, 72px); }
       .hero-actions { gap: 10px; }
       .hero-ai-banner { padding: 14px; gap: 12px; }
       .preview-shell { padding: 14px; border-radius: 22px; }
@@ -1482,6 +1592,12 @@
       .cta-outer { padding: 88px 16px 76px; }
     }
   </style>
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-MqlkxDRdqe-po4_g79NkH.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
 </head>
 <body>
 
@@ -1489,12 +1605,13 @@
 <nav>
   <a href="/" class="nav-logo">
     <div class="nav-logo-mark">$</div>
-    MeetingMeter
+    AgendaBurn
   </a>
   <ul class="nav-links">
     <li><a href="#how-it-works">How It Works</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <a href="/app" class="btn-nav-cta">Open App</a>
@@ -1518,7 +1635,7 @@
       </h1>
 
       <p class="hero-sub">
-        MeetingMeter puts a live dollar figure on every meeting — so your team shows up prepared, stays focused, and stops burning budget on talk.
+        AgendaBurn puts a live dollar figure on every meeting — so your team shows up prepared, stays focused, and stops burning budget on talk.
       </p>
 
       <div class="hero-actions">
@@ -1528,11 +1645,17 @@
 
       <p class="hero-note"><strong>Free forever</strong> for up to 3 attendees · No credit card required</p>
 
+      <div class="hero-proof-row fi">
+        <div class="hero-proof-chip">Live meeting cost</div>
+        <div class="hero-proof-chip">AI debrief in seconds</div>
+        <div class="hero-proof-chip">Slack, email, PDF</div>
+      </div>
+
       <div class="hero-ai-banner fi">
         <div class="hero-ai-icon">✦</div>
         <div class="hero-ai-copy">
           <strong>AI meeting summaries are built in</strong>
-          <span>After every session, MeetingMeter can turn raw notes into a polished recap with decisions, action items, and a share-ready summary for the team.</span>
+          <span>After every session, AgendaBurn can turn raw notes into a polished recap with decisions, action items, and a share-ready summary for the team.</span>
         </div>
         <div class="hero-ai-pill">AI Feature</div>
       </div>
@@ -1542,7 +1665,7 @@
       <div class="preview-shell">
         <div class="preview-topbar">
           <div class="preview-dots"><span></span><span></span><span></span></div>
-          <div class="preview-eyebrow">MeetingMeter / Live Session</div>
+          <div class="preview-eyebrow">AgendaBurn / Live Session</div>
         </div>
 
         <div class="preview-grid">
@@ -1573,7 +1696,7 @@
                 <span>Burn trend</span>
                 <strong id="preview-chart-total">$0.00 today</strong>
               </div>
-              <svg viewBox="0 0 320 96" aria-hidden="true">
+              <svg viewBox="0 0 320 96" overflow="visible" aria-hidden="true">
                 <line class="preview-chart-grid" x1="0" y1="16" x2="320" y2="16"></line>
                 <line class="preview-chart-grid" x1="0" y1="48" x2="320" y2="48"></line>
                 <line class="preview-chart-grid" x1="0" y1="80" x2="320" y2="80"></line>
@@ -1589,21 +1712,21 @@
             </div>
 
             <div class="counterfactual-card">
-              <div class="counterfactual-label">Counterfactual savings</div>
+              <div class="counterfactual-label">Recovered if you tightened the room</div>
               <div class="counterfactual-headline" id="counterfactual-headline">
-                If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$0.00</strong>.
+                End 11 minutes earlier and trim 2 attendees to recover <strong>$0.00</strong>.
               </div>
               <div class="counterfactual-metrics">
                 <div class="counterfactual-metric">
-                  <span>Time saved</span>
+                  <span>Time</span>
                   <strong id="counterfactual-time">11 min</strong>
                 </div>
                 <div class="counterfactual-metric">
-                  <span>Headcount</span>
+                  <span>Seats</span>
                   <strong id="counterfactual-people">2 fewer</strong>
                 </div>
                 <div class="counterfactual-metric">
-                  <span>Recovered</span>
+                  <span>Saved</span>
                   <strong id="counterfactual-value">$0.00</strong>
                 </div>
               </div>
@@ -1612,19 +1735,10 @@
 
           <div class="preview-stack">
             <div class="preview-sidecard">
-              <h3>Top cost drivers</h3>
+              <h3>Where the spend is</h3>
               <div class="preview-minirow" id="preview-person-0"><span>VP Product</span><strong id="preview-person-cost-0">$0.00</strong></div>
               <div class="preview-minirow" id="preview-person-1"><span>Engineering Lead</span><strong id="preview-person-cost-1">$0.00</strong></div>
               <div class="preview-minirow" id="preview-person-2"><span>Design Manager</span><strong id="preview-person-cost-2">$0.00</strong></div>
-            </div>
-
-            <div class="preview-list">
-              <h3>After the meeting</h3>
-              <ul>
-                <li>Save the meeting with a full attendee-level breakdown</li>
-                <li>Generate AI summaries, decisions, and action items</li>
-                <li>Share to Slack, email, PDF, or CSV without extra formatting</li>
-              </ul>
             </div>
 
             <div class="ai-snapshot">
@@ -1632,7 +1746,7 @@
                 <div class="ai-snapshot-title">AI Debrief Snapshot</div>
                 <div class="ai-snapshot-badge" id="ai-snapshot-badge">Ready</div>
               </div>
-              <p id="ai-snapshot-summary">MeetingMeter turns messy notes into a structured recap seconds after the session ends.</p>
+              <p id="ai-snapshot-summary">AgendaBurn turns messy notes into a structured recap seconds after the session ends.</p>
               <div class="ai-snapshot-points">
                 <div id="ai-point-1">Decision: Lock the launch scope before Friday.</div>
                 <div id="ai-point-2">Action: Product to publish the updated rollout checklist.</div>
@@ -1646,85 +1760,22 @@
   </div>
 </section>
 
-<!-- ════════════ STATS ════════════ -->
-<div class="stats-strip">
-  <div class="stats-inner">
-    <div class="stat-item fi">
-      <div class="stat-num">$37B</div>
-      <div class="stat-lbl">lost to unproductive<br />meetings annually in the US</div>
+<div class="section" style="padding-top:28px;">
+  <div class="proof-grid fi" style="margin-top:0;">
+    <div class="proof-card">
+      <div class="proof-label">Visibility</div>
+      <p class="proof-text">See the cost of the room while the meeting is still happening, not after the damage is done.</p>
+      <div class="proof-savings">Live burn, attendee by attendee</div>
     </div>
-    <div class="stat-item fi">
-      <div class="stat-num">23 hrs</div>
-      <div class="stat-lbl">average manager spends<br />in meetings per week</div>
+    <div class="proof-card">
+      <div class="proof-label">Clarity</div>
+      <p class="proof-text">Turn messy notes into decisions, action items, and a debrief your team can actually use.</p>
+      <div class="proof-savings">AI recap in seconds</div>
     </div>
-    <div class="stat-item fi">
-      <div class="stat-num">71%</div>
-      <div class="stat-lbl">of meetings considered<br />unproductive by attendees</div>
-    </div>
-    <div class="stat-item fi">
-      <div class="stat-num">5 sec</div>
-      <div class="stat-lbl">to set up MeetingMeter<br />and start tracking</div>
-    </div>
-  </div>
-</div>
-
-<div class="section dna-section" id="meeting-dna">
-  <div class="dna-wrap">
-    <div class="dna-grid">
-      <div class="dna-intro">
-        <div class="eyebrow fi">Meeting DNA</div>
-        <h2 class="fi">Not just what the meeting cost.<br />What kind of meeting it was.</h2>
-        <p class="sec-sub fi">MeetingMeter can evolve from a simple burn-rate tracker into a meeting intelligence layer: showing how a session behaves, where value comes from, and where it quietly leaks out.</p>
-
-        <div class="dna-list">
-          <div class="dna-card fi is-active" id="dna-card-0">
-            <div class="dna-card-label">Decision density</div>
-            <div class="dna-card-value" id="dna-value-0">0.0 / hr</div>
-            <p>How many real decisions happened relative to the time and spend in the room.</p>
-          </div>
-          <div class="dna-card fi" id="dna-card-1">
-            <div class="dna-card-label">Cost per decision</div>
-            <div class="dna-card-value" id="dna-value-1">$0</div>
-            <p>The cost of moving the meeting toward an actual decision instead of discussion loops.</p>
-          </div>
-          <div class="dna-card fi" id="dna-card-2">
-            <div class="dna-card-label">Action-item yield</div>
-            <div class="dna-card-value" id="dna-value-2">0</div>
-            <p>How much actionable output the meeting created once notes were distilled by AI.</p>
-          </div>
-          <div class="dna-card fi" id="dna-card-3">
-            <div class="dna-card-label">Focus drift</div>
-            <div class="dna-card-value" id="dna-value-3">0%</div>
-            <p>How much time the meeting spent circling context, repetition, or misaligned topics.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="dna-sidepanel fi">
-        <h3>Meeting archetype</h3>
-        <p id="dna-side-text">The same cost can mean very different things. A fast decision jam and a status-loop sync might burn the same budget, but only one moves the work forward.</p>
-
-        <div class="dna-archetype">
-          <div class="dna-archetype-label">Live classification</div>
-          <div class="dna-archetype-name" id="dna-archetype-name">Fast Decision Jam</div>
-          <div class="dna-archetype-desc" id="dna-archetype-desc">High decision density, solid action-item yield, and low drift. Expensive, but clearly moving the project forward.</div>
-        </div>
-
-        <div class="dna-tradeoffs">
-          <div class="dna-tradeoff">
-            <span>Recovered if 2 fewer attendees joined</span>
-            <strong id="dna-tradeoff-1">$84.20</strong>
-          </div>
-          <div class="dna-tradeoff">
-            <span>Recovered if the session ended 11 minutes earlier</span>
-            <strong id="dna-tradeoff-2">$57.90</strong>
-          </div>
-          <div class="dna-tradeoff">
-            <span>Equivalent value recovered</span>
-            <strong id="dna-tradeoff-3">3.2 engineering hrs</strong>
-          </div>
-        </div>
-      </div>
+    <div class="proof-card">
+      <div class="proof-label">Follow-through</div>
+      <p class="proof-text">Share the result to Slack, email, PDF, or CSV without rebuilding the meeting by hand.</p>
+      <div class="proof-savings">Share-ready from the app</div>
     </div>
   </div>
 </div>
@@ -1732,29 +1783,29 @@
 <!-- ════════════ HOW IT WORKS ════════════ -->
 <div class="section" id="how-it-works">
   <div class="eyebrow fi">How It Works</div>
-  <h2 class="fi">Four steps.<br />Zero friction.</h2>
-  <p class="sec-sub fi">Open the app, add attendees, start the timer, and leave with a clean record your team can use.</p>
+  <h2 class="fi">Four steps.<br />No clutter.</h2>
+  <p class="sec-sub fi">Open the app, pull in the meeting, hit start, and leave with a record your team can use.</p>
 
   <div class="steps">
     <div class="step fi">
       <div class="step-num">01</div>
-      <div class="step-title">Name the Meeting</div>
-      <div class="step-desc">Add a title and duration, or pull the meeting in from your calendar.</div>
+      <div class="step-title">Pull In the Meeting</div>
+      <div class="step-desc">Start from scratch or import the title and timing from your calendar.</div>
     </div>
     <div class="step fi">
       <div class="step-num">02</div>
-      <div class="step-title">Add Attendees</div>
-      <div class="step-desc">Use role presets or custom salaries. Every attendee gets a live cost rate instantly.</div>
+      <div class="step-title">Set the Room</div>
+      <div class="step-desc">Add the people in the room. Each attendee gets a live cost rate immediately.</div>
     </div>
     <div class="step fi">
       <div class="step-num">03</div>
-      <div class="step-title">Hit Start</div>
-      <div class="step-desc">Watch the burn rate in real time and keep the room honest while the meeting runs.</div>
+      <div class="step-title">Watch the Burn</div>
+      <div class="step-desc">See the cost climb in real time and keep the meeting focused while it runs.</div>
     </div>
     <div class="step fi">
       <div class="step-num">04</div>
-      <div class="step-title">Save &amp; Share</div>
-      <div class="step-desc">Save the session, share the summary, and keep decisions and follow-ups attached.</div>
+      <div class="step-title">Debrief &amp; Share</div>
+      <div class="step-desc">Save the session, capture decisions and actions, and send the recap out fast.</div>
     </div>
   </div>
 </div>
@@ -1763,8 +1814,8 @@
 <div class="features-outer" id="features">
   <div class="section" style="max-width:1080px;margin:0 auto;">
     <div class="eyebrow fi">Features</div>
-    <h2 class="fi">Everything you need.<br />Nothing you don't.</h2>
-    <p class="sec-sub fi">The core workflow, the right automations, and none of the usual meeting-software bloat.</p>
+    <h2 class="fi">The core workflow.<br />Trimmed down.</h2>
+    <p class="sec-sub fi">AgendaBurn stays focused on the few things that actually make meetings better.</p>
 
     <!-- AI callout -->
     <div class="ai-callout fi">
@@ -1818,59 +1869,18 @@
       </div>
       <div class="feature-card fi">
         <div class="fc-tag"><span class="pro-pill">Pro</span></div>
-        <div class="fc-title">Calendar + Slack</div>
-        <div class="fc-desc">Import meetings, auto-fill context, and push summaries back into the tools your team already uses.</div>
+        <div class="fc-title">Calendar Import</div>
+        <div class="fc-desc">Pull meeting names and timing in automatically so setup stays fast and clean.</div>
       </div>
       <div class="feature-card fi">
         <div class="fc-tag"><span class="pro-pill">Pro</span></div>
-        <div class="fc-title">Budget Alerts</div>
-        <div class="fc-desc">Set a cost ceiling and get warned when the meeting starts drifting past time or budget.</div>
+        <div class="fc-title">AI Debriefs</div>
+        <div class="fc-desc">Turn notes into decisions, action items, and a shareable summary without extra work.</div>
       </div>
       <div class="feature-card fi">
         <div class="fc-tag"><span class="pro-pill">Pro</span></div>
-        <div class="fc-title">PDF &amp; CSV Export</div>
-        <div class="fc-desc">Export detailed meeting reports for finance reviews, leadership decks, or personal records.</div>
-      </div>
-      <div class="feature-card fi">
-        <div class="fc-tag"><span class="pro-pill">Pro</span></div>
-        <div class="fc-title">Unlimited Attendees + Reports</div>
-        <div class="fc-desc">Track anything from a quick sync to an all-hands, then review meeting cost patterns over time.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════ FIELD REPORTS ════════════ -->
-<div id="testimonials" style="padding:100px 24px;">
-  <div style="max-width:1080px;margin:0 auto;">
-    <div class="eyebrow fi">Field Reports</div>
-    <h2 class="fi">Real teams.<br />Real results.</h2>
-    <p class="sec-sub fi" style="margin-bottom:48px;">A few quick signals from teams using cost visibility to tighten the way they meet.</p>
-
-    <div class="proof-grid fi">
-      <div class="proof-card">
-        <div class="proof-label">Report #001</div>
-        <p class="proof-text">We cut our weekly meeting load by 40% in under a month. When everyone can see the cost live, meetings get productive fast.</p>
-        <div class="proof-author">
-          <div class="proof-av">MR</div>
-          <div>
-            <div class="proof-name">Marcus R.</div>
-            <div class="proof-role">VP of Engineering</div>
-          </div>
-        </div>
-        <div class="proof-savings">↓ 40% fewer meetings</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-label">Report #002</div>
-        <p class="proof-text">The Slack integration is a game-changer. I post the cost summary after every sprint planning and it completely changed how the team runs meetings.</p>
-        <div class="proof-author">
-          <div class="proof-av">TL</div>
-          <div>
-            <div class="proof-name">Tina L.</div>
-            <div class="proof-role">Engineering Manager</div>
-          </div>
-        </div>
-        <div class="proof-savings">↑ Team accountability up</div>
+        <div class="fc-title">Share Anywhere</div>
+        <div class="fc-desc">Send the outcome to Slack, email, PDF, or CSV without rebuilding the recap by hand.</div>
       </div>
     </div>
   </div>
@@ -1950,6 +1960,99 @@
   </div>
 </div>
 
+<!-- ════════════ FAQ ════════════ -->
+<div style="padding:100px 24px 80px;" id="faq">
+  <div style="max-width:720px;margin:0 auto;">
+    <div class="eyebrow fi" style="text-align:center;">FAQ</div>
+    <h2 class="fi" style="text-align:center;margin-bottom:8px;">Common questions</h2>
+    <p class="sec-sub fi" style="text-align:center;margin:0 auto 56px;max-width:480px;">Everything you need to know about AgendaBurn.</p>
+
+    <div class="faq-list fi">
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How does AgendaBurn calculate meeting costs?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          AgendaBurn takes each attendee's annual salary, converts it to a per-second rate, and multiplies by the elapsed meeting time. The total cost updates live every second as the timer runs — so everyone in the room can see exactly what the meeting is spending.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Is AgendaBurn free to use?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Yes — free forever for teams of up to 3 attendees with unlimited meetings. Pro starts at $4.99/month and unlocks Google Calendar sync, Slack integration, AI summaries, PDF export, and more.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How much does the average meeting cost a company?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Studies show a typical 1-hour meeting with 6 attendees costs between $300–$800 depending on seniority. Unnecessary meetings cost US businesses over $37 billion per year. AgendaBurn makes that number visible in real time, so your team can decide if a meeting is worth having before it runs over.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Does AgendaBurn store my salary data?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          No. All salary data and meeting history are stored locally in your browser using localStorage — nothing is sent to our servers. Your data stays completely private on your own device.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Can I connect AgendaBurn to Google Calendar or Slack?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Yes — both are Pro features. Google Calendar and Apple Calendar sync lets you load upcoming events directly into the timer with one click. Slack integration lets you post a full meeting summary — cost, duration, attendees, and AI action items — to any channel via webhook.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How can I reduce meeting costs at my company?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          The most effective approaches: (1) Show the live cost to all attendees — visibility alone creates urgency. (2) Set a hard time limit with a visible timer. (3) Only invite essential people — removing one senior attendee can cut costs by 20%. (4) Replace status update meetings with async tools like Slack or Notion. AgendaBurn helps with all of these.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What is a good cost per meeting?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          A useful benchmark: a meeting should generate value equal to at least 3× its cost. A 30-minute standup for 5 people at average salaries costs roughly $75–$150. If it doesn't produce clear decisions or alignment worth that amount, shorten it or cut it entirely.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Does AgendaBurn work on mobile?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Yes. AgendaBurn is a Progressive Web App (PWA) — open agendaburn.com in your mobile browser and tap "Add to Home Screen" to install it as a native-feeling app on iPhone or Android. It works fully offline after the first load.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ════════════ CONTACT ════════════ -->
 <div style="padding:100px 24px;" id="contact">
   <div class="contact-wrap">
@@ -1990,15 +2093,17 @@
 <footer>
   <a href="/" class="footer-logo">
     <div class="footer-logo-mark">$</div>
-    MeetingMeter
+    AgendaBurn
   </a>
   <ul class="footer-links">
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="/app">Open App</a></li>
-    <li><a href="mailto:support@meetingmeter.tech">Support</a></li>
+    <li><a href="mailto:support@agendaburn.com">Support</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+    <li><a href="/terms">Terms</a></li>
   </ul>
-  <div class="footer-copy">© 2026 MeetingMeter</div>
+  <div class="footer-copy">© 2026 AgendaBurn</div>
 </footer>
 
 <script>
@@ -2009,7 +2114,7 @@
   const aiSnapshots = [
     {
       badge: "Ready",
-      summary: "MeetingMeter turns messy notes into a structured recap seconds after the session ends.",
+      summary: "AgendaBurn turns messy notes into a structured recap seconds after the session ends.",
       points: [
         "Decision: Lock the launch scope before Friday.",
         "Action: Product to publish the updated rollout checklist.",
@@ -2071,17 +2176,24 @@
 
   function renderAiSnapshot(index) {
     const snap = aiSnapshots[index % aiSnapshots.length];
-    document.getElementById("ai-snapshot-badge").textContent = snap.badge;
-    document.getElementById("ai-snapshot-summary").textContent = snap.summary;
-    document.getElementById("ai-point-1").textContent = snap.points[0];
-    document.getElementById("ai-point-2").textContent = snap.points[1];
-    document.getElementById("ai-point-3").textContent = snap.points[2];
+    const badgeEl = document.getElementById("ai-snapshot-badge");
+    const summaryEl = document.getElementById("ai-snapshot-summary");
+    const point1El = document.getElementById("ai-point-1");
+    const point2El = document.getElementById("ai-point-2");
+    const point3El = document.getElementById("ai-point-3");
+    if (badgeEl) badgeEl.textContent = snap.badge;
+    if (summaryEl) summaryEl.textContent = snap.summary;
+    if (point1El) point1El.textContent = snap.points[0];
+    if (point2El) point2El.textContent = snap.points[1];
+    if (point3El) point3El.textContent = snap.points[2];
   }
 
   function renderDnaState(index) {
+    if (!document.getElementById("dna-archetype-name")) return;
     const state = dnaStates[index % dnaStates.length];
     state.values.forEach((value, i) => {
-      document.getElementById(`dna-value-${i}`).textContent = value;
+      const valueEl = document.getElementById(`dna-value-${i}`);
+      if (valueEl) valueEl.textContent = value;
       const card = document.getElementById(`dna-card-${i}`);
       if (card) card.classList.toggle("is-active", i === index % state.values.length);
     });
@@ -2097,6 +2209,7 @@
     const chartHeight = 96;
     const floor = 10;
     const usableHeight = 72;
+    const padX = 10; // keep dot fully inside the viewBox
     const maxValue = previewChartMax;
     const values = previewTrendBase.map((base, index) => {
       const climb = index * 1.9;
@@ -2109,10 +2222,10 @@
         : 0;
       return base + climb + waveA + waveB + tailLift + endpointDrift;
     });
-    const stepX = chartWidth / (values.length - 1);
+    const stepX = (chartWidth - padX * 2) / (values.length - 1);
 
     const points = values.map((value, index) => {
-      const x = index * stepX;
+      const x = padX + index * stepX;
       const y = floor + usableHeight - (value / maxValue) * usableHeight;
       return { x, y };
     });
@@ -2121,7 +2234,9 @@
       `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`
     ).join(" ");
 
-    const areaPath = `${linePath} L ${chartWidth} ${chartHeight} L 0 ${chartHeight} Z`;
+    const firstX = points[0].x.toFixed(2);
+    const lastX  = points[points.length - 1].x.toFixed(2);
+    const areaPath = `${linePath} L ${lastX} ${chartHeight} L ${firstX} ${chartHeight} Z`;
     const lastPoint = points[points.length - 1];
 
     const lineEl = document.getElementById("preview-chart-line");
@@ -2234,5 +2349,31 @@
   });
 </script>
 
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      // Close all
+      document.querySelectorAll('.faq-q').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        b.nextElementSibling.classList.remove('open');
+      });
+      // Open clicked (unless it was already open)
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        btn.nextElementSibling.classList.add('open');
+      }
+    });
+  });
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
