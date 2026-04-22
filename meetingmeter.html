@@ -3230,7 +3230,10 @@
     }
 
     const costs = renderSamples.map(s => s.cost);
-    const maxCost = Math.max(...costs, 0.0001); // avoid div-by-zero
+    const latestCost = costs[costs.length - 1] || 0;
+    const projectedSeconds = Math.max((renderSamples[renderSamples.length - 1]?.t || 0) + 18, 30);
+    const projectedMax = totalPerSecond() * projectedSeconds;
+    const maxCost = Math.max(...costs, projectedMax, 0.0001) * 1.08; // keep visible headroom so the live dot can climb
 
     // Map sample index → SVG x, cost → SVG y (invert: 0 cost = bottom)
     // PAD_X keeps the dot fully inside the chart area (dot r=5 + stroke 2 + glow 9)
@@ -3238,7 +3241,7 @@
     const n = renderSamples.length;
     const totalTime = Math.max(renderSamples[n - 1].t, 1);
     const toX = t => PAD_X + (t / totalTime) * (W - PAD_X * 2);
-    const toY = c => H - (c / maxCost) * (H - 10) - 2; // 2px bottom margin, 10px top room
+    const toY = c => H - (c / maxCost) * (H - 16) - 6; // extra top/bottom headroom so the endpoint doesn't pin to the edge
 
     // Build polyline points string
     const pts = renderSamples.map(s => `${toX(s.t).toFixed(1)},${toY(s.cost).toFixed(1)}`).join(" ");
@@ -3263,7 +3266,7 @@
 
     // Update today label with current cost
     const sym = currencySymbol();
-    const currentCost = toCurrentCurrency(renderSamples[lastIdx].cost);
+    const currentCost = toCurrentCurrency(latestCost);
     const todayEl = document.getElementById("burn-trend-today");
     if (todayEl) todayEl.textContent = sym + currentCost.toFixed(2);
   }
