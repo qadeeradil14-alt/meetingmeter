@@ -3211,14 +3211,20 @@
     const svg = document.getElementById("burn-trend-svg");
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
-    const renderSamples = costSamples.slice();
+    const renderSamples = costSamples.map(s => ({ ...s }));
     if (running && !paused && lastCostSampleAt && renderSamples.length > 0) {
       const lastSample = renderSamples[renderSamples.length - 1];
       const driftSeconds = Math.min(Math.max((performance.now() - lastCostSampleAt) / 1000, 0), 0.9);
       if (driftSeconds > 0) {
+        const liveCost = lastSample.cost + (totalPerSecond() * driftSeconds);
+        const tailStart = Math.max(renderSamples.length - 3, 1);
+        for (let i = tailStart; i < renderSamples.length; i++) {
+          const tailWeight = (i - tailStart + 1) / (renderSamples.length - tailStart + 1);
+          renderSamples[i].cost += (liveCost - lastSample.cost) * 0.45 * tailWeight;
+        }
         renderSamples.push({
           t: lastSample.t + driftSeconds,
-          cost: lastSample.cost + (totalPerSecond() * driftSeconds),
+          cost: liveCost,
         });
       }
     }
