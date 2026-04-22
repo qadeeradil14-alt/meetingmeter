@@ -1870,7 +1870,7 @@
 
     <div class="setup-card">
       <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        Meeting Title
+        Meeting Name
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <button class="settings-btn header-action-btn" id="new-meeting-btn" title="Clear everything and start a new meeting">
             ↺ New
@@ -1916,7 +1916,10 @@
           </button>
         </div>
       </div>
-      <input id="meeting-title" type="text" placeholder="e.g. Weekly Standup" />
+      <input id="meeting-title" type="text" placeholder="e.g. Weekly standup or Client call" />
+      <div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.5;">
+        Use the meeting, company, or project name here. Add the people attending in the section below.
+      </div>
       <div class="duration-target-row">
         <label for="duration-input" class="duration-target-label">Planned Duration</label>
         <div class="duration-target-input-wrap">
@@ -2972,6 +2975,30 @@
     return cleaned || "Untitled Meeting";
   }
 
+  function simplifyImportedMeetingTitle(title) {
+    const raw = normaliseMeetingTitle(title);
+    let cleaned = raw
+      .replace(/^appointment:\s*/i, "")
+      .replace(/^meeting:\s*/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const withMatch = cleaned.match(/^meeting with\s+(.+)$/i);
+    if (withMatch) {
+      cleaned = `${withMatch[1].trim()} Appointment`;
+    }
+
+    return normaliseMeetingTitle(cleaned);
+  }
+
+  function formatAttendeeContext(attendees) {
+    const names = (attendees || []).map(a => (a?.name || "").trim()).filter(Boolean);
+    if (names.length === 0) return "";
+    if (names.length === 1) return `With ${names[0]}`;
+    if (names.length === 2) return `With ${names[0]} and ${names[1]}`;
+    return `With ${names[0]} +${names.length - 1} more`;
+  }
+
   function syncMonthlyReportTitle(historyIndex, title) {
     const safeTitle = normaliseMeetingTitle(title);
     document.querySelectorAll(`.report-editable-title[data-history-index="${historyIndex}"]`).forEach(el => {
@@ -3974,13 +4001,14 @@ Action items (raw notes): ${actions || "None recorded"}`;
 
       const hasEmails = item.attendees && item.attendees.some(a => a.email);
       const hasDebrief = d && (d.decisions || d.actions || d.aiSummary);
+      const attendeeContext = formatAttendeeContext(item.attendees);
 
       card.innerHTML = `
         <div style="display:flex;align-items:center;gap:10px;">
           <div class="history-icon">📋</div>
           <div class="history-info">
             <div class="history-title editable-title" data-id="${esc(item.id)}" style="cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s;" title="Click to edit">${esc(item.title)}</div>
-            <div class="history-meta">${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
+            <div class="history-meta">${attendeeContext ? `${esc(attendeeContext)} · ` : ""}${dateStr} at ${timeStr} · ${fmtTime(item.duration_seconds)} · ${item.attendees.length} people</div>
           </div>
           <div class="history-cost">${fmtMoneyPlain(item.total_cost)}</div>
           <button class="history-del" data-id="${item.id}" title="Delete">×</button>
@@ -5274,7 +5302,7 @@ Sent via AgendaBurn · agendaburn.com`;
       const allEvents = (await Promise.all([url].map(u =>
         fetch(`${API}/api/calendar-events?ics_url=${encodeURIComponent(u)}`).then(r => r.ok ? r.json() : {})
       ))).flatMap(data => (data.events || []).map(e => ({
-        title:            e.summary || e.title || "Untitled",
+        title:            simplifyImportedMeetingTitle(e.summary || e.title || "Untitled"),
         start:            new Date(e.start_ts * 1000),
         start_ts:         e.start_ts,
         duration_minutes: e.duration_min || 60,
@@ -5344,7 +5372,7 @@ Sent via AgendaBurn · agendaburn.com`;
                         : isTomorrow ? "Tomorrow"
                         : start.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
           const fmt = (d) => d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-          const displayTitle = (event.title || "Untitled").trim();
+          const displayTitle = simplifyImportedMeetingTitle(event.title || "Untitled");
           item.innerHTML = `
             <div class="calendar-event-name">${displayTitle}</div>
             <div class="calendar-event-meta">${dayLabel} · ${fmt(start)} – ${fmt(end)}</div>`;
@@ -5391,7 +5419,7 @@ Sent via AgendaBurn · agendaburn.com`;
     document.getElementById("apple-dropdown")?.classList.remove("open");
     setMenuCardActive(false);
 
-    const title = (event && (event.title || event.summary)) || "Untitled";
+    const title = simplifyImportedMeetingTitle((event && (event.title || event.summary)) || "Untitled");
     const titleEl = document.getElementById("meeting-title");
     if (titleEl) {
       titleEl.value = title;
