@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
-  <meta name="theme-color" content="#0f0f13" />
+  <meta name="theme-color" content="#091018" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="MeetingMeter" />
+  <meta name="apple-mobile-web-app-title" content="AgendaBurn" />
   <meta name="format-detection" content="telephone=no" />
-  <title>MeetingMeter</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+  <title>AgendaBurn</title>
   <style>
     :root {
       --bg: #091018;
@@ -373,7 +376,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      overflow-y: auto;
+      overflow: visible;
     }
 
     .right-panel {
@@ -399,6 +402,12 @@
       padding: 18px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
+      position: relative;
+      z-index: 1;
+    }
+
+    .setup-card.menu-active {
+      z-index: 1200;
     }
 
     .setup-card-compact {
@@ -903,6 +912,62 @@
 
     .hidden { display: none !important; }
 
+    /* ── Burn Trend chart ── */
+    .burn-trend-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(120,214,255,0.15);
+      border-radius: 16px;
+      padding: 16px 18px 12px;
+      margin-bottom: 16px;
+    }
+    .burn-trend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .burn-trend-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--cyan, #78d6ff);
+      opacity: 0.7;
+    }
+    .burn-trend-today {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--amber, #f6b54d);
+    }
+    .burn-trend-chart-wrap {
+      width: 100%;
+      height: 72px;
+      position: relative;
+    }
+    .burn-trend-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+    .burn-trend-axis {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.6px;
+      color: rgba(114,144,171,0.6);
+    }
+    #trend-dot-glow {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: trendPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes trendPulse {
+      0%,100% { opacity: 0.18; transform: scale(1); }
+      50%      { opacity: 0.04; transform: scale(1.55); }
+    }
+
     /* ── Settings modal ── */
     .settings-btn {
       background: rgba(255,255,255,0.02);
@@ -1143,10 +1208,13 @@
     /* ── Calendar picker dropdown ── */
     .calendar-picker {
       position: relative;
+      z-index: 40;
+      overflow: visible;
     }
     .calendar-dropdown {
       position: fixed;
-      top: auto;
+      top: 0;
+      left: 0;
       min-width: 280px;
       max-width: 360px;
       max-height: 70vh;
@@ -1154,15 +1222,15 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      z-index: 150;
+      z-index: 10000;
       overflow-y: auto;
       display: none;
     }
     .calendar-dropdown.open { display: block; }
     .calendar-dropdown-header {
-      padding: 10px 14px;
+      padding: 9px 14px;
       font-size: 10px;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
@@ -1185,9 +1253,9 @@
       background: #4285F4;
       flex-shrink: 0;
     }
-    .calendar-event-name { font-size: 13px; font-weight: 600; flex: 1; }
-    .calendar-event-meta { font-size: 11px; color: var(--muted); }
-    .calendar-event-dur  { font-size: 11px; color: var(--accent); font-weight: 600; }
+    .calendar-event-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.35; }
+    .calendar-event-meta { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+    .calendar-event-dur  { font-size: 11px; color: var(--accent); font-weight: 500; }
     .calendar-empty { padding: 16px 14px; font-size: 13px; color: var(--muted); text-align: center; }
 
     /* ── Slack notify button ── */
@@ -1436,27 +1504,27 @@
     }
 
     /* ── Templates dropdown ── */
-    .template-picker { position: relative; }
+    .template-picker { position: relative; z-index: 40; overflow: visible; }
     .template-dropdown {
-      display: none; position: fixed; top: auto;
+      display: none; position: fixed; top: 0; left: 0;
       background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; min-width: 240px; max-width: 320px; z-index: 150;
+      border-radius: 10px; min-width: 240px; max-width: 320px; z-index: 10000;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
       max-height: 70vh; overflow-y: auto;
     }
     .template-dropdown.open { display: block; }
     .template-dropdown-header {
-      padding: 8px 12px; font-size: 10px; font-weight: 700;
+      padding: 9px 12px; font-size: 10px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
       border-bottom: 1px solid var(--border);
     }
     .template-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 12px; cursor: pointer; font-size: 13px;
-      transition: background 0.15s;
+      padding: 9px 12px; cursor: pointer; font-size: 13px; font-weight: 400;
+      color: var(--text2); transition: background 0.15s;
     }
     .template-item:hover { background: rgba(120,214,255,0.08); }
-    .template-item-name { flex: 1; }
+    .template-item-name { flex: 1; font-weight: 500; }
     .template-item-count { font-size: 11px; color: var(--muted); margin-right: 6px; }
     .template-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
     .template-del:hover { color: var(--red); }
@@ -1517,6 +1585,30 @@
     .report-meeting-row:last-child { border-bottom: none; }
     .report-meeting-title { flex: 1; color: var(--muted); }
     .report-meeting-cost { font-weight: 600; color: var(--text); }
+    .report-editable-title {
+      width: 100%;
+      min-width: 0;
+      border-radius: 10px;
+      padding: 4px 8px;
+      border: 1px dashed rgba(120,214,255,0.18);
+      background: rgba(120,214,255,0.04);
+      color: var(--text);
+      outline: none;
+      transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      font: inherit;
+    }
+    .report-editable-title:hover {
+      background: rgba(120,214,255,0.08);
+      border-color: rgba(120,214,255,0.28);
+    }
+    .report-editable-title:focus {
+      background: rgba(120,214,255,0.12);
+      border-color: rgba(120,214,255,0.42);
+      box-shadow: 0 0 0 3px rgba(120,214,255,0.14);
+    }
+    .report-editable-title::placeholder {
+      color: var(--muted);
+    }
     .report-print-btn, .report-email-btn {
       flex: 1; min-width: 140px; margin-top: 0;
       background: linear-gradient(135deg, var(--amber), var(--gold)); color: #091018;
@@ -1653,14 +1745,72 @@
       transform: translateY(-1px);
     }
     .limit-upgrade-pill svg { width: 10px; height: 10px; }
+
+  /* ── Email capture prompt ── */
+  #email-capture-prompt {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    width: min(420px, calc(100vw - 32px));
+    background: #111c27; border: 1px solid #f59e0b55;
+    border-radius: 14px; padding: 20px 20px 18px;
+    box-shadow: 0 8px 32px #000a;
+    z-index: 999; display: none;
+    animation: slideUp .35s cubic-bezier(.16,1,.3,1);
+  }
+  #email-capture-prompt.visible { display: block; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  #email-capture-prompt h4 {
+    font-size: 14px; font-weight: 700; color: #e2e8f0; margin: 0 0 4px;
+  }
+  #email-capture-prompt p {
+    font-size: 12px; color: #64748b; margin: 0 0 12px; line-height: 1.5;
+  }
+  #email-capture-prompt .ec-row {
+    display: flex; gap: 8px;
+  }
+  #email-capture-prompt input {
+    flex: 1; background: #091018; border: 1px solid #1e2d3d;
+    border-radius: 8px; padding: 8px 12px; font-size: 13px;
+    color: #e2e8f0; outline: none;
+  }
+  #email-capture-prompt input:focus { border-color: #f59e0b; }
+  #email-capture-prompt .ec-submit {
+    background: #f59e0b; color: #000; border: none;
+    border-radius: 8px; padding: 8px 14px; font-size: 13px;
+    font-weight: 700; cursor: pointer; white-space: nowrap;
+  }
+  #email-capture-prompt .ec-submit:hover { background: #fbbf24; }
+  #email-capture-prompt .ec-dismiss {
+    position: absolute; top: 12px; right: 14px;
+    background: none; border: none; color: #475569;
+    font-size: 18px; cursor: pointer; line-height: 1;
+  }
+  #email-capture-prompt .ec-dismiss:hover { color: #94a3b8; }
+  #email-capture-prompt .ec-msg {
+    font-size: 11px; color: #64748b; margin-top: 8px; min-height: 14px;
+  }
   </style>
+  <!-- Sentry Error Monitoring -->
+  <script
+    src="https://browser.sentry-cdn.com/7.92.0/bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    Sentry.init({
+      dsn: "https://bc3653f01626d9ee2c1832cf084451b0@o4511258654605312.ingest.us.sentry.io/4511258656768000",
+      environment: "production",
+      tracesSampleRate: 1.0,
+    });
+  </script>
 </head>
 <body>
 
 <header>
   <div class="logo">
     <div class="logo-icon">💸</div>
-    MeetingMeter
+    AgendaBurn
   </div>
   <span class="tagline">Know the real cost of every meeting</span>
   <div class="header-actions">
@@ -1841,6 +1991,32 @@
       </div>
     </div>
 
+    <!-- Burn Trend chart — only visible while meeting is running -->
+    <div class="burn-trend-card hidden" id="burn-trend-card">
+      <div class="burn-trend-header">
+        <span class="burn-trend-label">BURN TREND</span>
+        <span class="burn-trend-today" id="burn-trend-today"></span>
+      </div>
+      <div class="burn-trend-chart-wrap">
+        <svg class="burn-trend-svg" id="burn-trend-svg" preserveAspectRatio="none" overflow="visible">
+          <defs>
+            <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#78d6ff" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#78d6ff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path id="trend-fill" fill="url(#trendGrad)" stroke="none"/>
+          <polyline id="trend-line" fill="none" stroke="#78d6ff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- glow ring pulses behind the dot -->
+          <circle id="trend-dot-glow" r="9" fill="#f6b54d" opacity="0" stroke="none"/>
+          <circle id="trend-dot" r="5" fill="#f6b54d" stroke="#091018" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="burn-trend-axis">
+        <span>START</span><span>MIDPOINT</span><span>NOW</span>
+      </div>
+    </div>
+
     <div class="live-stack">
       <!-- Per-person breakdown -->
       <div class="breakdown" id="breakdown-card">
@@ -1918,12 +2094,17 @@
 
     <div id="debrief-cost-comparisons"></div>
 
+    <div id="debrief-ai-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="section-label" style="margin:0;">✨ AI Summary <span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px;">Pro</span></div>
+        <button class="btn-ai" id="debrief-ai-btn" style="padding:6px 14px;font-size:12px;">Generate</button>
+      </div>
+      <div id="debrief-ai-output" style="display:none;" class="ai-summary-box"></div>
+    </div>
+
     <div class="modal-actions" style="flex-wrap:wrap;gap:8px;">
       <button class="btn btn-ghost" id="debrief-discard">Discard</button>
       <button class="btn btn-primary" id="debrief-save">Save Meeting</button>
-    </div>
-    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:-4px;">
-      Save first — then use ✨ AI Summary, 📧 Email, or 💬 Slack on the saved meeting card.
     </div>
   </div>
 </div>
@@ -1953,7 +2134,7 @@
   <div class="modal" style="width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;gap:20px;">
     <div>
       <h2>🔗 Integrations</h2>
-      <p style="margin-top:6px">Connect MeetingMeter to Slack, Google Calendar, or Apple Calendar. Credentials are stored locally on your device.</p>
+      <p style="margin-top:6px">Connect AgendaBurn to Slack, Google Calendar, or Apple Calendar. Credentials are stored locally on your device.</p>
       <div style="background:linear-gradient(135deg, rgba(120,214,255,0.1), rgba(246,181,77,0.08));border:1px solid rgba(120,214,255,0.2);border-radius:12px;padding:12px;margin-top:12px;font-size:13px;color:var(--text);">
         <strong>💾 Your integrations persist after logout</strong><br/>
         Logging out does <strong>not</strong> erase your integration settings. They'll be available when you log back in on this device. If sharing this device, manually clear browser data to remove them.
@@ -2060,7 +2241,7 @@
         <button class="btn btn-ghost" id="zoom-disconnect-btn" style="font-size:13px;padding:8px 16px;display:none;">Disconnect</button>
       </div>
       <div class="integration-help">
-        Connects via Zoom OAuth. Your meetings and attendee lists will auto-populate in MeetingMeter.
+        Connects via Zoom OAuth. Your meetings and attendee lists will auto-populate in AgendaBurn.
       </div>
     </div>
 
@@ -2156,8 +2337,8 @@
           <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">No. Your integrations (Slack, Google Calendar, Claude, Zoom) persist locally on your device after logout. They'll be available when you log back in. If you're sharing a device, you can manually clear browser data to remove them.</p>
         </details>
         <details style="cursor:pointer;">
-          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">What data does MeetingMeter collect?</summary>
-          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">MeetingMeter is 100% local. Meeting data, attendees, and settings stay on your device. No analytics, no tracking, no data collection.</p>
+          <summary style="color:var(--text);font-size:13px;font-weight:500;outline:none;">What data does AgendaBurn collect?</summary>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px;line-height:1.5;">AgendaBurn is 100% local. Meeting data, attendees, and settings stay on your device. No analytics, no tracking, no data collection.</p>
         </details>
       </div>
     </div>
@@ -2165,12 +2346,16 @@
     <!-- Support Section -->
     <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);margin-bottom:16px;">
       <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:12px;letter-spacing:0.1em;">Support</div>
-      <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Have a question or found a bug? We'd love to hear from you.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button onclick="showToast('🐦 Twitter — Coming Soon!')" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;">𝕏 Twitter</button>
-        <a href="mailto:support@meetingmeter.tech" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;text-decoration:none;">📧 Contact Us</a>
-        <button onclick="showToast('🌐 Website — Coming Soon!')" class="btn btn-ghost" style="flex:1;min-width:120px;font-size:12px;padding:6px 12px;">🌐 Website</button>
-      </div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Have a question or found a bug? We'll get back to you within 24 hours.</p>
+      <form id="in-app-contact-form" action="https://formspree.io/f/xwvwrzvy" method="POST" style="display:flex;flex-direction:column;gap:8px;">
+        <input type="email" name="email" required placeholder="Your email" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;width:100%;box-sizing:border-box;" />
+        <textarea name="message" required rows="3" placeholder="How can we help?" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;resize:vertical;width:100%;box-sizing:border-box;font-family:inherit;"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button type="submit" id="in-app-contact-btn" class="btn btn-primary" style="flex:1;min-width:120px;font-size:13px;padding:8px 16px;">📧 Send Message</button>
+          <button type="button" onclick="showToast('🐦 Twitter — Coming Soon!')" class="btn btn-ghost" style="flex:1;min-width:100px;font-size:12px;padding:8px 12px;">𝕏 Twitter</button>
+        </div>
+        <div id="in-app-contact-msg" style="font-size:12px;text-align:center;min-height:16px;color:var(--muted);"></div>
+      </form>
     </div>
 
     <!-- Sign Out Section -->
@@ -2465,7 +2650,6 @@
   const FREE_ATTENDEE_LIMIT = 3;
 
   function isPaid() {
-    if (localStorage.getItem("mm_admin") === "true") return true;
     if (localStorage.getItem("mm_paid") !== "true") return false;
     // Check subscription expiry if we have a period_end stored
     const until = localStorage.getItem("mm_paid_until");
@@ -2492,15 +2676,61 @@
     document.getElementById("upgrade-modal").classList.add("open");
   }
 
-  // Admin reset — visit /app?admin=reset to clear any locally-stored admin/paid flags (owner use)
-  (function checkAdminKey() {
+  // ── Session validation on page load ────────────────────────────────────────
+  // Calls /api/auth/profile to sync Pro status from Stripe.
+  // Prevents mm_paid localStorage forgery — server is the source of truth.
+  async function initializeSession() {
+    const token = localStorage.getItem("mm_session_token");
+    if (!token) return; // No session — free user, nothing to validate
+
+    try {
+      const res = await fetch("/api/auth/profile", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (!res.ok) throw new Error("profile_error");
+      const data = await res.json();
+
+      if (!data.ok) {
+        // Token invalid or expired — revoke and clear Pro
+        localStorage.removeItem("mm_session_token");
+        localStorage.removeItem("mm_paid");
+        localStorage.removeItem("mm_paid_until");
+        renderAttendees();
+        updateProLabel();
+        if (typeof updateSettingsModal === "function") updateSettingsModal();
+        return;
+      }
+
+      // pro === null means Stripe was unreachable — keep existing localStorage state
+      if (data.pro === true) {
+        localStorage.setItem("mm_paid", "true");
+        if (data.period_end) localStorage.setItem("mm_paid_until", String(data.period_end));
+      } else if (data.pro === false) {
+        // Subscription lapsed — revoke Pro
+        localStorage.removeItem("mm_paid");
+        localStorage.removeItem("mm_paid_until");
+      }
+
+      renderAttendees();
+      updateProLabel();
+      if (typeof updateSettingsModal === "function") updateSettingsModal();
+    } catch (e) {
+      // Network error — keep existing localStorage state (offline fallback)
+    }
+  }
+
+  // Validate session token + sync Pro status on every page load
+  initializeSession();
+
+  // Dev reset — visit /app?reset=1 to clear Pro flags (for testing sign-in flow)
+  (function checkResetParam() {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("admin") === "reset") {
-      localStorage.removeItem("mm_admin");
+    if (params.get("reset") === "1") {
       localStorage.removeItem("mm_paid");
       localStorage.removeItem("mm_paid_until");
+      localStorage.removeItem("mm_session_token");
       history.replaceState({}, "", window.location.pathname);
-      showToast("🔒 Admin mode cleared");
+      showToast("🔒 Session cleared");
       renderAttendees();
     }
   })();
@@ -2676,8 +2906,8 @@
     const timeoutId = setTimeout(() => controller.abort(), 20000);
 
     try {
-      // Endpoint depends on purpose: verify-code (for restore) or customer-portal (for manage)
-      const endpoint = ecPurpose === "manage" ? "/api/customer-portal" : "/api/verify-code";
+      // Endpoint depends on purpose: sign-in (for restore) or customer-portal (for manage)
+      const endpoint = ecPurpose === "manage" ? "/api/customer-portal" : "/api/auth/sign-in";
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2694,6 +2924,9 @@
       }
 
       if (ecPurpose === "restore") {
+        // Store session token to prevent Pro fakery on future page loads
+        if (data.token) localStorage.setItem("mm_session_token", data.token);
+        if (data.period_end) ecPeriodEnd = data.period_end;
         msgEl.style.color = "var(--green)";
         msgEl.textContent = "✅ Verified!";
         localStorage.setItem("mm_email", ecEmail);
@@ -2734,12 +2967,83 @@
       .replace(/'/g, "&#39;");
   }
 
+  function normaliseMeetingTitle(title) {
+    const cleaned = String(title || "").replace(/\s+/g, " ").trim();
+    return cleaned || "Untitled Meeting";
+  }
+
+  function syncMonthlyReportTitle(historyIndex, title) {
+    const safeTitle = normaliseMeetingTitle(title);
+    document.querySelectorAll(`.report-editable-title[data-history-index="${historyIndex}"]`).forEach(el => {
+      if (el.value !== safeTitle) el.value = safeTitle;
+      el.setAttribute("value", safeTitle);
+    });
+
+    const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+    if (history[historyIndex]) {
+      history[historyIndex].title = safeTitle;
+      localStorage.setItem("mm_history", JSON.stringify(history));
+    }
+  }
+
+  function initMonthlyReportEditors() {
+    document.querySelectorAll(".report-editable-title").forEach(el => {
+      if (el.dataset.bound === "1") return;
+      el.dataset.bound = "1";
+      el.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          el.blur();
+        }
+      });
+      el.addEventListener("input", () => {
+        syncMonthlyReportTitle(el.dataset.historyIndex, el.value);
+      });
+      el.addEventListener("blur", () => {
+        syncMonthlyReportTitle(el.dataset.historyIndex, el.value);
+      });
+      syncMonthlyReportTitle(el.dataset.historyIndex, el.value);
+    });
+  }
+
+  function compactDebriefLine(text, maxLen = 180) {
+    if (!text) return "";
+    const candidates = String(text)
+      .replace(/\r/g, "")
+      .split(/\n|•|-/)
+      .map(part => part.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+    if (candidates.length === 0) return "";
+    const line = candidates[0];
+    return line.length > maxLen ? line.slice(0, maxLen - 1).trimEnd() + "…" : line;
+  }
+
+  function buildHistoryDebriefPreview(d) {
+    if (!d) return "";
+
+    const rows = [
+      { label: "Summary", text: compactDebriefLine(d.aiSummary) },
+      { label: "Decision", text: compactDebriefLine(d.decisions) },
+      { label: "Action", text: compactDebriefLine(d.actions) },
+    ].filter(row => row.text);
+
+    return rows.map(row => `
+      <div style="margin-top:6px;line-height:1.5;">
+        <span style="color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">${esc(row.label)}</span>
+        <span style="color:var(--text);margin-left:8px;">${esc(row.text)}</span>
+      </div>
+    `).join("");
+  }
+
   // ── State ──────────────────────────────────────────────────
   let attendees = [];  // { id, name, role }
   let timerInterval = null;
   let elapsedSeconds = 0;
   let running = false;
   let paused = false;
+  let costSamples = []; // { t, cost } — one per second while running
+  let lastCostSampleAt = 0;
+  let burnTrendRafId = null;
   let lastCompletedMeeting = null; // snapshot for exporting after save/discard
 
   // ── Attendees ──────────────────────────────────────────────
@@ -2873,6 +3177,91 @@
     updateBreakdown();
   }
 
+  // ── Burn Trend chart ───────────────────────────────────────
+  function stopBurnTrendAnimation() {
+    if (burnTrendRafId !== null) {
+      cancelAnimationFrame(burnTrendRafId);
+      burnTrendRafId = null;
+    }
+  }
+
+  function startBurnTrendAnimation() {
+    if (burnTrendRafId !== null) return;
+    const tick = () => {
+      burnTrendRafId = null;
+      if (!running || paused || costSamples.length < 2) return;
+      updateBurnTrend();
+      burnTrendRafId = requestAnimationFrame(tick);
+    };
+    burnTrendRafId = requestAnimationFrame(tick);
+  }
+
+  function updateBurnTrend() {
+    const card = document.getElementById("burn-trend-card");
+    if (!card) return;
+
+    // Need at least 2 samples to draw a line
+    if (costSamples.length < 2) return;
+
+    const wrap = card.querySelector(".burn-trend-chart-wrap");
+    const W = wrap.clientWidth || 320;
+    const H = 72;
+
+    // Keep SVG viewBox in sync with rendered size
+    const svg = document.getElementById("burn-trend-svg");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+    const renderSamples = costSamples.slice();
+    if (running && !paused && lastCostSampleAt && renderSamples.length > 0) {
+      const lastSample = renderSamples[renderSamples.length - 1];
+      const driftSeconds = Math.min(Math.max((performance.now() - lastCostSampleAt) / 1000, 0), 0.9);
+      if (driftSeconds > 0) {
+        renderSamples.push({
+          t: lastSample.t + driftSeconds,
+          cost: lastSample.cost + (totalPerSecond() * driftSeconds),
+        });
+      }
+    }
+
+    const costs = renderSamples.map(s => s.cost);
+    const maxCost = Math.max(...costs, 0.0001); // avoid div-by-zero
+
+    // Map sample index → SVG x, cost → SVG y (invert: 0 cost = bottom)
+    // PAD_X keeps the dot fully inside the chart area (dot r=5 + stroke 2 + glow 9)
+    const PAD_X = 12;
+    const n = renderSamples.length;
+    const totalTime = Math.max(renderSamples[n - 1].t, 1);
+    const toX = t => PAD_X + (t / totalTime) * (W - PAD_X * 2);
+    const toY = c => H - (c / maxCost) * (H - 10) - 2; // 2px bottom margin, 10px top room
+
+    // Build polyline points string
+    const pts = renderSamples.map(s => `${toX(s.t).toFixed(1)},${toY(s.cost).toFixed(1)}`).join(" ");
+
+    // Build fill area path (close down to bottom)
+    const firstX = toX(renderSamples[0].t).toFixed(1);
+    const lastX  = toX(renderSamples[n - 1].t).toFixed(1);
+    const fillD  = `M${firstX},${H} ${renderSamples.map(s => `L${toX(s.t).toFixed(1)},${toY(s.cost).toFixed(1)}`).join(" ")} L${lastX},${H} Z`;
+
+    document.getElementById("trend-line").setAttribute("points", pts);
+    document.getElementById("trend-fill").setAttribute("d", fillD);
+
+    // Place the dot (and glow ring) at the last point
+    const lastIdx = n - 1;
+    const dotX = toX(renderSamples[lastIdx].t);
+    const dotY = toY(renderSamples[lastIdx].cost);
+    const dot = document.getElementById("trend-dot");
+    dot.setAttribute("cx", dotX.toFixed(1));
+    dot.setAttribute("cy", dotY.toFixed(1));
+    const glow = document.getElementById("trend-dot-glow");
+    if (glow) { glow.setAttribute("cx", dotX.toFixed(1)); glow.setAttribute("cy", dotY.toFixed(1)); }
+
+    // Update today label with current cost
+    const sym = currencySymbol();
+    const currentCost = toCurrentCurrency(renderSamples[lastIdx].cost);
+    const todayEl = document.getElementById("burn-trend-today");
+    if (todayEl) todayEl.textContent = sym + currentCost.toFixed(2);
+  }
+
   // ── Timer ──────────────────────────────────────────────────
   function fmtTime(s) {
     const h = Math.floor(s / 3600);
@@ -2896,7 +3285,7 @@
     // Feature 1: live cost in browser tab
     if (running) {
       const title = document.getElementById("meeting-title").value || "Meeting";
-      document.title = `${fmtMoneyPlain(cost)} · ${title} — MeetingMeter`;
+      document.title = `${fmtMoneyPlain(cost)} · ${title} — AgendaBurn`;
     }
   }
 
@@ -2984,6 +3373,10 @@
       updateBreakdown();
       updateStats(); // Update live stat chips (attendees, burn rate, etc.)
       updateDurationBar();
+      // Sample cost for burn trend
+      costSamples.push({ t: elapsedSeconds, cost: totalPerSecond() * elapsedSeconds });
+      lastCostSampleAt = performance.now();
+      updateBurnTrend();
     }, 1000);
   }
 
@@ -2996,12 +3389,18 @@
     // Clear past meeting view state — start a new meeting
     viewingPastMeeting = null;
     running = true; paused = false;
+    costSamples = [{ t: 0, cost: 0 }]; // Reset burn trend samples for new meeting
+    lastCostSampleAt = performance.now();
+    stopBurnTrendAnimation();
     document.getElementById("start-btn").classList.add("hidden");
     document.getElementById("pause-btn").classList.remove("hidden");
     document.getElementById("stop-btn").classList.remove("hidden");
     document.getElementById("running-indicator").classList.remove("hidden");
+    document.getElementById("burn-trend-card").classList.remove("hidden");
     overtimeToastFired = false;
     updateDurationBar();
+    updateBurnTrend();
+    startBurnTrendAnimation();
     startTimer();
   });
 
@@ -3009,31 +3408,43 @@
     if (!paused) {
       clearInterval(timerInterval);
       paused = true;
+      stopBurnTrendAnimation();
       document.getElementById("pause-btn").textContent = "▶ Resume";
     } else {
-      startTimer();
       paused = false;
+      lastCostSampleAt = performance.now();
+      updateBurnTrend();
+      startBurnTrendAnimation();
       document.getElementById("pause-btn").textContent = "⏸ Pause";
+      startTimer();
     }
   });
 
   document.getElementById("stop-btn").addEventListener("click", () => {
     clearInterval(timerInterval);
     running = false;
+    paused = false;
+    stopBurnTrendAnimation();
     document.getElementById("running-indicator").classList.add("hidden");
+    document.getElementById("burn-trend-card").classList.add("hidden");
     openDebriefModal();
+    if (typeof showEmailPrompt === "function") showEmailPrompt();
   });
 
   document.getElementById("reset-btn").addEventListener("click", () => {
     clearInterval(timerInterval);
     viewingPastMeeting = null; // Clear past meeting view when resetting
     elapsedSeconds = 0; running = false; paused = false;
+    costSamples = [];
+    lastCostSampleAt = 0;
+    stopBurnTrendAnimation();
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
     document.getElementById("pause-btn").classList.add("hidden");
     document.getElementById("stop-btn").classList.add("hidden");
     document.getElementById("reset-btn").classList.add("hidden");
     document.getElementById("running-indicator").classList.add("hidden");
+    document.getElementById("burn-trend-card").classList.add("hidden");
     document.getElementById("pause-btn").textContent = "⏸ Pause";
     updateCostDisplay();
     updateBreakdown();
@@ -3055,6 +3466,11 @@
     document.getElementById("debrief-decisions").value = "";
     document.getElementById("debrief-actions").value = "";
     document.querySelectorAll(".rating-btn").forEach(b => b.className = "rating-btn");
+    // Reset AI summary section
+    const aiBtn = document.getElementById("debrief-ai-btn");
+    const aiOut = document.getElementById("debrief-ai-output");
+    if (aiBtn) { aiBtn.textContent = "Generate"; aiBtn.disabled = false; }
+    if (aiOut) { aiOut.style.display = "none"; aiOut.textContent = ""; }
 
     const costUSD = totalPerSecond() * elapsedSeconds;
     document.getElementById("debrief-duration").textContent = fmtTime(elapsedSeconds);
@@ -3130,7 +3546,7 @@
       // Truncate at last full sentence within limit
       const raw = body.substring(0, 2500);
       const lastStop = Math.max(raw.lastIndexOf(". "), raw.lastIndexOf(".\n"));
-      safeBody = (lastStop > 200 ? raw.substring(0, lastStop + 1) : raw) + "\n\n[Note: summary truncated — full details saved in MeetingMeter]";
+      safeBody = (lastStop > 200 ? raw.substring(0, lastStop + 1) : raw) + "\n\n[Note: summary truncated — full details saved in AgendaBurn]";
     }
     // Use location.href for mailto — never blocked by popup blockers
     window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`;
@@ -3256,7 +3672,7 @@
           ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.actions)}</div></div>` : ""}
           ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box">${esc(d.aiSummary)}</div></div>` : ""}
           <div style="display:flex;justify-content:center;padding-top:8px;border-top:1px solid var(--border);">
-            <a href="${location.origin}${location.pathname}" style="font-size:12px;color:var(--accent);text-decoration:none">⚡ Track your own meetings at MeetingMeter</a>
+            <a href="${location.origin}${location.pathname}" style="font-size:12px;color:var(--accent);text-decoration:none">⚡ Track your own meetings at AgendaBurn</a>
           </div>
         </div>`;
       document.body.appendChild(overlay);
@@ -3264,12 +3680,81 @@
     } catch(e) { console.error("Invalid share link", e); }
   }
 
+  // AI Summary inside debrief modal
+  document.getElementById("debrief-ai-btn").addEventListener("click", async () => {
+    if (!isPaid()) { showUpgradeModal(); return; }
+    const stored = JSON.parse(localStorage.getItem("mm_integrations") || "{}");
+    if (stored.claude_api_key) integrationsConfig.claude_api_key = stored.claude_api_key;
+    const key = integrationsConfig.claude_api_key || "";
+    if (!key) { showToast("⚠️ Add your Claude API key in Integrations first"); return; }
+
+    const btn = document.getElementById("debrief-ai-btn");
+    const out  = document.getElementById("debrief-ai-output");
+    btn.textContent = "⏳ Generating…"; btn.disabled = true;
+    out.style.display = "none";
+
+    const decisions = document.getElementById("debrief-decisions").value.trim();
+    const actions   = document.getElementById("debrief-actions").value.trim();
+    const title     = document.getElementById("meeting-title").value || "Untitled Meeting";
+    const attendeeNames = attendees.map(a => `${a.name || "Unnamed"} (${a.role})`).join(", ");
+    const cost = (totalPerSecond() * elapsedSeconds).toFixed(2);
+
+    const prompt = `You are a precise meeting summarizer. Return STRICT JSON with three keys: "summary", "decisions", "actions".
+
+CRITICAL RULES — violating any of these is a failure:
+• Preserve every specific name, person, location, building number, deadline, and assignment exactly as written in the raw notes. Do NOT generalize.
+• Use • as bullet character. No markdown bold/italic. No code fences.
+• "summary": concise bullets covering what was discussed and decided.
+• "decisions": one bullet per decision, preserving owners and specifics (who decided what, which location, which system, by when).
+• "actions": one bullet per task, format as "Owner: task (deadline if given)". Empty string if no actions.
+• Return ONLY the JSON object, nothing else.
+
+Meeting: ${title}
+Duration: ${fmtTime(elapsedSeconds)}
+Cost: $${cost}
+Attendees: ${attendeeNames}
+Decisions (raw notes): ${decisions || "None recorded"}
+Action items (raw notes): ${actions || "None recorded"}`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1024, messages: [{ role: "user", content: prompt }] }),
+      });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+      const data = await res.json();
+      const raw = data.content?.[0]?.text || "";
+      let summary = raw;
+      try {
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+        summary = parsed.summary || raw;
+        if (parsed.decisions) document.getElementById("debrief-decisions").value = parsed.decisions;
+        if (parsed.actions)   document.getElementById("debrief-actions").value   = parsed.actions;
+      } catch (_) {}
+      currentDebrief.aiSummary = summary;
+      out.textContent = summary;
+      out.style.display = "block";
+      btn.textContent = "✓ Done";
+    } catch (err) {
+      showToast("❌ AI error: " + err.message);
+      btn.textContent = "Generate";
+      btn.disabled = false;
+    }
+  });
+
   document.getElementById("debrief-save").addEventListener("click", async () => {
     currentDebrief.decisions = document.getElementById("debrief-decisions").value.trim();
     currentDebrief.actions   = document.getElementById("debrief-actions").value.trim();
     document.getElementById("debrief-modal").style.display = "none";
     await saveMeeting(currentDebrief);
-    showToast("✅ Meeting saved — use ✨ AI Summary on the card to generate the summary", 5000);
+    showToast("✅ Meeting saved!");
     resetAfterSave();
   });
 
@@ -3324,8 +3809,12 @@
     clearInterval(timerInterval);
     viewingPastMeeting = null; // Clear past meeting view
     elapsedSeconds = 0; running = false; paused = false;
+    costSamples = [];
+    lastCostSampleAt = 0;
+    stopBurnTrendAnimation();
     attendees = [];
     document.getElementById("meeting-title").value = "";
+    document.getElementById("burn-trend-card").classList.add("hidden");
     const di = document.getElementById("duration-input");
     if (di) di.value = "";
     overtimeToastFired = false;
@@ -3355,8 +3844,13 @@
       attendees: attendees.map(a => ({ ...a })),
     };
     viewingPastMeeting = null; // Clear past meeting view after save
+    running = false;
+    paused = false;
+    costSamples = [];
+    lastCostSampleAt = 0;
+    stopBurnTrendAnimation();
     elapsedSeconds = 0;
-    document.title = "MeetingMeter"; // reset tab title
+    document.title = "AgendaBurn"; // reset tab title
     document.getElementById("timer-display").textContent = "00:00:00";
     document.getElementById("start-btn").classList.remove("hidden");
     document.getElementById("pause-btn").classList.add("hidden");
@@ -3462,11 +3956,10 @@
       if (d && (d.rating || d.decisions || d.actions || d.aiSummary)) {
         const ratingClass = d.rating || "";
         const ratingText = d.rating ? RATING_LABEL[d.rating] : "";
-        const summaryText = d.aiSummary || d.decisions || "";
+        const previewHtml = buildHistoryDebriefPreview(d);
         debriefHtml = `<div class="history-outcome">
           ${ratingText ? `<div class="history-outcome-rating ${esc(ratingClass)}">${esc(ratingText)}</div>` : ""}
-          ${summaryText ? `<div style="white-space:pre-line">${esc(summaryText)}</div>` : ""}
-          ${d.actions && !d.aiSummary ? `<div style="margin-top:6px;color:var(--accent)">→ ${esc(d.actions)}</div>` : ""}
+          ${previewHtml}
         </div>`;
       }
 
@@ -3487,7 +3980,7 @@
         <div class="history-actions">
           <button class="history-action-btn email-btn" title="${hasEmails ? "Email debrief to attendees" : "Add attendee emails to send debrief"}" style="${!hasEmails ? "opacity:0.5;" : ""}">📧 Email${!hasEmails ? " +" : ""}</button>
           ${hasDebrief ? `<button class="history-action-btn expand-btn" title="View full debrief">📋 View Debrief</button>` : ""}
-          ${!d?.aiSummary ? `<button class="history-action-btn ai-btn" title="Generate AI summary">✨ AI Summary</button>` : ""}
+          <button class="history-action-btn ai-btn" title="${d?.aiSummary ? 'Regenerate AI summary' : 'Generate AI summary'}">✨ AI Summary</button>
           <button class="history-action-btn slack-card-btn" title="Post to Slack">💬 Slack</button>
           <button class="history-action-btn share-btn" title="Copy shareable link">🔗 Share</button>
           <button class="history-action-btn reload-btn" title="Reload these attendees">🔁 Reuse</button>
@@ -4088,7 +4581,7 @@ james@client.com"
       <div class="total">${sym}${cost.toFixed(2)} <span style="font-size:18px;color:#666">${cur}</span></div>
       <table><thead><tr><th>Name</th><th>Role</th><th>Rate</th><th>Cost</th></tr></thead>
       <tbody>${rows}</tbody></table>
-      <div class="footer">Generated by MeetingMeter · ${new Date().toLocaleString()}</div>
+      <div class="footer">Generated by AgendaBurn · ${new Date().toLocaleString()}</div>
       </body></html>`;
       const w = window.open("", "_blank");
       w.document.write(html); w.document.close();
@@ -4115,7 +4608,7 @@ james@client.com"
   let DEMO_MODE = localStorage.getItem("mm_demo_mode") === "true" || new URLSearchParams(window.location.search).has("demo");
 
   if (DEMO_MODE) {
-    console.log("🎬 MeetingMeter running in DEMO MODE (no backend required)");
+    console.log("🎬 AgendaBurn running in DEMO MODE (no backend required)");
     document.body.style.setProperty("--accent", "#fbbf24"); // change accent to gold to indicate demo
   }
 
@@ -4127,7 +4620,7 @@ Here's the debrief for our meeting: {{title}}
 
 {{summary}}
 —
-Sent via MeetingMeter · meetingmeter.tech`;
+Sent via AgendaBurn · agendaburn.com`;
 
   let integrationsConfig = {
     slack_webhook: "",
@@ -4248,9 +4741,17 @@ Sent via MeetingMeter · meetingmeter.tech`;
   });
 
   // Sign Out
-  document.getElementById("sign-out-btn").addEventListener("click", () => {
+  document.getElementById("sign-out-btn").addEventListener("click", async () => {
     if (confirm("Are you sure? You'll be signed out (integrations will be saved for next login).")) {
-      // Preserve these keys across sign-out — user preferences, not session data
+      // Revoke session token server-side (best-effort)
+      const token = localStorage.getItem("mm_session_token");
+      if (token) {
+        fetch("/api/auth/sign-out", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + token }
+        }).catch(() => {});
+      }
+      // Preserve user preferences across sign-out
       const keep = ["mm_integrations", "mm_salary_presets", "mm_user_roles", "mm_currency"];
       const preserved = {};
       keep.forEach(k => { const v = localStorage.getItem(k); if (v) preserved[k] = v; });
@@ -4799,16 +5300,18 @@ Sent via MeetingMeter · meetingmeter.tech`;
     const picker = document.getElementById(pickerId);
     const btn = document.getElementById(btnId);
 
-    if (picker.classList.contains("open")) { picker.classList.remove("open"); return; }
+    if (picker.classList.contains("open")) { picker.classList.remove("open"); setMenuCardActive(false); return; }
 
-    // Close the other calendar dropdown so only one opens at a time
-    ["calendar-dropdown", "apple-dropdown"].forEach(id => {
+    // Close all other pickers so only one opens at a time
+    ["calendar-dropdown", "apple-dropdown", "template-dropdown"].forEach(id => {
       if (id !== pickerId) document.getElementById(id)?.classList.remove("open");
     });
+    setMenuCardActive(false);
 
     const list = document.getElementById(listId);
     list.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center;">Loading events…</div>';
     picker.classList.add("open");
+    setMenuCardActive(true);
     positionDropdown(picker, btn);
     btn.disabled = true;
 
@@ -4833,10 +5336,12 @@ Sent via MeetingMeter · meetingmeter.tech`;
                         : start.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
           const fmt = (d) => d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
           const displayTitle = (event.title || "Untitled").trim();
-          item.textContent = `${displayTitle} — ${dayLabel}, ${fmt(start)} – ${fmt(end)}`;
+          item.innerHTML = `
+            <div class="calendar-event-name">${displayTitle}</div>
+            <div class="calendar-event-meta">${dayLabel} · ${fmt(start)} – ${fmt(end)}</div>`;
           const doSelect = (ev) => {
             if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-            console.log("[MeetingMeter] Calendar event clicked:", event);
+            console.log("[AgendaBurn] Calendar event clicked:", event);
             selectCalendarEvent(event);
           };
           // Use mousedown so focus/blur interference can't swallow the click
@@ -4875,6 +5380,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
     // Close dropdowns FIRST so the user immediately sees the form update
     document.getElementById("calendar-dropdown")?.classList.remove("open");
     document.getElementById("apple-dropdown")?.classList.remove("open");
+    setMenuCardActive(false);
 
     const title = (event && (event.title || event.summary)) || "Untitled";
     const titleEl = document.getElementById("meeting-title");
@@ -5090,18 +5596,39 @@ Sent via MeetingMeter · meetingmeter.tech`;
     });
   }
 
-  // Helper: position a fixed-positioned dropdown below its trigger button
+  // ── Portal: move dropdowns to <body> so they escape backdrop-filter stacking contexts ──
+  // backdrop-filter on .setup-card creates a new stacking context that traps
+  // position:fixed children, preventing them from appearing above other panels.
+  // Appending to body puts them in the root stacking context where z-index works globally.
+  (function portaliseDropdowns() {
+    ['template-dropdown', 'calendar-dropdown', 'apple-dropdown'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.parentElement !== document.body) document.body.appendChild(el);
+    });
+  })();
+
+  // Helper: position a picker dropdown directly under its trigger button
   function positionDropdown(dropdown, button) {
     const rect = button.getBoundingClientRect();
     const vw = window.innerWidth;
+    const vh = window.innerHeight;
     const ddWidth = Math.max(dropdown.offsetWidth || 240, 240);
+    const ddHeight = Math.min(dropdown.offsetHeight || 320, Math.floor(vh * 0.7));
     let left = rect.left;
-    // If dropdown would overflow right edge, anchor to right edge of button
-    if (left + ddWidth > vw - 8) {
-      left = Math.max(8, rect.right - ddWidth);
+    if (left + ddWidth > vw - 12) {
+      left = Math.max(12, rect.right - ddWidth);
     }
-    dropdown.style.top = (rect.bottom + 6) + "px";
+    let top = rect.bottom + 8;
+    if (top + ddHeight > vh - 12) {
+      top = Math.max(12, rect.top - ddHeight - 8);
+    }
     dropdown.style.left = left + "px";
+    dropdown.style.top = top + "px";
+  }
+
+  function setMenuCardActive(isActive) {
+    const menuCard = document.getElementById("template-picker")?.closest(".setup-card");
+    if (menuCard) menuCard.classList.toggle("menu-active", isActive);
   }
 
   // Toggle template dropdown
@@ -5110,18 +5637,25 @@ Sent via MeetingMeter · meetingmeter.tech`;
     const dd = document.getElementById("template-dropdown");
     const btn = document.getElementById("template-btn");
     const wasOpen = dd.classList.contains("open");
+    // Close all calendar dropdowns first
+    ["calendar-dropdown", "apple-dropdown"].forEach(id => {
+      document.getElementById(id)?.classList.remove("open");
+    });
     if (!wasOpen) {
       renderTemplateList();
       dd.classList.add("open");
+      setMenuCardActive(true);
       positionDropdown(dd, btn);
     } else {
       dd.classList.remove("open");
+      setMenuCardActive(false);
     }
   });
   document.addEventListener("click", () => {
     document.getElementById("template-dropdown").classList.remove("open");
     document.getElementById("calendar-dropdown").classList.remove("open");
     document.getElementById("apple-dropdown")?.classList.remove("open");
+    setMenuCardActive(false);
   });
   document.getElementById("template-dropdown").addEventListener("click", e => e.stopPropagation());
   document.getElementById("calendar-dropdown").addEventListener("click", e => e.stopPropagation());
@@ -5156,7 +5690,10 @@ Sent via MeetingMeter · meetingmeter.tech`;
 
   // ── Monthly Report ──────────────────────────────────────────
   function openMonthlyReport() {
-    const history = JSON.parse(localStorage.getItem("mm_history") || "[]");
+    const history = JSON.parse(localStorage.getItem("mm_history") || "[]").map((m, idx) => ({
+      ...m,
+      _historyIndex: idx,
+    }));
     if (history.length === 0) { showToast("⚠️ No meetings saved yet"); return; }
 
     const sym = currencySymbol();
@@ -5201,7 +5738,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
         <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px;">
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Most Expensive</div>
           <div style="font-size:18px;font-weight:800;color:#f87171;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sym}${toCurrentCurrency(mostExp.total_cost || 0).toFixed(2)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(mostExp.title || "Untitled")}</div>
+          <input class="report-editable-title" type="text" data-history-index="${mostExp._historyIndex}" title="Edit meeting title before sending or printing the report" aria-label="Edit most expensive meeting title" value="${esc(normaliseMeetingTitle(mostExp.title))}" style="font-size:11px;margin-top:2px;" />
         </div>
       </div>`;
 
@@ -5220,7 +5757,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
           return `<div class="report-meeting-row">
             <div style="flex:1;min-width:0;">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-                <span class="report-meeting-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(m.title || "Untitled")}</span>
+                <input class="report-meeting-title report-editable-title" type="text" data-history-index="${m._historyIndex}" title="Edit meeting title before sending or printing the report" aria-label="Edit meeting title" value="${esc(normaliseMeetingTitle(m.title))}" />
                 <span class="report-meeting-cost">${sym}${toCurrentCurrency(m.total_cost || 0).toFixed(2)}</span>
               </div>
               <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
@@ -5250,6 +5787,7 @@ Sent via MeetingMeter · meetingmeter.tech`;
     document.getElementById("report-sub").textContent =
       `Generated ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
     document.getElementById("report-content").innerHTML = summaryHtml + monthsHtml;
+    initMonthlyReportEditors();
     document.getElementById("report-modal").classList.add("open");
   }
 
@@ -5331,7 +5869,29 @@ Sent via MeetingMeter · meetingmeter.tech`;
     msg.style.color = "var(--muted)";
     msg.textContent = "";
 
-    const reportHtml = document.getElementById("report-content").innerHTML;
+    // Replace CSS variables with literal values — email clients don't have access to the app's stylesheet
+    const cssVarMap = {
+      "var(--muted)":    "#7290ab",
+      "var(--muted2)":   "#9cb1c6",
+      "var(--cyan)":     "#78d6ff",
+      "var(--amber)":    "#f6b54d",
+      "var(--amber2)":   "#df9730",
+      "var(--amber3)":   "#ffd38f",
+      "var(--gold)":     "#ffd38f",
+      "var(--green)":    "#4ade80",
+      "var(--red)":      "#ff7d66",
+      "var(--text)":     "#111827",
+      "var(--text2)":    "#1f2937",
+      "var(--border)":   "#e5e7eb",
+      "var(--surface)":  "#f9fafb",
+      "var(--surface2)": "#f3f4f6",
+      "var(--accent)":   "#0891b2",
+      "var(--bg)":       "#ffffff",
+    };
+    let reportHtml = document.getElementById("report-content").innerHTML;
+    Object.entries(cssVarMap).forEach(([cssVar, hex]) => {
+      reportHtml = reportHtml.split(cssVar).join(hex);
+    });
     const reportText = document.getElementById("report-sub").textContent;
     const allRecipients = [toEmail, ...ccEmails];
 
@@ -5369,6 +5929,127 @@ Sent via MeetingMeter · meetingmeter.tech`;
     updateIntegrationStatus();
     updateSlackPostButtonVisibility();
   });
+
+  // ── In-app contact form (Formspree, no page navigation) ────
+  const inAppContactForm = document.getElementById("in-app-contact-form");
+  if (inAppContactForm) {
+    inAppContactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("in-app-contact-btn");
+      const msg = document.getElementById("in-app-contact-msg");
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      msg.textContent = "";
+      try {
+        const res = await fetch(inAppContactForm.action, {
+          method: "POST",
+          body: new FormData(inAppContactForm),
+          headers: { "Accept": "application/json" }
+        });
+        if (res.ok) {
+          msg.style.color = "var(--green)";
+          msg.textContent = "✓ Message sent — we'll get back to you within 24 hours.";
+          inAppContactForm.reset();
+          btn.textContent = "✓ Sent";
+        } else {
+          throw new Error("Server error");
+        }
+      } catch {
+        msg.style.color = "var(--red, #ff7d66)";
+        msg.textContent = "Failed to send — please email support@agendaburn.com directly.";
+        btn.disabled = false;
+        btn.textContent = "📧 Send Message";
+      }
+    });
+  }
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+</script>
+
+<!-- Email capture prompt — shown after first meeting to free users -->
+<div id="email-capture-prompt" role="dialog" aria-label="Newsletter signup">
+  <button class="ec-dismiss" id="ec-dismiss-btn" aria-label="Dismiss">×</button>
+  <h4>💡 Get smarter meeting tips</h4>
+  <p>Occasional emails on running leaner, cheaper meetings. No spam. Unsubscribe anytime.</p>
+  <div class="ec-row">
+    <input type="email" id="ec-email-input" placeholder="your@email.com" autocomplete="email">
+    <button class="ec-submit" id="ec-submit-btn">Subscribe</button>
+  </div>
+  <div class="ec-msg" id="ec-msg"></div>
+</div>
+
+<footer style="text-align:center;padding:24px 16px;font-size:11px;color:#475569;border-top:1px solid #1e2d3d;margin-top:32px;">
+  © 2026 AgendaBurn &nbsp;·&nbsp;
+  <a href="/privacy" style="color:#475569;text-decoration:none;" target="_blank">Privacy Policy</a> &nbsp;·&nbsp;
+  <a href="/terms"   style="color:#475569;text-decoration:none;" target="_blank">Terms of Service</a>
+</footer>
+
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-MqlkxDRdqe-po4_g79NkH.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+
+<script>
+  // ── Email capture prompt ────────────────────────────────────────────────────
+  (function() {
+    const PROMPT_KEY = "mm_email_prompted";
+    const prompt     = document.getElementById("email-capture-prompt");
+    const dismissBtn = document.getElementById("ec-dismiss-btn");
+    const submitBtn  = document.getElementById("ec-submit-btn");
+    const emailInput = document.getElementById("ec-email-input");
+    const msgEl      = document.getElementById("ec-msg");
+
+    function shouldShow() {
+      if (localStorage.getItem(PROMPT_KEY)) return false;
+      if (localStorage.getItem("mm_session_token")) return false;
+      return true;
+    }
+
+    function dismiss() {
+      localStorage.setItem(PROMPT_KEY, "dismissed");
+      prompt.classList.remove("visible");
+    }
+
+    // Called after first meeting stops
+    window.showEmailPrompt = function() {
+      if (!shouldShow()) return;
+      setTimeout(() => prompt.classList.add("visible"), 1800);
+    };
+
+    dismissBtn.addEventListener("click", dismiss);
+
+    submitBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim().toLowerCase();
+      if (!email || !email.includes("@")) {
+        msgEl.style.color = "#ef4444";
+        msgEl.textContent = "Please enter a valid email.";
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = "…";
+      try {
+        await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+      } catch (_) {}
+      localStorage.setItem(PROMPT_KEY, "subscribed");
+      msgEl.style.color = "#22c55e";
+      msgEl.textContent = "✅ You're in! Thanks for subscribing.";
+      setTimeout(dismiss, 2200);
+    });
+
+    emailInput.addEventListener("keydown", e => { if (e.key === "Enter") submitBtn.click(); });
+  })();
 </script>
 </body>
 </html>
