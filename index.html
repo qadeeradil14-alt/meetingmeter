@@ -222,7 +222,7 @@
     }
 
     .hero-copy {
-      max-width: 580px;
+      max-width: 560px;
     }
 
     .hero-label {
@@ -285,7 +285,7 @@
 
     .hero-actions {
       display: flex; align-items: center; gap: 14px;
-      flex-wrap: wrap; justify-content: center;
+      flex-wrap: wrap; justify-content: flex-start;
       margin-bottom: 20px;
     }
 
@@ -324,19 +324,23 @@
     }
 
     .hero-proof-chip {
-      padding: 14px;
-      border-radius: 18px;
+      padding: 16px 15px;
+      border-radius: 20px;
       background:
         linear-gradient(180deg, rgba(120,214,255,0.06), rgba(255,255,255,0.015)),
         rgba(12, 20, 30, 0.76);
       border: 1px solid rgba(116,187,255,0.12);
       box-shadow: 0 14px 28px rgba(0,0,0,0.16);
+      min-height: 96px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .hero-proof-chip strong {
       display: block;
-      font-size: 17px;
-      line-height: 1;
+      font-size: 15px;
+      line-height: 1.1;
       color: var(--text);
       margin-bottom: 8px;
       letter-spacing: -0.03em;
@@ -350,12 +354,12 @@
     }
 
     .hero-ai-banner {
-      margin-top: 22px;
+      margin-top: 18px;
       display: grid;
       grid-template-columns: auto 1fr auto;
       gap: 16px;
       align-items: center;
-      padding: 16px 18px;
+      padding: 15px 18px;
       border-radius: 22px;
       background:
         linear-gradient(135deg, rgba(246,181,77,0.1), rgba(120,214,255,0.08)),
@@ -426,9 +430,9 @@
     .preview-shell {
       position: relative;
       width: 100%;
-      max-width: 760px;
+      max-width: 736px;
       margin-left: auto;
-      padding: 18px;
+      padding: 16px;
       border-radius: 28px;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
@@ -501,7 +505,7 @@
 
     .preview-card {
       padding: 18px;
-      min-height: 290px;
+      min-height: 272px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -592,7 +596,8 @@
 
     .preview-sidecard h3,
     .preview-list h3 {
-      font-size: 14px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
       color: var(--text);
       margin-bottom: 10px;
     }
@@ -753,7 +758,7 @@
 
     .counterfactual-card {
       margin-top: 16px;
-      padding: 16px;
+      padding: 15px;
       border-radius: 18px;
       background:
         linear-gradient(135deg, rgba(74,222,128,0.1), rgba(120,214,255,0.06)),
@@ -783,7 +788,7 @@
     }
 
     .counterfactual-headline {
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.55;
       color: var(--text2);
       margin-bottom: 12px;
@@ -823,7 +828,7 @@
 
     .ai-snapshot {
       margin-top: 14px;
-      padding: 16px;
+      padding: 15px;
       border-radius: 18px;
       background:
         linear-gradient(135deg, rgba(246,181,77,0.08), rgba(120,214,255,0.06)),
@@ -1167,14 +1172,14 @@
     /* Feature grid */
     .feature-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
     }
     .feature-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 32px 32px 28px;
+      padding: 28px 28px 24px;
       transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
       box-shadow: 0 16px 40px rgba(0,0,0,0.18);
     }
@@ -1204,14 +1209,16 @@
     /* ══════════════════ FIELD REPORTS (TESTIMONIALS) ══════════════════ */
     .proof-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
     }
     .proof-card {
-      background: var(--surface);
+      background:
+        linear-gradient(180deg, rgba(120,214,255,0.04), rgba(255,255,255,0.01)),
+        var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 32px;
+      padding: 28px;
       box-shadow: 0 16px 40px rgba(0,0,0,0.18);
     }
     .proof-label {
@@ -1228,22 +1235,12 @@
     }
     .proof-text {
       font-size: 15px; line-height: 1.72;
-      color: var(--text2); margin-bottom: 24px; font-weight: 400;
+      color: var(--text2); margin-bottom: 16px; font-weight: 400;
     }
-    .proof-author { display: flex; align-items: center; gap: 12px; }
-    .proof-av {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--surface2); border: 0.5px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: var(--amber);
-      font-family: var(--mono); flex-shrink: 0;
-    }
-    .proof-name { font-size: 14px; font-weight: 600; color: var(--text); }
-    .proof-role { font-size: 13px; color: var(--muted); margin-top: 2px; }
     .proof-savings {
       font-family: var(--mono);
       font-size: 11px; color: var(--amber3);
-      margin-top: 10px; font-weight: 600; letter-spacing: 0.04em;
+      margin-top: 0; font-weight: 600; letter-spacing: 0.04em;
     }
 
     /* ══════════════════ PRICING ══════════════════ */
@@ -1581,6 +1578,7 @@
       .hero-inner { padding: 14px; gap: 22px; }
       .hero-counter { font-size: clamp(42px, 13vw, 72px); }
       .hero-actions { gap: 10px; }
+      .hero-proof-row { grid-template-columns: 1fr; }
       .hero-ai-banner { padding: 14px; gap: 12px; }
       .preview-shell { padding: 14px; border-radius: 22px; }
       .preview-statbar { grid-template-columns: 1fr; }
@@ -1646,9 +1644,18 @@
       <p class="hero-note"><strong>Free forever</strong> for up to 3 attendees · No credit card required</p>
 
       <div class="hero-proof-row fi">
-        <div class="hero-proof-chip">Live meeting cost</div>
-        <div class="hero-proof-chip">AI debrief in seconds</div>
-        <div class="hero-proof-chip">Slack, email, PDF</div>
+        <div class="hero-proof-chip">
+          <strong>Live cost</strong>
+          <span>Make the room feel the burn while the meeting is still happening.</span>
+        </div>
+        <div class="hero-proof-chip">
+          <strong>Instant debrief</strong>
+          <span>Turn notes into decisions and actions without cleanup work after.</span>
+        </div>
+        <div class="hero-proof-chip">
+          <strong>Share fast</strong>
+          <span>Push the result to Slack, email, PDF, or CSV in one move.</span>
+        </div>
       </div>
 
       <div class="hero-ai-banner fi">
@@ -1850,22 +1857,7 @@
       <div class="feature-card fi">
         <div class="fc-tag">Core</div>
         <div class="fc-title">Role Templates</div>
-        <div class="fc-desc">Pre-built salary rates from Intern to C-Level. Add custom job titles and rates — they're remembered between sessions.</div>
-      </div>
-      <div class="feature-card fi">
-        <div class="fc-tag">Core</div>
-        <div class="fc-title">Was It Worth It?</div>
-        <div class="fc-desc">Rate every meeting as Productive, Mixed, or Wasted. Track patterns over time and find which recurring meetings aren't pulling their weight.</div>
-      </div>
-      <div class="feature-card fi">
-        <div class="fc-tag">Core</div>
-        <div class="fc-title">100% Private</div>
-        <div class="fc-desc">No account required on the free plan. Salary data lives only in your browser — never leaves your device or touches a server.</div>
-      </div>
-      <div class="feature-card fi">
-        <div class="fc-tag">Core</div>
-        <div class="fc-title">Meeting History</div>
-        <div class="fc-desc">Every saved meeting is logged with a full cost breakdown. Compare sessions over time and spot your most expensive recurring meetings.</div>
+        <div class="fc-desc">Pre-built rates make setup fast, and custom titles stick for the next meeting too.</div>
       </div>
       <div class="feature-card fi">
         <div class="fc-tag"><span class="pro-pill">Pro</span></div>
