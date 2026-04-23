@@ -2264,6 +2264,11 @@
   renderAiSnapshot(0);
   renderDnaState(0);
 
+  setInterval(() => {
+    previewTrendPhase += 0.12;
+    renderPreviewChart();
+  }, 12000);
+
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
