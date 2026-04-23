@@ -1,7 +1,7 @@
 {
   "version": 2,
   "builds": [
-    { "src": "meetingmeter.html",           "use": "@vercel/static" },
+    { "src": "agendaburn.html",              "use": "@vercel/static" },
     { "src": "index.html",                  "use": "@vercel/static" },
     { "src": "google6511461603d34f80.html", "use": "@vercel/static" },
     { "src": "privacy.html",                "use": "@vercel/static" },
@@ -58,8 +58,8 @@
     { "source": "/privacy",                    "destination": "/privacy.html" },
     { "source": "/terms",                      "destination": "/terms.html" },
     { "source": "/landing",                    "destination": "/" },
-    { "source": "/app",                        "destination": "/meetingmeter.html" },
-    { "source": "/staging",                    "destination": "/meetingmeter.html" },
+    { "source": "/app",                        "destination": "/agendaburn.html" },
+    { "source": "/staging",                    "destination": "/agendaburn.html" },
     { "source": "/",                           "destination": "/index.html" }
   ],
   "headers": [

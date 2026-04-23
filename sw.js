@@ -1,8 +1,8 @@
-const CACHE = "agendaburn-v2";
+const CACHE = "agendaburn-v3";
 const SHELL = [
   "/",
   "/app",
-  "/meetingmeter.html",
+  "/agendaburn.html",
   "/manifest.json",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
