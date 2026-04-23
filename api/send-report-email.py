@@ -97,7 +97,7 @@ class handler(BaseHTTPRequestHandler):
         body = json.dumps(data).encode()
         self.send_response(status)
         origin = self.headers.get("Origin", "")
-        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        allowed = origin if origin in ALLOWED_ORIGINS else "https://agendaburn.com"
         self.send_header("Access-Control-Allow-Origin", allowed)
         self.send_header("Vary", "Origin")
         self.send_header("Content-Type", "application/json")

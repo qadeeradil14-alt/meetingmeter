@@ -1,6 +1,29 @@
 from http.server import BaseHTTPRequestHandler
 
 ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
+
+# Domains allowed as calendar ICS sources (SSRF protection)
+ALLOWED_CALENDAR_HOSTS = {
+    "calendar.google.com",
+    "www.google.com",
+    "p01-caldav.icloud.com",
+    "p02-caldav.icloud.com",
+    "p03-caldav.icloud.com",
+    "p04-caldav.icloud.com",
+    "p05-caldav.icloud.com",
+    "p06-caldav.icloud.com",
+    "p07-caldav.icloud.com",
+    "p08-caldav.icloud.com",
+    "p09-caldav.icloud.com",
+    "caldav.icloud.com",
+    "outlook.live.com",
+    "outlook.office365.com",
+    "outlook.office.com",
+    "ical.notion.so",
+    "teamup.com",
+    "www.teamup.com",
+}
+
 import json
 import time
 import datetime
@@ -19,7 +42,7 @@ class handler(BaseHTTPRequestHandler):
 
     def _cors(self):
         origin = self.headers.get("Origin", "")
-        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        allowed = origin if origin in ALLOWED_ORIGINS else "https://agendaburn.com"
         self.send_header("Access-Control-Allow-Origin", allowed)
         self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
@@ -41,6 +64,28 @@ class handler(BaseHTTPRequestHandler):
 
         # webcal:// is identical to https:// — just a protocol hint for calendar apps
         ics_url = ics_url.replace("webcal://", "https://").replace("webcal+ssl://", "https://")
+
+        # SSRF protection: only allow https:// and trusted calendar domains
+        try:
+            parsed_url = urllib.parse.urlparse(ics_url)
+            if parsed_url.scheme != "https":
+                self._json({"ok": False, "error": "Only HTTPS calendar URLs are supported"}, 400)
+                return
+            hostname = parsed_url.hostname or ""
+            # Allow exact matches and Google's ical subdomains (e.g. user@group.calendar.google.com)
+            allowed = (
+                hostname in ALLOWED_CALENDAR_HOSTS
+                or hostname.endswith(".google.com")
+                or hostname.endswith(".icloud.com")
+                or hostname.endswith(".outlook.com")
+                or hostname.endswith(".office365.com")
+            )
+            if not allowed:
+                self._json({"ok": False, "error": "Calendar URL domain not permitted"}, 400)
+                return
+        except Exception:
+            self._json({"ok": False, "error": "Invalid calendar URL"}, 400)
+            return
 
         try:
             req = urllib.request.Request(ics_url)

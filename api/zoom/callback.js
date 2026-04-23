@@ -1,19 +1,28 @@
 // Handles Zoom OAuth callback — exchanges code for token, redirects to app
 export default async function handler(req, res) {
-  const { code, error } = req.query;
+  const { code, error, state } = req.query;
 
   if (error) {
     return res.redirect(`/app?zoom_error=${encodeURIComponent(error)}`);
   }
 
+  // CSRF: validate state parameter against the cookie set in auth.js
+  const cookieHeader = req.headers.cookie || "";
+  const cookieState = cookieHeader
+    .split(";")
+    .map(c => c.trim())
+    .find(c => c.startsWith("zoom_oauth_state="))
+    ?.split("=")[1] || "";
+
+  if (!state || !cookieState || state !== cookieState) {
+    return res.redirect(`/app?zoom_error=${encodeURIComponent("Invalid OAuth state — possible CSRF. Please try connecting again.")}`);
+  }
+
+  // Clear the state cookie now that it's been validated
+  res.setHeader("Set-Cookie", "zoom_oauth_state=; Max-Age=0; Path=/api/zoom; HttpOnly; Secure; SameSite=Lax");
+
   if (!code) {
-    // Debug: show everything received so we can diagnose
-    return res.status(400).json({
-      error: "No authorization code received",
-      received_query: req.query,
-      received_url: req.url,
-      host: req.headers["x-forwarded-host"] || req.headers.host,
-    });
+    return res.redirect(`/app?zoom_error=${encodeURIComponent("No authorization code received")}`);
   }
 
   const clientId     = (process.env.ZOOM_CLIENT_ID || "").trim();
