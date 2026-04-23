@@ -3569,13 +3569,13 @@
   }
 
   // ── Build email summary block ─────────────────────────────
-  // Always includes AI summary + decisions + actions when present,
-  // with markdown stripped for clean plain-text rendering
+  // Labels and order match every other surface (history card, debrief modal, overlay).
+  // Bullets are preserved; only markdown bold/italic/headers are stripped.
   function buildEmailSummary(aiSummary, decisions, actions) {
     const parts = [];
-    if (aiSummary)  parts.push(`AI SUMMARY:\n${stripMarkdown(aiSummary)}`);
-    if (decisions)  parts.push(`DECISIONS MADE:\n${stripMarkdown(decisions)}`);
-    if (actions)    parts.push(`ACTION ITEMS:\n${stripMarkdown(actions)}`);
+    if (aiSummary)  parts.push(`SUMMARY\n${ stripMarkdown(aiSummary) }`);
+    if (decisions)  parts.push(`DECISIONS\n${ stripMarkdown(decisions) }`);
+    if (actions)    parts.push(`ACTION ITEMS\n${ stripMarkdown(actions) }`);
     return parts.join("\n\n") || "No notes recorded.";
   }
 
@@ -4203,11 +4203,17 @@ Action items (raw notes): ${actions || "None recorded"}`;
           try {
             const d = item.debrief || {};
             // Only use AI-generated summary — not raw user input
-            const aiSummary = d.aiSummary || "";
+            const aiSummary  = d.aiSummary  || "";
+            const decisions  = d.decisions  || "";
+            const actions    = d.actions    || "";
             const ratingText = d.rating ? `\n*Rating:* ${RATING_LABEL[d.rating]}` : "";
-            const actions = d.actions ? `\n*Action Items:* ${d.actions}` : "";
             const attendeeList = item.attendees.map(a => `• ${a.name || "Unnamed"} (${a.role})`).join("\n");
-            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${fmtMoneyPlain(item.total_cost)}  |  *Duration:* ${fmtTime(item.duration_seconds)}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${aiSummary ? `\n\n*AI Summary:*\n${aiSummary}` : ""}${actions}`;
+            const summaryBlock = [
+              aiSummary ? `*Summary:*\n${aiSummary}` : "",
+              decisions ? `*Decisions:*\n${decisions}` : "",
+              actions   ? `*Action Items:*\n${actions}` : "",
+            ].filter(Boolean).join("\n\n");
+            const message = `📊 *Meeting Cost Summary: ${item.title}*\n*Cost:* ${fmtMoneyPlain(item.total_cost)}  |  *Duration:* ${fmtTime(item.duration_seconds)}  |  *Attendees:* ${item.attendees.length}${ratingText}\n${attendeeList}${summaryBlock ? `\n\n${summaryBlock}` : ""}`;
             const res = await fetch("/api/slack-notify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -4376,9 +4382,9 @@ Action items (raw notes): ${d.actions || "None recorded"}`;
               </div>
               <div style="font-size:12px;color:var(--muted)">${new Date(item.timestamp*1000).toLocaleString()} · ${fmtTime(item.duration_seconds)} · ${fmtMoneyPlain(item.total_cost)}</div>
               ${d.rating ? `<div class="history-outcome-rating ${esc(d.rating)}" style="font-size:11px;font-weight:700;text-transform:uppercase">${{ productive:"✅ Productive", mixed:"🤔 Mixed", wasted:"❌ Time Wasted" }[d.rating]}</div>` : ""}
-              ${d.decisions ? `<div><div class="section-label">Decisions Made</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.decisions)}</div></div>` : ""}
-              ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6">${esc(d.actions)}</div></div>` : ""}
-              ${d.aiSummary ? `<div><div class="section-label">AI Summary</div><div class="ai-summary-box" style="margin-top:6px">${esc(d.aiSummary)}</div></div>` : ""}
+              ${d.aiSummary ? `<div><div class="section-label">Summary</div><div style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-wrap">${esc(d.aiSummary)}</div></div>` : ""}
+              ${d.decisions ? `<div><div class="section-label">Decisions</div><div style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-wrap">${esc(d.decisions)}</div></div>` : ""}
+              ${d.actions   ? `<div><div class="section-label">Action Items</div><div style="font-size:13px;margin-top:6px;line-height:1.6;white-space:pre-wrap">${esc(d.actions)}</div></div>` : ""}
             </div>`;
           document.body.appendChild(overlay);
           overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
