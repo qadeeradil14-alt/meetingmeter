@@ -754,11 +754,24 @@
       fill: var(--amber);
       filter: drop-shadow(0 0 8px rgba(246,181,77,0.35));
       transition: cx 0.8s ease, cy 0.8s ease, r 0.35s ease, opacity 0.35s ease;
+      animation: chartDotPulse 3.6s ease-in-out infinite;
+      transform-origin: center;
     }
 
     .preview-chart-dot.is-live {
       r: 5.4;
       opacity: 0.98;
+    }
+
+    @keyframes chartDotPulse {
+      0%, 100% {
+        opacity: 0.92;
+        filter: drop-shadow(0 0 8px rgba(246,181,77,0.28));
+      }
+      50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 14px rgba(246,181,77,0.42));
+      }
     }
 
     .preview-chart-labels {
@@ -2300,7 +2313,7 @@
   setInterval(() => {
     previewTrendPhase += 0.12;
     renderPreviewChart();
-  }, 12000);
+  }, 4000);
 
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
