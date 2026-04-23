@@ -245,22 +245,44 @@
       50% { opacity: 0.46; transform: scale(0.9); }
     }
 
-    .hero-counter {
-      font-family: var(--mono);
-      font-size: clamp(72px, 11vw, 128px);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      color: var(--amber);
-      font-variant-numeric: tabular-nums;
-      margin-bottom: 10px;
-      text-shadow: 0 0 40px rgba(246,181,77,0.12);
+    .hero-context {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 34px;
+      max-width: 560px;
     }
 
-    .hero-counter-meta {
-      font-size: 13px; color: var(--muted);
-      font-family: var(--mono); letter-spacing: 0.06em;
-      margin-bottom: 44px;
+    .hero-context-card {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(12, 20, 30, 0.54);
+      border: 1px solid rgba(116,187,255,0.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+    }
+
+    .hero-context-label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .hero-context-value {
+      display: block;
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+
+    .hero-context-value.is-mono {
+      font-family: var(--mono);
+      color: var(--amber3);
+      font-size: 15px;
     }
 
     .hero-h1 {
@@ -1525,6 +1547,9 @@
       .hero-copy {
         max-width: 560px;
       }
+      .hero-context {
+        max-width: 100%;
+      }
       .preview-shell {
         padding: 16px;
       }
@@ -1550,6 +1575,7 @@
       .hero-inner { grid-template-columns: 1fr; padding: 24px; }
       .hero-copy { max-width: 100%; text-align: center; margin: 0 auto; }
       .hero-actions { justify-content: center; }
+      .hero-context { grid-template-columns: 1fr; }
       .hero-ai-banner { grid-template-columns: 1fr; text-align: left; }
       .stats-inner { grid-template-columns: 1fr 1fr; }
       .steps { grid-template-columns: 1fr 1fr; gap: 40px; }
@@ -1570,8 +1596,8 @@
       .section { padding: 64px 16px; }
       .hero::before { inset: 78px 8px 16px; border-radius: 26px; }
       .hero-inner { padding: 14px; gap: 22px; }
-      .hero-counter { font-size: clamp(42px, 13vw, 72px); }
       .hero-actions { gap: 10px; }
+      .hero-context { grid-template-columns: 1fr; }
       .hero-proof-row { grid-template-columns: 1fr; }
       .hero-ai-banner { padding: 14px; gap: 12px; }
       .preview-shell { padding: 14px; border-radius: 22px; }
@@ -1618,9 +1644,20 @@
         Live Burn Rate
       </div>
 
-      <div class="hero-counter" id="demo-cost">$0.00</div>
-
-      <div class="hero-counter-meta" id="demo-sub">4 attendees · 00:00 · Q2 Planning Session</div>
+      <div class="hero-context">
+        <div class="hero-context-card">
+          <span class="hero-context-label">Use case</span>
+          <span class="hero-context-value">Live meeting cost visibility</span>
+        </div>
+        <div class="hero-context-card">
+          <span class="hero-context-label">Output</span>
+          <span class="hero-context-value">Summary, decisions, and actions</span>
+        </div>
+        <div class="hero-context-card">
+          <span class="hero-context-label">Share</span>
+          <span class="hero-context-value is-mono">Slack · Email · PDF · CSV</span>
+        </div>
+      </div>
 
       <h1 class="hero-h1">
         This is what your meeting<br />is costing right now.
@@ -2227,13 +2264,9 @@
     dotEl.setAttribute("cy", lastPoint.y.toFixed(2));
   }
 
-  const total = costs.reduce((sum, value) => sum + value, 0);
   const previewTotal = previewCosts.reduce((sum, value) => sum + value, 0);
   const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
   const s = String(elapsed % 60).padStart(2, "0");
-  document.getElementById("demo-cost").textContent = `$${total.toFixed(2)}`;
-  document.getElementById("demo-sub").textContent =
-    `4 attendees · ${m}:${s} · Q2 Planning Session`;
   document.getElementById("preview-cost").textContent = `$${previewTotal.toFixed(2)}`;
   document.getElementById("preview-meta").textContent =
     `Q2 Planning Session · ${m}:${s} elapsed`;
