@@ -9,14 +9,17 @@
     { "src": "terms.html",                  "use": "@vercel/static" },
     { "src": "sitemap.xml",                 "use": "@vercel/static" },
     { "src": "robots.txt",                  "use": "@vercel/static" },
+    { "src": "manifest.json",               "use": "@vercel/static" },
+    { "src": "sw.js",                       "use": "@vercel/static" },
+    { "src": "icons/**",                    "use": "@vercel/static" },
     { "src": "api/*.py",                    "use": "@vercel/python" },
     { "src": "api/zoom/*.js",               "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/subscribe",              "dest": "/api/subscribe.py" },
+    { "src": "/api/auth/(.*)",              "dest": "/api/auth.py" },
     { "src": "/api/slack-notify",           "dest": "/api/slack-notify.py" },
     { "src": "/api/calendar-events",        "dest": "/api/calendar-events.py" },
-    { "src": "/api/verify-license",         "dest": "/api/verify-license.py" },
-    { "src": "/api/verify-subscription",    "dest": "/api/verify-subscription.py" },
     { "src": "/api/customer-portal",        "dest": "/api/customer-portal.py" },
     { "src": "/api/send-verification-code", "dest": "/api/send-verification-code.py" },
     { "src": "/api/verify-code",            "dest": "/api/verify-code.py" },
@@ -25,6 +28,9 @@
     { "src": "/api/zoom/auth",              "dest": "/api/zoom/auth.js" },
     { "src": "/api/zoom/meetings",          "dest": "/api/zoom/meetings.js" },
     { "src": "/api/zoom/registrants",       "dest": "/api/zoom/registrants.js" },
+    { "src": "/manifest.json",              "dest": "/manifest.json" },
+    { "src": "/sw.js",                      "dest": "/sw.js" },
+    { "src": "/icons/(.*)",                 "dest": "/icons/$1" },
     { "src": "/google6511461603d34f80.html","dest": "/google6511461603d34f80.html" },
     { "src": "/sitemap.xml",                "dest": "/sitemap.xml" },
     { "src": "/robots.txt",                 "dest": "/robots.txt" },
@@ -38,17 +44,47 @@
   "redirects": [
     {
       "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.agendaburn.com" }],
+      "destination": "https://agendaburn.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "meetingmeter.tech" }],
+      "destination": "https://agendaburn.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
       "has": [{ "type": "host", "value": "www.meetingmeter.tech" }],
-      "destination": "https://meetingmeter.tech/:path*",
+      "destination": "https://agendaburn.com/:path*",
       "permanent": true
     }
   ],
   "headers": [
     {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Content-Type",           "value": "application/javascript" },
+        { "key": "Service-Worker-Allowed", "value": "/" },
+        { "key": "Cache-Control",          "value": "no-cache" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Content-Type",           "value": "application/manifest+json" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" }
+        { "key": "X-Frame-Options",                     "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options",              "value": "nosniff" },
+        { "key": "Referrer-Policy",                     "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy",                  "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security",           "value": "max-age=63072000; includeSubDomains; preload" },
+        { "key": "Content-Security-Policy",             "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://formspree.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://formspree.io https://api.resend.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self';" }
       ]
     }
   ]

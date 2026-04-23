@@ -2918,7 +2918,15 @@
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      const data = await res.json();
+      const raw = await res.text();
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        msgEl.style.color = "var(--red)";
+        msgEl.textContent = `❌ Verification service error (${res.status}).`;
+        return;
+      }
 
       if (!data.ok) {
         msgEl.style.color = "var(--red)";
@@ -2952,7 +2960,7 @@
       msgEl.style.color = "var(--red)";
       msgEl.textContent = err.name === "AbortError"
         ? "❌ Request timed out."
-        : "❌ Verification error.";
+        : "❌ " + (err.message || "Verification error.");
     } finally {
       this.disabled = false;
       this.textContent = "Verify";
