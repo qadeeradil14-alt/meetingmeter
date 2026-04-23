@@ -3747,15 +3747,23 @@
     const attendeeNames = attendees.map(a => `${a.name || "Unnamed"} (${a.role})`).join(", ");
     const cost = (totalPerSecond() * elapsedSeconds).toFixed(2);
 
-    const prompt = `You are a precise meeting summarizer. Return STRICT JSON with three keys: "summary", "decisions", "actions".
+    const prompt = `You are a precise meeting summarizer. Return STRICT JSON with exactly three keys: "summary", "decisions", "actions".
 
-CRITICAL RULES — violating any of these is a failure:
-• Preserve every specific name, person, location, building number, deadline, and assignment exactly as written in the raw notes. Do NOT generalize.
-• Use • as bullet character. No markdown bold/italic. No code fences.
-• "summary": concise bullets covering what was discussed and decided.
-• "decisions": one bullet per decision, preserving owners and specifics (who decided what, which location, which system, by when).
-• "actions": one bullet per task, format as "Owner: task (deadline if given)". Empty string if no actions.
-• Return ONLY the JSON object, nothing else.
+ABSOLUTE RULES — every single one must be followed or the output is wrong:
+• EVERY action item bullet MUST start with the owner name exactly as it appears in the raw notes. Format: "Name: task description (deadline)". If no deadline, omit the parenthetical. NEVER omit the owner name.
+• NEVER merge two people's tasks into one bullet. Each person's each task gets its own bullet.
+• NEVER generalize. If the notes say "[Hewad] finalize the testing protocols by EOD Friday", output "Hewad: finalize the testing protocols (by EOD Friday)". Do not write "Team member to finalize protocols."
+• Copy deadlines verbatim from the raw notes — do not paraphrase or drop them.
+• Use • as bullet character. No markdown bold/italic. No code fences. No headers inside strings.
+• "summary": 3-6 bullets covering what was discussed. Include specifics — who said what, which systems/locations were mentioned, what was resolved.
+• "decisions": one bullet per discrete decision. Preserve who decided what, exact names, systems, locations, dates.
+• "actions": one bullet per individual task. If no actions were recorded, use empty string "".
+• Return ONLY the raw JSON object. No explanation, no code fences, no extra text.
+
+EXAMPLE of correct "actions" output:
+• Hewad: finalize the draft for the new testing protocols (by EOD Friday)
+• Adel: review the integration report and flag any issues (by Monday)
+• Khan: update the team on timeline changes (before next standup)
 
 Meeting: ${title}
 Duration: ${fmtTime(elapsedSeconds)}
@@ -3773,21 +3781,31 @@ Action items (raw notes): ${actions || "None recorded"}`;
           "anthropic-version": "2023-06-01",
           "anthropic-dangerous-direct-browser-access": "true",
         },
-        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1024, messages: [{ role: "user", content: prompt }] }),
+        body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 2048, messages: [{ role: "user", content: prompt }] }),
       });
       if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
       const data = await res.json();
       const raw = data.content?.[0]?.text || "";
-      let summary = raw;
+      let summary = raw, refinedDecisions = "", refinedActions = "";
       try {
         const jsonMatch = raw.match(/\{[\s\S]*\}/);
         const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
         summary = parsed.summary || raw;
-        if (parsed.decisions) document.getElementById("debrief-decisions").value = parsed.decisions;
-        if (parsed.actions)   document.getElementById("debrief-actions").value   = parsed.actions;
+        refinedDecisions = parsed.decisions || "";
+        refinedActions   = parsed.actions   || "";
+        if (refinedDecisions) document.getElementById("debrief-decisions").value = refinedDecisions;
+        if (refinedActions)   document.getElementById("debrief-actions").value   = refinedActions;
       } catch (_) {}
       currentDebrief.aiSummary = summary;
-      out.textContent = summary;
+
+      // Render a preview matching the history-card style (amber labels)
+      const labelStyle = "color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:3px;";
+      const sectionStyle = "margin-bottom:10px;line-height:1.6;font-size:13px;color:var(--text);white-space:pre-wrap;";
+      let previewHtml = "";
+      if (summary)          previewHtml += `<div style="${sectionStyle}"><span style="${labelStyle}">Summary</span>${summary.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`;
+      if (refinedDecisions) previewHtml += `<div style="${sectionStyle}"><span style="${labelStyle}">Decisions</span>${refinedDecisions.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`;
+      if (refinedActions)   previewHtml += `<div style="${sectionStyle}"><span style="${labelStyle}">Action Items</span>${refinedActions.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>`;
+      out.innerHTML = previewHtml || summary;
       out.style.display = "block";
       btn.textContent = "✓ Done";
     } catch (err) {
@@ -4252,15 +4270,23 @@ Action items (raw notes): ${actions || "None recorded"}`;
           try {
             const d = item.debrief || {};
             const attendeeNames = item.attendees.map(a => `${a.name} (${a.role})`).join(", ");
-            const prompt = `You are a precise meeting summarizer. Return STRICT JSON with three keys: "summary", "decisions", "actions".
+            const prompt = `You are a precise meeting summarizer. Return STRICT JSON with exactly three keys: "summary", "decisions", "actions".
 
-CRITICAL RULES — violating any of these is a failure:
-• Preserve every specific name, person, location, building number, deadline, and assignment exactly as written in the raw notes. Do NOT generalize (e.g. never write "members assigned to buildings" when the notes say "Hewad → Building 21, Rishad → Building 22").
-• Use • as bullet character. No markdown bold/italic. No code fences.
-• "summary": concise bullets covering what was discussed and decided. Include enough detail that someone not in the meeting understands exactly what happened.
-• "decisions": one bullet per decision, preserving owners and specifics (who decided what, which location, which system, by when).
-• "actions": one bullet per task, format as "Owner: task (deadline if given)". If no clear owner, write "Team:". Empty string if no actions.
-• Return ONLY the JSON object, nothing else.
+ABSOLUTE RULES — every single one must be followed or the output is wrong:
+• EVERY action item bullet MUST start with the owner name exactly as it appears in the raw notes. Format: "Name: task description (deadline)". If no deadline, omit the parenthetical. NEVER omit the owner name.
+• NEVER merge two people's tasks into one bullet. Each person's each task gets its own bullet.
+• NEVER generalize. If the notes say "[Hewad] finalize the testing protocols by EOD Friday", output "Hewad: finalize the testing protocols (by EOD Friday)". Do not write "Team member to finalize protocols."
+• Copy deadlines verbatim from the raw notes — do not paraphrase or drop them.
+• Use • as bullet character. No markdown bold/italic. No code fences. No headers inside strings.
+• "summary": 3-6 bullets covering what was discussed. Include specifics — who said what, which systems/locations were mentioned, what was resolved.
+• "decisions": one bullet per discrete decision. Preserve who decided what, exact names, systems, locations, dates.
+• "actions": one bullet per individual task. If no actions were recorded, use empty string "".
+• Return ONLY the raw JSON object. No explanation, no code fences, no extra text.
+
+EXAMPLE of correct "actions" output:
+• Hewad: finalize the draft for the new testing protocols (by EOD Friday)
+• Adel: review the integration report and flag any issues (by Monday)
+• Khan: update the team on timeline changes (before next standup)
 
 Meeting: ${item.title}
 Duration: ${fmtTime(item.duration_seconds)}
@@ -4277,7 +4303,7 @@ Action items (raw notes): ${d.actions || "None recorded"}`;
                 "anthropic-version": "2023-06-01",
                 "anthropic-dangerous-direct-browser-access": "true",
               },
-              body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1024, messages: [{ role: "user", content: prompt }] }),
+              body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 2048, messages: [{ role: "user", content: prompt }] }),
             });
 
             if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
