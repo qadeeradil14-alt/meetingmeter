@@ -2207,6 +2207,7 @@
   const previewChartMax = 110;
   let previewTrendPhase = 0.14;
   let previewChartDisplayValue = 86.99;
+  let previewFocusIndex = 0;
   const previewRatePerMinute = previewRps.reduce((sum, rate) => sum + rate, 0) * 60;
 
   function renderAiSnapshot(index) {
@@ -2303,14 +2304,12 @@
     document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
     document.getElementById("counterfactual-headline").innerHTML =
       `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
-    const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
-      value > arr[bestIndex] ? index : bestIndex, 0);
     previewRoles.forEach((_, i) => {
       const personCost = previewCosts[i];
       const row = document.getElementById(`preview-person-${i}`);
       const personCostEl = document.getElementById(`preview-person-cost-${i}`);
       if (personCostEl) personCostEl.textContent = `$${personCost.toFixed(2)}`;
-      if (row) row.classList.toggle("is-hot", i === hottestIndex);
+      if (row) row.classList.toggle("is-hot", i === previewFocusIndex);
     });
     [0, 1, 2].forEach((i) => {
       const stat = document.getElementById(`preview-stat-${i}`);
@@ -2326,15 +2325,16 @@
   renderDnaState(0);
 
   setInterval(() => {
-    previewTrendPhase += 0.12;
-    elapsed += 3;
-    previewChartDisplayValue += 0.36;
+    previewTrendPhase += 0.18;
+    elapsed += 4;
+    previewChartDisplayValue += 0.52;
+    previewFocusIndex = (previewFocusIndex + 1) % previewRoles.length;
     previewCosts.forEach((_, i) => {
-      previewCosts[i] += previewRps[i] * 3;
+      previewCosts[i] += previewRps[i] * 4;
     });
     renderPreviewSnapshot();
     renderPreviewChart();
-  }, 3000);
+  }, 1800);
 
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
