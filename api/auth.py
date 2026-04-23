@@ -216,24 +216,35 @@ def handle_sign_out() -> tuple[dict, int]:
 # ── Vercel handler class ───────────────────────────────────────────────────────
 
 class handler(BaseHTTPRequestHandler):
+    def _get_action(self):
+        """Resolve action from query param (set by vercel.json dest) or URL path."""
+        parsed = urllib.parse.urlparse(self.path)
+        qs     = urllib.parse.parse_qs(parsed.query)
+        action = qs.get("action", [""])[0]
+        if not action:
+            # Fallback: derive from path (e.g. /api/auth/sign-in → sign-in)
+            path = parsed.path.rstrip("/")
+            action = path.split("/")[-1]
+        return action
+
     def do_GET(self):
-        path = self.path.split("?")[0].rstrip("/")
-        if path == "/api/auth/profile":
+        action = self._get_action()
+        if action == "profile":
             data, status = handle_profile(self.headers.get("Authorization", ""))
         else:
             data, status = {"ok": False, "error": "Not found"}, 404
         self._json(data, status)
 
     def do_POST(self):
-        path   = self.path.split("?")[0].rstrip("/")
+        action = self._get_action()
         length = int(self.headers.get("Content-Length", 0))
         body   = json.loads(self.rfile.read(length) or b"{}")
 
-        if path == "/api/auth/sign-in":
+        if action == "sign-in":
             data, status = handle_sign_in(body)
-        elif path == "/api/auth/sign-out":
+        elif action == "sign-out":
             data, status = handle_sign_out()
-        elif path == "/api/auth/profile":
+        elif action == "profile":
             data, status = handle_profile(self.headers.get("Authorization", ""))
         else:
             data, status = {"ok": False, "error": "Not found"}, 404

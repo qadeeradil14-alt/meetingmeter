@@ -18,6 +18,8 @@ import hashlib
 import base64
 from http.server import BaseHTTPRequestHandler
 
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
+
 VERIFY_SECRET = os.environ.get("VERIFY_SECRET", "").strip()
 
 
@@ -88,7 +90,10 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin", allowed)
+        self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 

@@ -17,7 +17,9 @@
   ],
   "routes": [
     { "src": "/api/subscribe",              "dest": "/api/subscribe.py" },
-    { "src": "/api/auth/(.*)",              "dest": "/api/auth.py" },
+    { "src": "/api/auth/sign-in",           "dest": "/api/auth.py?action=sign-in" },
+    { "src": "/api/auth/profile",           "dest": "/api/auth.py?action=profile" },
+    { "src": "/api/auth/sign-out",          "dest": "/api/auth.py?action=sign-out" },
     { "src": "/api/slack-notify",           "dest": "/api/slack-notify.py" },
     { "src": "/api/calendar-events",        "dest": "/api/calendar-events.py" },
     { "src": "/api/customer-portal",        "dest": "/api/customer-portal.py" },

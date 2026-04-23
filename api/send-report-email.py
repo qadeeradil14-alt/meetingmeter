@@ -6,6 +6,8 @@ import urllib.request
 import urllib.error
 from http.server import BaseHTTPRequestHandler
 
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
+
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "").strip()
 FROM_EMAIL = os.environ.get("VERIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
 
@@ -30,24 +32,46 @@ class handler(BaseHTTPRequestHandler):
 
         # Send via Resend
         email_body = {
-            "from": f"MeetingMeter <{FROM_EMAIL}>",
+            "from": f"AgendaBurn <{FROM_EMAIL}>",
             "to": [email],
             **({"cc": cc} if cc else {}),
-            "subject": f"Your Monthly Meeting Report - {report_text}",
-            "html": f"""
-            <div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:900px;margin:0 auto;padding:24px;">
-              <h2 style="color:#7c6af7;margin-bottom:20px;">📊 Your Monthly Report</h2>
-              <p style="color:#666;margin-bottom:20px;">{report_text}</p>
-              <div style="background:#f9fafb;padding:20px;border-radius:8px;border:1px solid #e5e7eb;">
-                {report_html}
-              </div>
-              <p style="color:#999;font-size:12px;margin-top:20px;">
-                <a href="https://meetingmeter.tech/app" style="color:#7c6af7;text-decoration:none;">
-                  View more reports in MeetingMeter →
-                </a>
-              </p>
-            </div>
-            """,
+            "reply_to": "support@agendaburn.com",
+            "subject": f"📊 Your Monthly Meeting Report — {report_text}",
+            "html": f"""<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <div style="max-width:640px;margin:0 auto;padding:32px 16px;">
+
+    <!-- Header -->
+    <div style="background:#0f172a;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center;">
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:28px;height:28px;border-radius:8px;background:#f6b54d;color:#0f172a;font-weight:900;font-size:14px;display:inline-flex;align-items:center;justify-content:center;line-height:1;">$</div>
+        <span style="color:#f5f0e8;font-size:17px;font-weight:600;letter-spacing:-0.2px;">AgendaBurn</span>
+      </div>
+      <div style="color:#f6b54d;font-size:22px;font-weight:700;letter-spacing:-0.5px;">📊 Monthly Spend Report</div>
+      <div style="color:#7290ab;font-size:13px;margin-top:6px;">{report_text}</div>
+    </div>
+
+    <!-- Report body -->
+    <div style="background:#ffffff;border-radius:0 0 16px 16px;padding:28px 32px;border:1px solid #e5e7eb;border-top:none;">
+      {report_html}
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;margin-top:20px;padding:0 16px;">
+      <a href="https://agendaburn.com/app" style="display:inline-block;padding:12px 28px;background:#f6b54d;color:#0f172a;font-weight:700;font-size:14px;border-radius:980px;text-decoration:none;">
+        Open AgendaBurn →
+      </a>
+      <p style="color:#9ca3af;font-size:11px;margin-top:16px;">
+        You received this because you requested a monthly report from AgendaBurn.<br>
+        © 2026 AgendaBurn · <a href="https://agendaburn.com" style="color:#9ca3af;">agendaburn.com</a>
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>""",
         }
         req = urllib.request.Request(
             "https://api.resend.com/emails",
@@ -55,7 +79,7 @@ class handler(BaseHTTPRequestHandler):
             headers={
                 "Authorization": f"Bearer {RESEND_API_KEY}",
                 "Content-Type": "application/json",
-                "User-Agent": "MeetingMeter/1.0",
+                "User-Agent": "AgendaBurn/1.0",
             },
             method="POST",
         )
@@ -72,7 +96,10 @@ class handler(BaseHTTPRequestHandler):
     def _json(self, data, status=200):
         body = json.dumps(data).encode()
         self.send_response(status)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin", allowed)
+        self.send_header("Vary", "Origin")
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()

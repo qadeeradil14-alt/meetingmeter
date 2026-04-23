@@ -26,12 +26,46 @@ import urllib.parse
 import urllib.error
 from http.server import BaseHTTPRequestHandler
 
-STRIPE_SECRET = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+STRIPE_SECRET  = os.environ.get("STRIPE_SECRET_KEY", "").strip()
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "").strip()
-VERIFY_SECRET = os.environ.get("VERIFY_SECRET", "").strip()
-FROM_EMAIL = os.environ.get("VERIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
+VERIFY_SECRET  = os.environ.get("VERIFY_SECRET", "").strip()
+FROM_EMAIL     = os.environ.get("VERIFY_FROM_EMAIL", "onboarding@resend.dev").strip()
 
 CODE_TTL_SECONDS = 10 * 60  # 10 minutes
+
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
+
+# ── rate limiter (per-email, file-based, per-container) ───────────────────────
+import fcntl
+
+_RL_DIR          = "/tmp/rl_svc"
+_RL_MAX_ATTEMPTS = 3          # max code-send requests
+_RL_WINDOW       = 600        # per 10 minutes
+
+def _is_rate_limited(email: str) -> bool:
+    os.makedirs(_RL_DIR, exist_ok=True)
+    key  = hashlib.sha256(email.encode()).hexdigest()[:20]
+    path = f"{_RL_DIR}/{key}.json"
+    now  = time.time()
+    try:
+        with open(path, "r+") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                data = json.load(f)
+            except Exception:
+                data = []
+            data = [t for t in data if now - t < _RL_WINDOW]
+            if len(data) >= _RL_MAX_ATTEMPTS:
+                f.seek(0); json.dump(data, f); f.truncate()
+                return True
+            data.append(now)
+            f.seek(0); json.dump(data, f); f.truncate()
+            return False
+    except FileNotFoundError:
+        with open(path, "w") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            json.dump([now], f)
+        return False
 
 
 def b64u(data: bytes) -> str:
@@ -67,18 +101,19 @@ def stripe_get_active_sub(email: str) -> tuple[bool, int]:
 def send_email_via_resend(to_email: str, code: str) -> tuple[bool, str]:
     """Send the verification code email via Resend. Returns (ok, error_message)."""
     body = {
-        "from": f"MeetingMeter <{FROM_EMAIL}>",
+        "from": f"AgendaBurn <{FROM_EMAIL}>",
         "to": [to_email],
-        "subject": f"Your MeetingMeter verification code: {code}",
+        "reply_to": "support@agendaburn.com",
+        "subject": f"Your AgendaBurn verification code: {code}",
         "html": (
             f"<div style=\"font-family:-apple-system,Segoe UI,sans-serif;max-width:480px;margin:0 auto;padding:24px;\">"
             f"<h2 style=\"color:#7c6af7;margin:0 0 12px;\">Your verification code</h2>"
-            f"<p style=\"color:#333;font-size:14px;line-height:1.5;\">Enter this code in MeetingMeter to continue:</p>"
+            f"<p style=\"color:#333;font-size:14px;line-height:1.5;\">Enter this code in AgendaBurn to continue:</p>"
             f"<div style=\"font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;padding:20px;background:#f4f3ff;border-radius:8px;color:#7c6af7;margin:16px 0;\">{code}</div>"
             f"<p style=\"color:#666;font-size:12px;\">This code expires in 10 minutes. If you didn't request this, ignore this email.</p>"
             f"</div>"
         ),
-        "text": f"Your MeetingMeter verification code is: {code}\n\nThis code expires in 10 minutes. If you didn't request this, ignore this email.",
+        "text": f"Your AgendaBurn verification code is: {code}\n\nThis code expires in 10 minutes. If you didn't request this, ignore this email.",
     }
     req = urllib.request.Request(
         "https://api.resend.com/emails",
@@ -86,7 +121,7 @@ def send_email_via_resend(to_email: str, code: str) -> tuple[bool, str]:
         headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
-            "User-Agent": "MeetingMeter/1.0",
+            "User-Agent": "AgendaBurn/1.0",
         },
         method="POST",
     )
@@ -109,6 +144,10 @@ class handler(BaseHTTPRequestHandler):
 
         if not email or "@" not in email:
             self._json({"ok": False, "error": "Valid email required"}, 400)
+            return
+
+        if _is_rate_limited(email):
+            self._json({"ok": False, "error": "Too many requests. Please wait 10 minutes and try again."}, 429)
             return
 
         if not STRIPE_SECRET or not RESEND_API_KEY or not VERIFY_SECRET:
@@ -148,9 +187,12 @@ class handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin",  allowed)
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Vary", "Origin")
 
     def _json(self, data, status=200):
         body = json.dumps(data).encode()

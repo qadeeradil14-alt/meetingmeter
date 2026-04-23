@@ -1,4 +1,6 @@
 from http.server import BaseHTTPRequestHandler
+
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
 import json
 import time
 import datetime
@@ -16,7 +18,10 @@ class handler(BaseHTTPRequestHandler):
         pass
 
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin", allowed)
+        self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
@@ -39,7 +44,7 @@ class handler(BaseHTTPRequestHandler):
 
         try:
             req = urllib.request.Request(ics_url)
-            req.add_header("User-Agent", "MeetingMeter/1.0")
+            req.add_header("User-Agent", "AgendaBurn/1.0")
             with urllib.request.urlopen(req, timeout=15) as resp:
                 raw = resp.read().decode("utf-8", errors="replace")
         except Exception as e:

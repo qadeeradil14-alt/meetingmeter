@@ -1,4 +1,6 @@
 from http.server import BaseHTTPRequestHandler
+
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
 import json
 import urllib.request
 import urllib.error
@@ -10,7 +12,10 @@ class handler(BaseHTTPRequestHandler):
         pass
 
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin", allowed)
+        self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
@@ -59,7 +64,7 @@ class handler(BaseHTTPRequestHandler):
                 "blocks": [
                     {
                         "type": "header",
-                        "text": {"type": "plain_text", "text": f"💸 MeetingMeter: {title}"}
+                        "text": {"type": "plain_text", "text": f"💸 AgendaBurn: {title}"}
                     },
                     {
                         "type": "section",
@@ -74,7 +79,7 @@ class handler(BaseHTTPRequestHandler):
                     },
                     {
                         "type": "context",
-                        "elements": [{"type": "mrkdwn", "text": "Sent by *MeetingMeter* — Know the real cost of every meeting."}]
+                        "elements": [{"type": "mrkdwn", "text": "Sent by *AgendaBurn* — Know the real cost of every meeting."}]
                     }
                 ]
             }

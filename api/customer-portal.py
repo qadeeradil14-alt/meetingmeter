@@ -2,6 +2,8 @@ import os, json, time, hmac, hashlib, base64
 import urllib.request, urllib.parse
 from http.server import BaseHTTPRequestHandler
 
+ALLOWED_ORIGINS = {"https://agendaburn.com", "https://www.agendaburn.com"}
+
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "").strip()
 VERIFY_SECRET = os.environ.get("VERIFY_SECRET", "").strip()
 
@@ -94,7 +96,7 @@ class handler(BaseHTTPRequestHandler):
             customer_id = customers["data"][0]["id"]
             session = stripe_post("billing_portal/sessions", {
                 "customer": customer_id,
-                "return_url": "https://meetingmeter.tech/app"
+                "return_url": "https://agendaburn.com/app"
             })
             self._json(200, {"ok": True, "url": session["url"]})
 
@@ -102,7 +104,10 @@ class handler(BaseHTTPRequestHandler):
             self._json(500, {"ok": False, "error": str(e)})
 
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = self.headers.get("Origin", "")
+        allowed = origin if (origin in ALLOWED_ORIGINS or origin.endswith(".vercel.app")) else "https://agendaburn.com"
+        self.send_header("Access-Control-Allow-Origin", allowed)
+        self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
 
