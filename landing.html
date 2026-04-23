@@ -558,6 +558,13 @@
       margin: 12px 0;
       max-width: 100%;
       overflow-wrap: anywhere;
+      transition: opacity 0.45s ease, transform 0.45s ease, text-shadow 0.45s ease;
+    }
+
+    .preview-value.is-live {
+      opacity: 0.98;
+      transform: translateY(-1px);
+      text-shadow: 0 0 18px rgba(246,181,77,0.16);
     }
 
     .preview-meta {
@@ -2277,43 +2284,57 @@
     dotEl.setAttribute("cy", lastPoint.y.toFixed(2));
   }
 
-  const previewTotal = previewCosts.reduce((sum, value) => sum + value, 0);
-  const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-  const s = String(elapsed % 60).padStart(2, "0");
-  document.getElementById("preview-cost").textContent = `$${previewTotal.toFixed(2)}`;
-  document.getElementById("preview-meta").textContent =
-    `Q2 Planning Session · ${m}:${s} elapsed`;
-  document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
-  document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
-  document.getElementById("preview-status").textContent = "Live";
-  document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
-  const savedValue = ((previewRatePerMinute * 11) + (previewRps.slice(0, 2).reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
-  document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
-  document.getElementById("counterfactual-headline").innerHTML =
-    `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
-  const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
-    value > arr[bestIndex] ? index : bestIndex, 0);
-  previewRoles.forEach((_, i) => {
-    const personCost = previewCosts[i];
-    const row = document.getElementById(`preview-person-${i}`);
-    const costEl = document.getElementById(`preview-person-cost-${i}`);
-    if (costEl) costEl.textContent = `$${personCost.toFixed(2)}`;
-    if (row) row.classList.toggle("is-hot", i === hottestIndex);
-  });
-  [0, 1, 2].forEach((i) => {
-    const stat = document.getElementById(`preview-stat-${i}`);
-    if (stat) stat.classList.toggle("is-pulse", i === 1);
-  });
-  const ctaEl = document.getElementById("cta-counter");
-  if (ctaEl) ctaEl.textContent = "$5.47";
+  function renderPreviewSnapshot() {
+    const previewTotal = previewCosts.reduce((sum, value) => sum + value, 0);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+    const s = String(elapsed % 60).padStart(2, "0");
+    const costEl = document.getElementById("preview-cost");
+    costEl.textContent = `$${previewTotal.toFixed(2)}`;
+    costEl.classList.remove("is-live");
+    void costEl.getBoundingClientRect();
+    costEl.classList.add("is-live");
+    document.getElementById("preview-meta").textContent =
+      `Q2 Planning Session · ${m}:${s} elapsed`;
+    document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
+    document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
+    document.getElementById("preview-status").textContent = "Live";
+    document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
+    const savedValue = ((previewRatePerMinute * 11) + (previewRps.slice(0, 2).reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
+    document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
+    document.getElementById("counterfactual-headline").innerHTML =
+      `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
+    const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
+      value > arr[bestIndex] ? index : bestIndex, 0);
+    previewRoles.forEach((_, i) => {
+      const personCost = previewCosts[i];
+      const row = document.getElementById(`preview-person-${i}`);
+      const personCostEl = document.getElementById(`preview-person-cost-${i}`);
+      if (personCostEl) personCostEl.textContent = `$${personCost.toFixed(2)}`;
+      if (row) row.classList.toggle("is-hot", i === hottestIndex);
+    });
+    [0, 1, 2].forEach((i) => {
+      const stat = document.getElementById(`preview-stat-${i}`);
+      if (stat) stat.classList.toggle("is-pulse", i === 1);
+    });
+    const ctaEl = document.getElementById("cta-counter");
+    if (ctaEl) ctaEl.textContent = "$5.47";
+  }
+
+  renderPreviewSnapshot();
   renderPreviewChart();
   renderAiSnapshot(0);
   renderDnaState(0);
 
   setInterval(() => {
     previewTrendPhase += 0.12;
+    elapsed += 3;
+    previewChartDisplayValue += 0.36;
+    previewCosts.forEach((_, i) => {
+      previewCosts[i] += previewRps[i] * 3;
+    });
+    renderPreviewSnapshot();
     renderPreviewChart();
-  }, 4000);
+  }, 3000);
 
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
