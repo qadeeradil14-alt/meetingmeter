@@ -3041,31 +3041,19 @@
     });
   }
 
-  function compactDebriefLine(text, maxLen = 260) {
-    if (!text) return "";
-    const candidates = String(text)
-      .replace(/\r/g, "")
-      .split(/\n+|(?:^|\n)\s*[•*-]\s+/)
-      .map(part => part.replace(/\s+/g, " ").trim())
-      .filter(Boolean);
-    if (candidates.length === 0) return "";
-    const line = candidates[0];
-    return line.length > maxLen ? line.slice(0, maxLen - 1).trimEnd() + "…" : line;
-  }
-
   function buildHistoryDebriefPreview(d) {
     if (!d) return "";
 
     const rows = [
-      { label: "Summary", text: compactDebriefLine(d.aiSummary) },
-      { label: "Decision", text: compactDebriefLine(d.decisions) },
-      { label: "Action", text: compactDebriefLine(d.actions) },
-    ].filter(row => row.text);
+      { label: "Summary",      text: d.aiSummary  || "" },
+      { label: "Decisions",    text: d.decisions   || "" },
+      { label: "Action Items", text: d.actions     || "" },
+    ].filter(row => row.text.trim());
 
     return rows.map(row => `
-      <div style="margin-top:6px;line-height:1.5;">
-        <span style="color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">${esc(row.label)}</span>
-        <span style="color:var(--text);margin-left:8px;">${esc(row.text)}</span>
+      <div style="margin-top:8px;line-height:1.7;">
+        <span style="color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:2px;">${esc(row.label)}</span>
+        <span style="color:var(--text);font-size:13px;white-space:pre-wrap;">${esc(row.text.trim())}</span>
       </div>
     `).join("");
   }
@@ -3750,6 +3738,7 @@
     const prompt = `You are a precise meeting summarizer. Return STRICT JSON with exactly three keys: "summary", "decisions", "actions".
 
 ABSOLUTE RULES — every single one must be followed or the output is wrong:
+• Fix all spelling mistakes and grammar errors in the raw notes — output must be polished, professional English.
 • EVERY action item bullet MUST start with the owner name exactly as it appears in the raw notes. Format: "Name: task description (deadline)". If no deadline, omit the parenthetical. NEVER omit the owner name.
 • NEVER merge two people's tasks into one bullet. Each person's each task gets its own bullet.
 • NEVER generalize. If the notes say "[Hewad] finalize the testing protocols by EOD Friday", output "Hewad: finalize the testing protocols (by EOD Friday)". Do not write "Team member to finalize protocols."
@@ -4279,6 +4268,7 @@ Action items (raw notes): ${actions || "None recorded"}`;
             const prompt = `You are a precise meeting summarizer. Return STRICT JSON with exactly three keys: "summary", "decisions", "actions".
 
 ABSOLUTE RULES — every single one must be followed or the output is wrong:
+• Fix all spelling mistakes and grammar errors in the raw notes — output must be polished, professional English.
 • EVERY action item bullet MUST start with the owner name exactly as it appears in the raw notes. Format: "Name: task description (deadline)". If no deadline, omit the parenthetical. NEVER omit the owner name.
 • NEVER merge two people's tasks into one bullet. Each person's each task gets its own bullet.
 • NEVER generalize. If the notes say "[Hewad] finalize the testing protocols by EOD Friday", output "Hewad: finalize the testing protocols (by EOD Friday)". Do not write "Team member to finalize protocols."
