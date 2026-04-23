@@ -3584,16 +3584,20 @@
   // navigating the page on all modern browsers (Chrome, Safari, Firefox).
   // Body is capped to avoid 400 errors from oversized URLs.
   function triggerMailto(emails, subject, body) {
-    const MAX = 8000; // encoded body length — window.open mailto: handles this fine
+    const MAX = 8000;
     let safeBody = body;
     if (encodeURIComponent(body).length > MAX) {
-      // Truncate at last full sentence within limit
       const raw = body.substring(0, 2500);
       const lastStop = Math.max(raw.lastIndexOf(". "), raw.lastIndexOf(".\n"));
       safeBody = (lastStop > 200 ? raw.substring(0, lastStop + 1) : raw) + "\n\n[Note: summary truncated — full details saved in AgendaBurn]";
     }
-    // Use location.href for mailto — never blocked by popup blockers
-    window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`;
+    // Use a temporary <a> element — most reliable cross-browser mailto trigger
+    const a = document.createElement("a");
+    a.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(safeBody)}`;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 500);
   }
 
   // ── Send debrief email helper ──────────────────────────────
@@ -4035,7 +4039,7 @@ Action items (raw notes): ${actions || "None recorded"}`;
           ${item.attendees.map((a, i) => `<div style="display:flex;align-items:center;gap:8px;">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${a.name ? esc(a.name.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()) : "?"}</div>
             <span style="font-size:12px;flex:0 0 90px;color:var(--text);">${esc(a.name || "Unnamed")}</span>
-            <input type="email" placeholder="email@example.com" data-attendee-idx="${i}" class="attendee-email-input" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;" />
+            <input type="email" placeholder="email@example.com" data-attendee-idx="${i}" class="attendee-email-input" autocomplete="off" value="${esc(a.email || '')}" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;outline:none;" />
           </div>`).join("")}
           <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
             <button class="btn btn-ghost cancel-emails-btn" style="font-size:12px;padding:4px 10px;">Cancel</button>
