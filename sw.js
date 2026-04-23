@@ -1,4 +1,4 @@
-const CACHE = "agendaburn-v1";
+const CACHE = "agendaburn-v2";
 const SHELL = [
   "/",
   "/app",
