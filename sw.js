@@ -2,7 +2,6 @@ const CACHE = "agendaburn-v1";
 const SHELL = [
   "/",
   "/app",
-  "/landing.html",
   "/meetingmeter.html",
   "/manifest.json",
   "/icons/icon-192.png",
