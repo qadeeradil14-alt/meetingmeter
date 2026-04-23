@@ -211,10 +211,10 @@
 
     .hero-inner {
       width: 100%;
-      max-width: 1380px;
+      max-width: 1360px;
       display: grid;
-      grid-template-columns: minmax(320px, 0.82fr) minmax(620px, 1.18fr);
-      gap: 44px;
+      grid-template-columns: minmax(320px, 0.76fr) minmax(620px, 1.24fr);
+      gap: 56px;
       align-items: center;
       position: relative;
       z-index: 1;
@@ -222,7 +222,7 @@
     }
 
     .hero-copy {
-      max-width: 560px;
+      max-width: 520px;
     }
 
     .hero-label {
@@ -238,11 +238,11 @@
     .live-dot {
       width: 6px; height: 6px; border-radius: 50%;
       background: var(--amber);
-      animation: blink 2s ease-in-out infinite;
+      animation: blink 4.8s ease-in-out infinite;
     }
     @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
+      0%, 100% { opacity: 0.92; transform: scale(1); }
+      50% { opacity: 0.46; transform: scale(0.9); }
     }
 
     .hero-counter {
@@ -324,17 +324,15 @@
     }
 
     .hero-proof-chip {
-      padding: 16px 15px;
+      padding: 14px 15px;
       border-radius: 20px;
-      background:
-        linear-gradient(180deg, rgba(120,214,255,0.06), rgba(255,255,255,0.015)),
-        rgba(12, 20, 30, 0.76);
+      background: rgba(12, 20, 30, 0.58);
       border: 1px solid rgba(116,187,255,0.12);
-      box-shadow: 0 14px 28px rgba(0,0,0,0.16);
-      min-height: 96px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
     }
 
     .hero-proof-chip strong {
@@ -359,13 +357,11 @@
       grid-template-columns: auto 1fr auto;
       gap: 16px;
       align-items: center;
-      padding: 15px 18px;
+      padding: 13px 16px;
       border-radius: 22px;
-      background:
-        linear-gradient(135deg, rgba(246,181,77,0.1), rgba(120,214,255,0.08)),
-        rgba(12, 20, 30, 0.78);
-      border: 1px solid rgba(246,181,77,0.18);
-      box-shadow: 0 16px 36px rgba(0,0,0,0.18);
+      background: rgba(12, 20, 30, 0.62);
+      border: 1px solid rgba(246,181,77,0.14);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.14);
     }
 
     .hero-ai-icon {
@@ -422,8 +418,8 @@
       content: "";
       position: absolute;
       inset: 18% 8% -8% 18%;
-      background: radial-gradient(circle, rgba(120,214,255,0.28), transparent 62%);
-      filter: blur(24px);
+      background: radial-gradient(circle, rgba(120,214,255,0.18), transparent 62%);
+      filter: blur(28px);
       pointer-events: none;
     }
 
@@ -432,7 +428,7 @@
       width: 100%;
       max-width: 736px;
       margin-left: auto;
-      padding: 16px;
+      padding: 18px;
       border-radius: 28px;
       background:
         linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
@@ -440,12 +436,12 @@
       border: 1px solid rgba(116,187,255,0.18);
       box-shadow: var(--shadow);
       overflow: hidden;
-      animation: heroFloat 9s ease-in-out infinite;
+      animation: heroFloat 18s ease-in-out infinite;
     }
 
     @keyframes heroFloat {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-3px); }
     }
 
     .preview-shell::after {
@@ -559,7 +555,7 @@
       padding: 10px 12px;
       border-radius: 14px;
       background: rgba(255,255,255,0.025);
-      transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+      transition: background 0.5s ease, border-color 0.5s ease;
       border: 1px solid transparent;
     }
 
@@ -578,9 +574,8 @@
     }
 
     .preview-stat.is-pulse {
-      transform: translateY(-2px);
-      background: rgba(120,214,255,0.08);
-      border-color: rgba(120,214,255,0.16);
+      background: rgba(120,214,255,0.05);
+      border-color: rgba(120,214,255,0.12);
     }
 
     .preview-stack {
@@ -611,7 +606,7 @@
       border-bottom: 1px solid rgba(116,187,255,0.08);
       color: var(--muted2);
       font-size: 13px;
-      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+      transition: background 0.5s ease, border-color 0.5s ease;
       border-radius: 12px;
     }
 
@@ -634,9 +629,8 @@
     }
 
     .preview-minirow.is-hot {
-      transform: translateX(4px);
-      background: rgba(246,181,77,0.08);
-      border-color: rgba(246,181,77,0.18);
+      background: rgba(246,181,77,0.06);
+      border-color: rgba(246,181,77,0.12);
     }
 
     .preview-minirow.is-hot strong {
@@ -721,7 +715,7 @@
 
     .preview-chart-area {
       fill: rgba(120,214,255,0.12);
-      transition: d 0.3s ease, opacity 0.3s ease;
+      transition: d 0.8s ease, opacity 0.8s ease;
     }
 
     .preview-chart-line {
@@ -731,18 +725,18 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(0 0 10px rgba(120,214,255,0.22));
-      transition: d 0.3s ease;
+      transition: d 0.8s ease;
     }
 
     .preview-chart-dot {
       fill: var(--amber);
       filter: drop-shadow(0 0 8px rgba(246,181,77,0.35));
-      transition: cx 0.3s ease, cy 0.3s ease, r 0.15s ease, opacity 0.15s ease;
+      transition: cx 0.8s ease, cy 0.8s ease, r 0.35s ease, opacity 0.35s ease;
     }
 
     .preview-chart-dot.is-live {
-      r: 6;
-      opacity: 1;
+      r: 5.4;
+      opacity: 0.98;
     }
 
     .preview-chart-labels {
@@ -1621,7 +1615,7 @@
     <div class="hero-copy">
       <div class="hero-label">
         <span class="live-dot"></span>
-        Live Burn Rate
+        Live Burn Rate · TEST MARKER
       </div>
 
       <div class="hero-counter" id="demo-cost">$0.00</div>
@@ -1637,7 +1631,7 @@
       </p>
 
       <div class="hero-actions">
-        <a href="/app" class="btn-primary">Start Tracking Free</a>
+        <a href="/app" class="btn-primary">TEST BUTTON · Start Tracking Free</a>
         <a href="#how-it-works" class="btn-ghost">See How It Works</a>
       </div>
 
@@ -1646,15 +1640,15 @@
       <div class="hero-proof-row fi">
         <div class="hero-proof-chip">
           <strong>Live cost</strong>
-          <span>Make the room feel the burn while the meeting is still happening.</span>
+          <span>See the room spend while there is still time to change it.</span>
         </div>
         <div class="hero-proof-chip">
           <strong>Instant debrief</strong>
-          <span>Turn notes into decisions and actions without cleanup work after.</span>
+          <span>Decisions and actions appear without a second cleanup pass.</span>
         </div>
         <div class="hero-proof-chip">
           <strong>Share fast</strong>
-          <span>Push the result to Slack, email, PDF, or CSV in one move.</span>
+          <span>Send the recap to Slack, email, PDF, or CSV in one move.</span>
         </div>
       </div>
 
@@ -1662,7 +1656,7 @@
         <div class="hero-ai-icon">✦</div>
         <div class="hero-ai-copy">
           <strong>AI meeting summaries are built in</strong>
-          <span>After every session, AgendaBurn can turn raw notes into a polished recap with decisions, action items, and a share-ready summary for the team.</span>
+          <span>Raw notes become a polished recap with decisions, owners, and a share-ready summary right after the meeting ends.</span>
         </div>
         <div class="hero-ai-pill">AI Feature</div>
       </div>
@@ -1672,7 +1666,7 @@
       <div class="preview-shell">
         <div class="preview-topbar">
           <div class="preview-dots"><span></span><span></span><span></span></div>
-          <div class="preview-eyebrow">AgendaBurn / Live Session</div>
+          <div class="preview-eyebrow">AgendaBurn / Live Session / TEST</div>
         </div>
 
         <div class="preview-grid">
@@ -1709,7 +1703,7 @@
                 <line class="preview-chart-grid" x1="0" y1="80" x2="320" y2="80"></line>
                 <path class="preview-chart-area" id="preview-chart-area" d=""></path>
                 <path class="preview-chart-line" id="preview-chart-line" d=""></path>
-                <circle class="preview-chart-dot" id="preview-chart-dot" cx="0" cy="0" r="5"></circle>
+                <circle class="preview-chart-dot is-live" id="preview-chart-dot" cx="0" cy="0" r="5"></circle>
               </svg>
               <div class="preview-chart-labels">
                 <span>Start</span>
@@ -1770,19 +1764,14 @@
 <div class="section" style="padding-top:28px;">
   <div class="proof-grid fi" style="margin-top:0;">
     <div class="proof-card">
-      <div class="proof-label">Visibility</div>
-      <p class="proof-text">See the cost of the room while the meeting is still happening, not after the damage is done.</p>
-      <div class="proof-savings">Live burn, attendee by attendee</div>
+      <div class="proof-label">One live number</div>
+      <p class="proof-text">The room sees a single cost signal, so it is obvious when the conversation is worth the time and when it is drifting.</p>
+      <div class="proof-savings">Clear pressure while the meeting runs</div>
     </div>
     <div class="proof-card">
-      <div class="proof-label">Clarity</div>
-      <p class="proof-text">Turn messy notes into decisions, action items, and a debrief your team can actually use.</p>
-      <div class="proof-savings">AI recap in seconds</div>
-    </div>
-    <div class="proof-card">
-      <div class="proof-label">Follow-through</div>
-      <p class="proof-text">Share the result to Slack, email, PDF, or CSV without rebuilding the meeting by hand.</p>
-      <div class="proof-savings">Share-ready from the app</div>
+      <div class="proof-label">One clean output</div>
+      <p class="proof-text">You leave with a summary, decisions, and action items that can be sent immediately instead of rebuilt later.</p>
+      <div class="proof-savings">Structured debrief in seconds</div>
     </div>
   </div>
 </div>
@@ -2160,11 +2149,11 @@
   const previewTrendBase = [26, 34, 31, 48, 46, 62, 58, 76, 83];
   const previewChartMax = 110;
   let previewTrendPhase = 0;
-  let previewChartLastFrame = 0;
   let previewChartDisplayValue = 83;
   const pageLoadTime = Date.now();
   const ctaRps = (5 * 120000) / (52 * 40 * 3600);
   const previewRatePerMinute = previewRps.reduce((sum, rate) => sum + rate, 0) * 60;
+  const previewMotionSeconds = 6;
 
   function renderAiSnapshot(index) {
     const snap = aiSnapshots[index % aiSnapshots.length];
@@ -2205,12 +2194,12 @@
     const maxValue = previewChartMax;
     const values = previewTrendBase.map((base, index) => {
       const climb = index * 1.9;
-      const waveA = Math.sin(previewTrendPhase + index * 0.62) * 4.2;
-      const waveB = Math.cos(previewTrendPhase * 0.72 + index * 0.33) * 1.8;
+      const waveA = Math.sin(previewTrendPhase + index * 0.62) * 1.2;
+      const waveB = Math.cos(previewTrendPhase * 0.72 + index * 0.33) * 0.65;
       const tailWeight = index / (previewTrendBase.length - 1);
-      const tailLift = Math.sin(previewTrendPhase * 1.45 + index * 0.18) * 3.4 * tailWeight;
+      const tailLift = Math.sin(previewTrendPhase * 1.45 + index * 0.18) * 1.25 * tailWeight;
       const endpointDrift = index === previewTrendBase.length - 1
-        ? (Math.sin(previewTrendPhase * 2.2) * 8.5) + (Math.cos(previewTrendPhase * 1.15) * 2.5)
+        ? (Math.sin(previewTrendPhase * 1.7) * 2.6) + (Math.cos(previewTrendPhase * 1.05) * 0.85)
         : 0;
       return base + climb + waveA + waveB + tailLift + endpointDrift;
     });
@@ -2239,27 +2228,15 @@
     areaEl.setAttribute("d", areaPath);
     dotEl.setAttribute("cx", lastPoint.x.toFixed(2));
     dotEl.setAttribute("cy", lastPoint.y.toFixed(2));
-    dotEl.classList.remove("is-live");
-    void dotEl.getBoundingClientRect();
-    dotEl.classList.add("is-live");
-
-  }
-
-  function animatePreviewChart(timestamp) {
-    if (!previewChartLastFrame) previewChartLastFrame = timestamp;
-    const delta = Math.min(timestamp - previewChartLastFrame, 32);
-    previewChartLastFrame = timestamp;
-    previewTrendPhase += delta * 0.0024;
-    renderPreviewChart();
-    requestAnimationFrame(animatePreviewChart);
   }
 
   setInterval(() => {
-    elapsed++;
+    elapsed += previewMotionSeconds;
+    previewTrendPhase += 0.22;
     let total = 0;
     let previewTotal = 0;
-    costs.forEach((_, i) => { costs[i] += rps[i]; total += costs[i]; });
-    previewCosts.forEach((_, i) => { previewCosts[i] += previewRps[i]; previewTotal += previewCosts[i]; });
+    costs.forEach((_, i) => { costs[i] += rps[i] * previewMotionSeconds; total += costs[i]; });
+    previewCosts.forEach((_, i) => { previewCosts[i] += previewRps[i] * previewMotionSeconds; previewTotal += previewCosts[i]; });
     document.getElementById("demo-cost").textContent = `$${total.toFixed(2)}`;
     const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
     const s = String(elapsed % 60).padStart(2, "0");
@@ -2270,7 +2247,7 @@
       `Q2 Planning Session · ${m}:${s} elapsed`;
     document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
     document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
-    document.getElementById("preview-status").textContent = elapsed % 12 === 0 ? "Review" : "Live";
+    document.getElementById("preview-status").textContent = "Live";
     const previewDisplayTarget =
       83 +
       (elapsed * 0.35) +
@@ -2282,25 +2259,24 @@
     document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
     document.getElementById("counterfactual-headline").innerHTML =
       `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
+    const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
+      value > arr[bestIndex] ? index : bestIndex, 0);
     previewRoles.forEach((_, i) => {
       const personCost = previewCosts[i];
       const row = document.getElementById(`preview-person-${i}`);
       const costEl = document.getElementById(`preview-person-cost-${i}`);
       if (costEl) costEl.textContent = `$${personCost.toFixed(2)}`;
-      if (row) row.classList.toggle("is-hot", i === elapsed % previewRoles.length);
+      if (row) row.classList.toggle("is-hot", i === hottestIndex);
     });
     [0, 1, 2].forEach((i) => {
       const stat = document.getElementById(`preview-stat-${i}`);
-      if (stat) stat.classList.toggle("is-pulse", i === elapsed % 3);
+      if (stat) stat.classList.toggle("is-pulse", i === 1);
     });
-    renderAiSnapshot(Math.floor(elapsed / 5));
-    renderDnaState(Math.floor(elapsed / 6));
 
     const ctaEl = document.getElementById("cta-counter");
     if (ctaEl) ctaEl.textContent = `$${((Date.now() - pageLoadTime) / 1000 * ctaRps).toFixed(2)}`;
-  }, 1000);
+  }, previewMotionSeconds * 1000);
   renderPreviewChart();
-  requestAnimationFrame(animatePreviewChart);
   renderAiSnapshot(0);
   renderDnaState(0);
 
