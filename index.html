@@ -591,7 +591,7 @@
       padding: 10px 12px;
       border-radius: 14px;
       background: rgba(255,255,255,0.025);
-      transition: background 0.5s ease, border-color 0.5s ease;
+      transition: background 0.32s ease, border-color 0.32s ease, transform 0.32s ease;
       border: 1px solid transparent;
     }
 
@@ -607,11 +607,20 @@
     .preview-stat strong {
       font-size: 18px;
       color: var(--text);
+      display: inline-block;
+      transition: color 0.28s ease, transform 0.28s ease, text-shadow 0.28s ease;
+    }
+
+    .preview-stat strong.is-live {
+      color: var(--cyan);
+      transform: translateY(-1px);
+      text-shadow: 0 0 12px rgba(120,214,255,0.26);
     }
 
     .preview-stat.is-pulse {
       background: rgba(120,214,255,0.05);
       border-color: rgba(120,214,255,0.12);
+      transform: translateY(-1px);
     }
 
     .preview-stack {
@@ -753,7 +762,7 @@
 
     .preview-chart-area {
       fill: rgba(120,214,255,0.12);
-      transition: d 0.45s ease, opacity 0.45s ease;
+      transition: d 0.32s ease, opacity 0.32s ease;
     }
 
     .preview-chart-line {
@@ -763,13 +772,13 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(0 0 10px rgba(120,214,255,0.22));
-      transition: d 0.45s ease;
+      transition: d 0.32s ease;
     }
 
     .preview-chart-dot {
       fill: var(--amber);
       filter: drop-shadow(0 0 8px rgba(246,181,77,0.35));
-      transition: cx 0.45s ease, cy 0.45s ease, r 0.25s ease, opacity 0.25s ease;
+      transition: cx 0.32s ease, cy 0.32s ease, r 0.2s ease, opacity 0.2s ease;
       animation: chartDotPulse 3.6s ease-in-out infinite;
       transform-origin: center;
     }
@@ -2222,7 +2231,7 @@
   let elapsed = 20;
   const costs = [0.42, 0.33, 0.28, 0.36];
   const previewCosts = [0.56, 0.49, 0.43];
-  const previewTrendBase = [26, 34, 31, 48, 46, 62, 58, 76, 83];
+  const previewTrendBase = [26, 34, 32, 45, 44, 58, 55, 69, 66, 81, 78, 90];
   const previewChartMax = 110;
   let previewTrendPhase = 0.14;
   let previewChartDisplayValue = 86.99;
@@ -2267,16 +2276,20 @@
     const usableHeight = 72;
     const padX = 10; // keep dot fully inside the viewBox
     const maxValue = previewChartMax;
+    const pulsePosition = (previewTrendPhase * 1.15 % 1) * (previewTrendBase.length - 1);
     const values = previewTrendBase.map((base, index) => {
       const climb = index * 1.9;
       const waveA = Math.sin(previewTrendPhase + index * 0.62) * 1.2;
       const waveB = Math.cos(previewTrendPhase * 0.72 + index * 0.33) * 0.65;
       const tailWeight = index / (previewTrendBase.length - 1);
       const tailLift = Math.sin(previewTrendPhase * 1.45 + index * 0.18) * 1.25 * tailWeight;
+      const pulseDistance = Math.abs(index - pulsePosition);
+      const pulseSpike = Math.max(0, 1 - pulseDistance) * 13;
+      const pulseRebound = Math.max(0, 1 - Math.abs(index - pulsePosition - 0.65)) * -7;
       const endpointDrift = index === previewTrendBase.length - 1
         ? (Math.sin(previewTrendPhase * 1.7) * 2.6) + (Math.cos(previewTrendPhase * 1.05) * 0.85)
         : 0;
-      return base + climb + waveA + waveB + tailLift + endpointDrift;
+      return base + climb + waveA + waveB + tailLift + pulseSpike + pulseRebound + endpointDrift;
     });
     const stepX = (chartWidth - padX * 2) / (values.length - 1);
 
@@ -2305,8 +2318,15 @@
     dotEl.setAttribute("cy", lastPoint.y.toFixed(2));
   }
 
+  function getLivePreviewRatePerMinute() {
+    const breathingCents = Math.sin(previewTrendPhase * 2.4) * 0.11;
+    const focusLift = previewFocusIndex * 0.025;
+    return previewRatePerMinute + breathingCents + focusLift;
+  }
+
   function renderPreviewSnapshot() {
     const previewTotal = previewCosts.reduce((sum, value) => sum + value, 0);
+    const livePreviewRate = getLivePreviewRatePerMinute();
     const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
     const s = String(elapsed % 60).padStart(2, "0");
     const costEl = document.getElementById("preview-cost");
@@ -2316,12 +2336,16 @@
     costEl.classList.add("is-live");
     document.getElementById("preview-meta").textContent =
       `Q2 Planning Session · ${m}:${s} elapsed`;
-    document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
+    const rateEl = document.getElementById("preview-rate");
+    rateEl.textContent = `$${livePreviewRate.toFixed(2)}`;
+    rateEl.classList.remove("is-live");
+    void rateEl.getBoundingClientRect();
+    rateEl.classList.add("is-live");
     document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
     document.getElementById("preview-status").textContent = "Live";
     document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
     const topSeatRates = [...previewRps].sort((a, b) => b - a).slice(0, droppedSeats);
-    const savedValue = ((previewRatePerMinute * 11) + (topSeatRates.reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
+    const savedValue = ((livePreviewRate * 11) + (topSeatRates.reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
     document.getElementById("counterfactual-people").textContent = `${droppedSeats} fewer`;
     document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
     document.getElementById("counterfactual-headline").innerHTML =
@@ -2347,16 +2371,16 @@
   renderDnaState(0);
 
   setInterval(() => {
-    previewTrendPhase += 0.24;
-    elapsed += 5;
-    previewChartDisplayValue += 0.74;
+    previewTrendPhase += 0.36;
+    elapsed += 4;
+    previewChartDisplayValue += 0.92;
     previewFocusIndex = (previewFocusIndex + 1) % previewRoles.length;
     previewCosts.forEach((_, i) => {
-      previewCosts[i] += previewRps[i] * 5;
+      previewCosts[i] += previewRps[i] * 4;
     });
     renderPreviewSnapshot();
     renderPreviewChart();
-  }, 1200);
+  }, 900);
 
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
