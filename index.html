@@ -1615,7 +1615,7 @@
     <div class="hero-copy">
       <div class="hero-label">
         <span class="live-dot"></span>
-        Live Burn Rate · TEST MARKER
+        Live Burn Rate
       </div>
 
       <div class="hero-counter" id="demo-cost">$0.00</div>
@@ -1631,7 +1631,7 @@
       </p>
 
       <div class="hero-actions">
-        <a href="/app" class="btn-primary">TEST BUTTON · Start Tracking Free</a>
+        <a href="/app" class="btn-primary">Start Tracking Free</a>
         <a href="#how-it-works" class="btn-ghost">See How It Works</a>
       </div>
 
@@ -1666,7 +1666,7 @@
       <div class="preview-shell">
         <div class="preview-topbar">
           <div class="preview-dots"><span></span><span></span><span></span></div>
-          <div class="preview-eyebrow">AgendaBurn / Live Session / TEST</div>
+          <div class="preview-eyebrow">AgendaBurn / Live Session</div>
         </div>
 
         <div class="preview-grid">
@@ -2143,17 +2143,14 @@
   ];
   const rps = salaries.map(s => s / (52 * 40 * 3600));
   const previewRps = previewSalaries.map(s => s / (52 * 40 * 3600));
-  let elapsed = 0;
-  const costs = [0, 0, 0, 0];
-  const previewCosts = new Array(previewSalaries.length).fill(0);
+  let elapsed = 20;
+  const costs = [0.42, 0.33, 0.28, 0.36];
+  const previewCosts = [0.56, 0.49, 0.43];
   const previewTrendBase = [26, 34, 31, 48, 46, 62, 58, 76, 83];
   const previewChartMax = 110;
-  let previewTrendPhase = 0;
-  let previewChartDisplayValue = 83;
-  const pageLoadTime = Date.now();
-  const ctaRps = (5 * 120000) / (52 * 40 * 3600);
+  let previewTrendPhase = 0.14;
+  let previewChartDisplayValue = 86.99;
   const previewRatePerMinute = previewRps.reduce((sum, rate) => sum + rate, 0) * 60;
-  const previewMotionSeconds = 6;
 
   function renderAiSnapshot(index) {
     const snap = aiSnapshots[index % aiSnapshots.length];
@@ -2230,52 +2227,39 @@
     dotEl.setAttribute("cy", lastPoint.y.toFixed(2));
   }
 
-  setInterval(() => {
-    elapsed += previewMotionSeconds;
-    previewTrendPhase += 0.22;
-    let total = 0;
-    let previewTotal = 0;
-    costs.forEach((_, i) => { costs[i] += rps[i] * previewMotionSeconds; total += costs[i]; });
-    previewCosts.forEach((_, i) => { previewCosts[i] += previewRps[i] * previewMotionSeconds; previewTotal += previewCosts[i]; });
-    document.getElementById("demo-cost").textContent = `$${total.toFixed(2)}`;
-    const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-    const s = String(elapsed % 60).padStart(2, "0");
-    document.getElementById("demo-sub").textContent =
-      `4 attendees · ${m}:${s} · Q2 Planning Session`;
-    document.getElementById("preview-cost").textContent = `$${previewTotal.toFixed(2)}`;
-    document.getElementById("preview-meta").textContent =
-      `Q2 Planning Session · ${m}:${s} elapsed`;
-    document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
-    document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
-    document.getElementById("preview-status").textContent = "Live";
-    const previewDisplayTarget =
-      83 +
-      (elapsed * 0.35) +
-      (Math.sin(elapsed / 3.2) * 2.6) +
-      (Math.cos(elapsed / 5.1) * 1.2);
-    previewChartDisplayValue += (previewDisplayTarget - previewChartDisplayValue) * 0.28;
-    document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
-    const savedValue = ((previewRatePerMinute * 11) + (previewRps.slice(0, 2).reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
-    document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
-    document.getElementById("counterfactual-headline").innerHTML =
-      `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
-    const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
-      value > arr[bestIndex] ? index : bestIndex, 0);
-    previewRoles.forEach((_, i) => {
-      const personCost = previewCosts[i];
-      const row = document.getElementById(`preview-person-${i}`);
-      const costEl = document.getElementById(`preview-person-cost-${i}`);
-      if (costEl) costEl.textContent = `$${personCost.toFixed(2)}`;
-      if (row) row.classList.toggle("is-hot", i === hottestIndex);
-    });
-    [0, 1, 2].forEach((i) => {
-      const stat = document.getElementById(`preview-stat-${i}`);
-      if (stat) stat.classList.toggle("is-pulse", i === 1);
-    });
-
-    const ctaEl = document.getElementById("cta-counter");
-    if (ctaEl) ctaEl.textContent = `$${((Date.now() - pageLoadTime) / 1000 * ctaRps).toFixed(2)}`;
-  }, previewMotionSeconds * 1000);
+  const total = costs.reduce((sum, value) => sum + value, 0);
+  const previewTotal = previewCosts.reduce((sum, value) => sum + value, 0);
+  const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+  const s = String(elapsed % 60).padStart(2, "0");
+  document.getElementById("demo-cost").textContent = `$${total.toFixed(2)}`;
+  document.getElementById("demo-sub").textContent =
+    `4 attendees · ${m}:${s} · Q2 Planning Session`;
+  document.getElementById("preview-cost").textContent = `$${previewTotal.toFixed(2)}`;
+  document.getElementById("preview-meta").textContent =
+    `Q2 Planning Session · ${m}:${s} elapsed`;
+  document.getElementById("preview-rate").textContent = `$${previewRatePerMinute.toFixed(2)}`;
+  document.getElementById("preview-attendees").textContent = String(previewSalaries.length);
+  document.getElementById("preview-status").textContent = "Live";
+  document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
+  const savedValue = ((previewRatePerMinute * 11) + (previewRps.slice(0, 2).reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
+  document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
+  document.getElementById("counterfactual-headline").innerHTML =
+    `If this meeting ended 11 minutes earlier and dropped 2 attendees, you would save <strong>$${savedValue}</strong>.`;
+  const hottestIndex = previewCosts.reduce((bestIndex, value, index, arr) =>
+    value > arr[bestIndex] ? index : bestIndex, 0);
+  previewRoles.forEach((_, i) => {
+    const personCost = previewCosts[i];
+    const row = document.getElementById(`preview-person-${i}`);
+    const costEl = document.getElementById(`preview-person-cost-${i}`);
+    if (costEl) costEl.textContent = `$${personCost.toFixed(2)}`;
+    if (row) row.classList.toggle("is-hot", i === hottestIndex);
+  });
+  [0, 1, 2].forEach((i) => {
+    const stat = document.getElementById(`preview-stat-${i}`);
+    if (stat) stat.classList.toggle("is-pulse", i === 1);
+  });
+  const ctaEl = document.getElementById("cta-counter");
+  if (ctaEl) ctaEl.textContent = "$5.47";
   renderPreviewChart();
   renderAiSnapshot(0);
   renderDnaState(0);
