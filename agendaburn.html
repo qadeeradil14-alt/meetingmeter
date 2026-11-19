@@ -1884,6 +1884,29 @@
   #email-capture-prompt .ec-msg {
     font-size: 11px; color: #64748b; margin-top: 8px; min-height: 14px;
   }
+  
+    .app-heading {
+      padding: 16px 28px 0;
+    }
+    .app-page-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .app-page-sub {
+      margin-top: 4px;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    @supports (padding: max(0px)) {
+      .app-heading {
+        padding-left: max(28px, env(safe-area-inset-left));
+        padding-right: max(28px, env(safe-area-inset-right));
+      }
+    }
+
   </style>
   <!-- Sentry Error Monitoring -->
   <script
@@ -1935,6 +1958,12 @@
     </button>
   </div>
 </header>
+
+<div class="app-heading">
+  <h1 class="app-page-title">Live meeting cost calculator</h1>
+  <p class="app-page-sub">Add attendees by role and salary, start the timer, and watch the cost climb in real time.</p>
+</div>
+
 
 <div id="already-pro-banner">
   <div class="already-pro-inner">

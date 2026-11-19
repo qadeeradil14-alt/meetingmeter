@@ -21,6 +21,14 @@ AgendaBurn, formerly MeetingMeter, is the product at https://agendaburn.com. The
 - [Meeting Cost Calculator: How Much Is Your Stand-Up?](https://blog.agendaburn.com/meeting-cost-calculator-how-much-is-your-stand-up/): What a recurring stand-up costs
 - [Why Most Meetings Are Useless](https://blog.agendaburn.com/why-most-meetings-are-useless-and-cost-you-millions/): Why status meetings fail and what to do instead
 
+
+## Compare
+
+- [Compare meeting cost tools](https://agendaburn.com/compare): AgendaBurn versus Flowtrace, Calwise, and MeetingToll
+- [AgendaBurn vs Flowtrace](https://agendaburn.com/vs/flowtrace)
+- [AgendaBurn vs Calwise](https://agendaburn.com/vs/calwise)
+- [AgendaBurn vs MeetingToll](https://agendaburn.com/vs/meetingtoll)
+
 ## Contact
 
 - [Support](mailto:support@agendaburn.com)
