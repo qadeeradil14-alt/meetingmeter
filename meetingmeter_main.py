@@ -246,7 +246,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
         if path in ("/", "/meetingmeter"):
-            html_path = resource_path("meetingmeter.html")
+            html_path = resource_path("agendaburn.html")
             with open(html_path, "rb") as f:
                 content = f.read()
             self.send_response(200)

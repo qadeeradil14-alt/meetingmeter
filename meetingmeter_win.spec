@@ -11,7 +11,7 @@ a = Analysis(
     ['meetingmeter_main.py'],
     pathex=[],
     binaries=webview_binaries,
-    datas=[('meetingmeter.html', '.')] + webview_datas,
+    datas=[('agendaburn.html', '.')] + webview_datas,
     hiddenimports=webview_hiddenimports + [
         'webview',
         'webview.platforms.edgechromium',
@@ -34,7 +34,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['tkinter'],
+    excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
