@@ -53,6 +53,9 @@ class handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         params = urllib.parse.parse_qs(parsed.query)
@@ -93,7 +96,7 @@ class handler(BaseHTTPRequestHandler):
             with urllib.request.urlopen(req, timeout=15) as resp:
                 raw = resp.read().decode("utf-8", errors="replace")
         except Exception as e:
-            self._json({"ok": False, "error": f"Could not fetch calendar: {str(e)}"}, 502)
+            self._json({"ok": False, "error": f"Could not fetch calendar: {str(e)}"}, 400)
             return
 
         events = self._parse_ics(raw)
@@ -263,8 +266,13 @@ class handler(BaseHTTPRequestHandler):
     def _json(self, data, status=200):
         body = json.dumps(data).encode()
         self.send_response(status)
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
         self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
         self._cors()
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)

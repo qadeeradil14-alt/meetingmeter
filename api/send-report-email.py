@@ -13,6 +13,12 @@ FROM_EMAIL = os.environ.get("VERIFY_FROM_EMAIL", "onboarding@resend.dev").strip(
 
 
 class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self._json({"ok": False, "error": "Method not allowed"}, 405)
+
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}")
@@ -100,7 +106,12 @@ class handler(BaseHTTPRequestHandler):
         allowed = origin if origin in ALLOWED_ORIGINS else "https://agendaburn.com"
         self.send_header("Access-Control-Allow-Origin", allowed)
         self.send_header("Vary", "Origin")
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
         self.send_header("Content-Type", "application/json")
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)

@@ -24,6 +24,12 @@ class handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
+    def do_GET(self):
+        self._json({"ok": False, "error": "Method not allowed"}, 405)
+
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_POST(self):
         try:
             length = int(self.headers.get("Content-Length", 0))
@@ -100,8 +106,13 @@ class handler(BaseHTTPRequestHandler):
     def _json(self, data, status=200):
         body = json.dumps(data).encode()
         self.send_response(status)
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
         self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", str(len(body)))
         self._cors()
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)

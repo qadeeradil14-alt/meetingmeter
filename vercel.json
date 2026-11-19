@@ -1,91 +1,123 @@
 {
   "version": 2,
   "builds": [
-    { "src": "agendaburn.html",              "use": "@vercel/static" },
-    { "src": "index.html",                  "use": "@vercel/static" },
+    { "src": "agendaburn.html", "use": "@vercel/static" },
+    { "src": "index.html", "use": "@vercel/static" },
     { "src": "google6511461603d34f80.html", "use": "@vercel/static" },
-    { "src": "privacy.html",                "use": "@vercel/static" },
-    { "src": "terms.html",                  "use": "@vercel/static" },
-    { "src": "sitemap.xml",                 "use": "@vercel/static" },
-    { "src": "robots.txt",                  "use": "@vercel/static" },
-    { "src": "manifest.json",               "use": "@vercel/static" },
-    { "src": "sw.js",                       "use": "@vercel/static" },
-    { "src": "icons/**",                    "use": "@vercel/static" },
-    { "src": "api/*.py",                    "use": "@vercel/python" },
-    { "src": "api/zoom/*.js",               "use": "@vercel/node" }
+    { "src": "privacy.html", "use": "@vercel/static" },
+    { "src": "terms.html", "use": "@vercel/static" },
+    { "src": "blog/**", "use": "@vercel/static" },
+    { "src": "sitemap.xml", "use": "@vercel/static" },
+    { "src": "robots.txt", "use": "@vercel/static" },
+    { "src": "llms.txt", "use": "@vercel/static" },
+    { "src": "favicon.ico", "use": "@vercel/static" },
+    { "src": "og-image.png", "use": "@vercel/static" },
+    { "src": "manifest.json", "use": "@vercel/static" },
+    { "src": "sw.js", "use": "@vercel/static" },
+    { "src": "icons/**", "use": "@vercel/static" },
+    { "src": "api/*.py", "use": "@vercel/python" },
+    { "src": "api/zoom/*.js", "use": "@vercel/node" }
   ],
   "redirects": [
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.agendaburn.com" }],
       "destination": "https://agendaburn.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "meetingmeter.tech" }],
       "destination": "https://agendaburn.com/:path*",
-      "permanent": true
+      "statusCode": 301
     },
     {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "www.meetingmeter.tech" }],
       "destination": "https://agendaburn.com/:path*",
-      "permanent": true
-    }
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "meetingmeter-liard.vercel.app" }],
+      "destination": "https://agendaburn.com/:path*",
+      "statusCode": 301
+    },
+    { "source": "/index.html", "destination": "/", "statusCode": 301 },
+    { "source": "/privacy.html", "destination": "/privacy", "statusCode": 301 },
+    { "source": "/terms.html", "destination": "/terms", "statusCode": 301 },
+    { "source": "/agendaburn.html", "destination": "/app", "statusCode": 301 },
+    { "source": "/landing", "destination": "/", "statusCode": 301 },
+    { "source": "/staging", "destination": "/app", "statusCode": 301 },
+    { "source": "/app/", "destination": "/app", "statusCode": 301 },
+    { "source": "/blog/how-much-does-a-meeting-cost/", "destination": "/blog/how-much-does-a-meeting-cost", "statusCode": 301 },
+    { "source": "/blog", "destination": "https://blog.agendaburn.com/", "statusCode": 301 },
+    { "source": "/blog/", "destination": "https://blog.agendaburn.com/", "statusCode": 301 },
+    { "source": "/pricing", "destination": "/#pricing", "statusCode": 301 },
+    { "source": "/features", "destination": "/#features", "statusCode": 301 },
+    { "source": "/faq", "destination": "/#faq", "statusCode": 301 },
+    { "source": "/contact", "destination": "/#contact", "statusCode": 301 }
   ],
   "rewrites": [
-    { "source": "/api/subscribe",              "destination": "/api/subscribe.py" },
-    { "source": "/api/auth/sign-in",           "destination": "/api/auth.py?action=sign-in" },
-    { "source": "/api/auth/profile",           "destination": "/api/auth.py?action=profile" },
-    { "source": "/api/auth/sign-out",          "destination": "/api/auth.py?action=sign-out" },
-    { "source": "/api/slack-notify",           "destination": "/api/slack-notify.py" },
-    { "source": "/api/calendar-events",        "destination": "/api/calendar-events.py" },
-    { "source": "/api/customer-portal",        "destination": "/api/customer-portal.py" },
+    { "source": "/api/subscribe", "destination": "/api/subscribe.py" },
+    { "source": "/api/auth/sign-in", "destination": "/api/auth.py?action=sign-in" },
+    { "source": "/api/auth/profile", "destination": "/api/auth.py?action=profile" },
+    { "source": "/api/auth/sign-out", "destination": "/api/auth.py?action=sign-out" },
+    { "source": "/api/slack-notify", "destination": "/api/slack-notify.py" },
+    { "source": "/api/calendar-events", "destination": "/api/calendar-events.py" },
+    { "source": "/api/customer-portal", "destination": "/api/customer-portal.py" },
     { "source": "/api/send-verification-code", "destination": "/api/send-verification-code.py" },
-    { "source": "/api/verify-code",            "destination": "/api/verify-code.py" },
-    { "source": "/api/send-report-email",      "destination": "/api/send-report-email.py" },
-    { "source": "/api/zoom/callback",          "destination": "/api/zoom/callback.js" },
-    { "source": "/api/zoom/auth",              "destination": "/api/zoom/auth.js" },
-    { "source": "/api/zoom/meetings",          "destination": "/api/zoom/meetings.js" },
-    { "source": "/api/zoom/registrants",       "destination": "/api/zoom/registrants.js" },
-    { "source": "/manifest.json",              "destination": "/manifest.json" },
-    { "source": "/sw.js",                      "destination": "/sw.js" },
-    { "source": "/icons/:file*",               "destination": "/icons/:file*" },
-    { "source": "/google6511461603d34f80.html","destination": "/google6511461603d34f80.html" },
-    { "source": "/sitemap.xml",                "destination": "/sitemap.xml" },
-    { "source": "/robots.txt",                 "destination": "/robots.txt" },
-    { "source": "/privacy",                    "destination": "/privacy.html" },
-    { "source": "/terms",                      "destination": "/terms.html" },
-    { "source": "/landing",                    "destination": "/" },
-    { "source": "/app",                        "destination": "/agendaburn.html" },
-    { "source": "/staging",                    "destination": "/agendaburn.html" },
-    { "source": "/",                           "destination": "/index.html" }
+    { "source": "/api/verify-code", "destination": "/api/verify-code.py" },
+    { "source": "/api/send-report-email", "destination": "/api/send-report-email.py" },
+    { "source": "/api/zoom/callback", "destination": "/api/zoom/callback.js" },
+    { "source": "/api/zoom/auth", "destination": "/api/zoom/auth.js" },
+    { "source": "/api/zoom/meetings", "destination": "/api/zoom/meetings.js" },
+    { "source": "/api/zoom/registrants", "destination": "/api/zoom/registrants.js" },
+    { "source": "/manifest.json", "destination": "/manifest.json" },
+    { "source": "/sw.js", "destination": "/sw.js" },
+    { "source": "/icons/:file*", "destination": "/icons/:file*" },
+    { "source": "/google6511461603d34f80.html", "destination": "/google6511461603d34f80.html" },
+    { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
+    { "source": "/robots.txt", "destination": "/robots.txt" },
+    { "source": "/llms.txt", "destination": "/llms.txt" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/og-image.png", "destination": "/og-image.png" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/blog/how-much-does-a-meeting-cost", "destination": "/blog/how-much-does-a-meeting-cost.html" },
+    { "source": "/app", "destination": "/agendaburn.html" },
+    { "source": "/", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Content-Type",           "value": "application/javascript" },
+        { "key": "Content-Type", "value": "application/javascript" },
         { "key": "Service-Worker-Allowed", "value": "/" },
-        { "key": "Cache-Control",          "value": "no-cache" }
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     },
     {
       "source": "/manifest.json",
       "headers": [
-        { "key": "Content-Type",           "value": "application/manifest+json" }
+        { "key": "Content-Type", "value": "application/manifest+json" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options",                     "value": "SAMEORIGIN" },
-        { "key": "X-Content-Type-Options",              "value": "nosniff" },
-        { "key": "Referrer-Policy",                     "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy",                  "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Strict-Transport-Security",           "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "Content-Security-Policy",             "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://formspree.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://formspree.io https://api.resend.com https://api.anthropic.com https://zoom.us; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self';" }
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://formspree.io https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://formspree.io https://api.resend.com https://api.anthropic.com https://zoom.us https://vitals.vercel-insights.com https://va.vercel-scripts.com; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self';" }
       ]
     }
   ]
