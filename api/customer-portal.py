@@ -66,6 +66,12 @@ class handler(BaseHTTPRequestHandler):
         self._cors()
         self.end_headers()
 
+    def do_GET(self):
+        self._json(405, {"ok": False, "error": "Method not allowed"})
+
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length)) if length else {}
@@ -115,8 +121,13 @@ class handler(BaseHTTPRequestHandler):
         body = json.dumps(data).encode()
         self.send_response(status)
         self._cors()
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
         self.send_header("Content-Type", "application/json")
-        self.send_header("Content-Length", len(body))
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 

@@ -1,4 +1,49 @@
+# https://agendaburn.com is the canonical host for AgendaBurn.
+# Legacy hosts (meetingmeter.tech, www, the Vercel alias, GitHub Pages)
+# redirect here. The blog canonical host is https://blog.agendaburn.com/.
+
 User-agent: *
 Allow: /
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /api/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /api/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /api/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /api/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /api/
+
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /api/
 
 Sitemap: https://agendaburn.com/sitemap.xml

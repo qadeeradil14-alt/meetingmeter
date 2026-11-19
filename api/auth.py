@@ -188,7 +188,7 @@ def handle_sign_in(body: dict) -> tuple[dict, int]:
 
 def handle_profile(auth_header: str) -> tuple[dict, int]:
     if not auth_header.startswith("Bearer "):
-        return {"ok": False, "error": "Missing Authorization header"}, 401
+        return {"ok": False, "error": "Not found"}, 404
     token = auth_header[len("Bearer "):].strip()
 
     if not VERIFY_SECRET:
@@ -235,6 +235,9 @@ class handler(BaseHTTPRequestHandler):
             data, status = {"ok": False, "error": "Not found"}, 404
         self._json(data, status)
 
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_POST(self):
         action = self._get_action()
         length = int(self.headers.get("Content-Length", 0))
@@ -267,7 +270,12 @@ class handler(BaseHTTPRequestHandler):
         body = json.dumps(data).encode()
         self.send_response(status)
         self._cors()
-        self.send_header("Content-Type",   "application/json")
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
+        self.send_header("Content-Type", "application/json")
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)

@@ -63,6 +63,12 @@ def send_notify(subscriber_email: str) -> tuple[bool, str]:
 
 
 class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self._json({"ok": False, "error": "Method not allowed"}, 405)
+
+    def do_HEAD(self):
+        self.do_GET()
+
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0))
         body   = json.loads(self.rfile.read(length) or b"{}")
@@ -98,7 +104,12 @@ class handler(BaseHTTPRequestHandler):
         payload = json.dumps(data).encode()
         self.send_response(status)
         self._cors()
-        self.send_header("Content-Type",   "application/json")
+        self.send_header("X-Robots-Tag", "noindex, nofollow")
+        self.send_header("Content-Type", "application/json")
+        if self.command == "HEAD":
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)

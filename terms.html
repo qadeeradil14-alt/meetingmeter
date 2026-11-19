@@ -4,8 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Service — AgendaBurn</title>
-  <meta name="robots" content="noindex">
+  <meta name="description" content="The terms for using AgendaBurn, including the free meeting cost calculator, Pro billing, and acceptable use.">
+  <link rel="canonical" href="https://agendaburn.com/terms">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agendaburn.com/terms">
+  <meta property="og:title" content="Terms of Service — AgendaBurn">
+  <meta property="og:description" content="The terms for using AgendaBurn, including the free meeting cost calculator, Pro billing, and acceptable use.">
+  <meta property="og:site_name" content="AgendaBurn">
+  <meta property="og:image" content="https://agendaburn.com/og-image.png">
+  <meta property="og:image:width" content="2802">
+  <meta property="og:image:height" content="1540">
+  <meta property="og:image:alt" content="AgendaBurn, a real-time meeting cost calculator">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Terms of Service — AgendaBurn">
+  <meta name="twitter:description" content="The terms for using AgendaBurn, including the free meeting cost calculator, Pro billing, and acceptable use.">
+  <meta name="twitter:image" content="https://agendaburn.com/og-image.png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AgendaBurn",
+    "url": "https://agendaburn.com/",
+    "description": "Free real-time meeting cost calculator for teams"
+  }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -122,7 +148,9 @@
 
   <h2>6. Your data</h2>
   <p>You are responsible for the meeting data, attendee information, salary/rate information, notes, summaries, exports, and other content you enter, import, or share through AgendaBurn. You represent that you have the necessary rights and permissions to use that content with the Service.</p>
-  <p>Some meeting data may be stored in your browser. Clearing browser data may permanently delete your meeting history. If you use integrations, AI summaries, email reports, Slack sharing, or other connected features, information needed to complete those actions may be sent to the relevant provider or recipient. See our <a href="/privacy">Privacy Policy</a> for details.</p>
+  <p><strong>Free users:</strong> meeting history and salary data are stored locally in your browser only. No meeting data is uploaded to AgendaBurn servers. Clearing your browser data will permanently delete your local history.</p>
+  <p><strong>Pro users:</strong> when signed in, meeting history is securely stored in AgendaBurn's database (hosted on Neon Postgres) and associated with your account email. This enables cross-device access to your history. You may delete individual meetings or your entire history at any time from within the app. We do not sell, share, or use your meeting data for any purpose other than providing the Service.</p>
+  <p>If you use integrations, AI summaries, email reports, Slack sharing, or other connected features, information needed to complete those actions may be sent to the relevant provider or recipient. See our <a href="/privacy">Privacy Policy</a> for details.</p>
 
   <h2>7. AI features</h2>
   <p>AgendaBurn may provide AI-assisted summaries, decisions, action items, or debriefs. AI output can be incomplete, inaccurate, or inappropriate for your context. You are responsible for reviewing, editing, and approving AI-generated content before relying on it or sharing it.</p>
@@ -166,6 +194,12 @@
     <a href="mailto:support@agendaburn.com">Support</a>
   </div>
 </footer>
+
+<!-- Vercel Web Analytics -->
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
 
 </body>
 </html>

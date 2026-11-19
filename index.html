@@ -10,14 +10,15 @@
   <meta name="apple-mobile-web-app-title" content="AgendaBurn" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
 
   <!-- Bing Webmaster Verification -->
   <meta name="msvalidate.01" content="9EB1CC58A6CC624483407D928677614A" />
 
   <!-- Primary SEO -->
-  <title>AgendaBurn — Free Real-Time Meeting Cost Tracker</title>
-  <meta name="description" content="Stop wasting money on unproductive meetings. Track burn rates in real-time with pizza/coffee metrics and get AI-generated summaries instantly." />
+  <title>Meeting Cost Calculator — Free Real-Time Tracker | AgendaBurn</title>
+  <meta name="description" content="Free meeting cost calculator that shows the real-time dollar cost of any meeting. Add attendees by salary and role, hit Start, and watch costs tick up live. No signup required." />
   <meta name="keywords" content="meeting cost calculator, real-time meeting cost calculator, free meeting cost tool, meeting ROI calculator, meeting timer with cost, how much does a meeting cost, meeting productivity software, reduce meeting costs, meeting budget tracker, salary meeting calculator" />
   <meta name="author" content="AgendaBurn" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -30,6 +31,9 @@
   <meta property="og:description" content="Watch the dollar amount tick up live as your meeting runs. Add attendees by role and salary. Free forever for small teams. Pro unlocks Slack, Calendar, PDF export and more." />
   <meta property="og:site_name" content="AgendaBurn" />
   <meta property="og:image" content="https://agendaburn.com/og-image.png" />
+  <meta property="og:image:width" content="2802" />
+  <meta property="og:image:height" content="1540" />
+  <meta property="og:image:alt" content="AgendaBurn, a real-time meeting cost calculator" />
   <meta property="og:locale" content="en_US" />
 
   <!-- Twitter Card -->
@@ -53,8 +57,7 @@
       { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free Forever" },
       { "@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Pro Monthly", "billingDuration": "P1M" },
       { "@type": "Offer", "price": "49.00", "priceCurrency": "USD", "name": "Pro Annual", "billingDuration": "P1Y" }
-    ],
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "38" }
+    ]
   }
   </script>
   <script type="application/ld+json">
@@ -69,7 +72,7 @@
       { "@type": "Question", "name": "How much does the average meeting cost a company?",
         "acceptedAnswer": { "@type": "Answer", "text": "Studies show the average 1-hour meeting with 6 attendees costs between $300–$800 depending on seniority. Unnecessary meetings cost US businesses over $37 billion per year. AgendaBurn makes this cost visible in real time so teams can decide if a meeting is worth having." } },
       { "@type": "Question", "name": "Does AgendaBurn store my salary data?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No. All salary data and meeting history are stored locally in your browser using localStorage. Nothing is sent to AgendaBurn's servers. Your data stays completely private on your own device." } },
+        "acceptedAnswer": { "@type": "Answer", "text": "Free users: salary data and meeting history stay entirely on your device in your browser — nothing is uploaded. Pro users get optional secure cross-device sync, storing meeting history in an encrypted database tied to their account." } },
       { "@type": "Question", "name": "Can I connect AgendaBurn to Google Calendar?",
         "acceptedAnswer": { "@type": "Answer", "text": "Yes. AgendaBurn Pro includes Google Calendar and Apple Calendar integration. You can load upcoming events directly into the meeting timer with one click, auto-filling the title, duration, and attendees." } },
       { "@type": "Question", "name": "Does AgendaBurn work with Slack?",
@@ -79,6 +82,29 @@
       { "@type": "Question", "name": "How can I reduce meeting costs?",
         "acceptedAnswer": { "@type": "Answer", "text": "The most effective ways to reduce meeting costs are: 1) Show the live cost to all attendees using a tool like AgendaBurn to create urgency, 2) Set a hard time limit with a visible timer, 3) Only invite essential attendees — removing one senior person can cut costs by 20%, 4) Replace status update meetings with async tools like Slack or Notion." } }
     ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AgendaBurn",
+    "url": "https://agendaburn.com/",
+    "description": "Free real-time meeting cost calculator for teams"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AgendaBurn",
+    "url": "https://agendaburn.com/",
+    "logo": "https://agendaburn.com/icons/icon-192.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "support@agendaburn.com"
+    }
   }
   </script>
 
@@ -371,6 +397,26 @@
       font-size: 15px; color: var(--muted); font-weight: 400;
     }
     .hero-note strong { color: var(--muted2); font-weight: 500; }
+
+    /* scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.45;
+      animation: bounce-hint 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .scroll-hint svg { width: 20px; height: 20px; stroke: var(--muted2); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    @keyframes bounce-hint {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
 
     .hero-proof-row {
       display: flex;
@@ -1152,7 +1198,7 @@
 
     /* ══════════════════ SECTION ══════════════════ */
     .section {
-      padding: 76px 24px;
+      padding: 64px 24px;
       max-width: 1080px;
       margin: 0 auto;
     }
@@ -1700,12 +1746,11 @@
       .cta-outer { padding: 88px 16px 76px; }
     }
   </style>
-  <!-- Privacy-friendly analytics by Plausible -->
-  <script async src="https://plausible.io/js/pa-MqlkxDRdqe-po4_g79NkH.js"></script>
+  <!-- Vercel Web Analytics -->
   <script>
-    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-    plausible.init()
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -1862,7 +1907,24 @@
       </div>
     </div>
   </div>
+  <a href="#pricing" class="scroll-hint" aria-label="Scroll down">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+  </a>
 </section>
+
+<!-- ════════════ SEO CONTENT BLOCK ════════════ -->
+<div style="max-width:760px;margin:0 auto;padding:64px 24px 0;text-align:center;">
+  <h2 style="font-size:clamp(20px,3vw,28px);font-weight:700;color:#eef5fb;margin-bottom:16px;line-height:1.3;">The Free Meeting Cost Calculator Built for Real Teams</h2>
+  <p style="font-size:16px;color:#9cb1c6;line-height:1.75;margin-bottom:16px;">
+    AgendaBurn is a <strong style="color:#eef5fb;">real-time meeting cost calculator</strong> that shows exactly how much any meeting costs your company — down to the second. Add each attendee's name and salary level, press Start, and watch the dollar amount climb live as the meeting runs.
+  </p>
+  <p style="font-size:16px;color:#9cb1c6;line-height:1.75;margin-bottom:16px;">
+    Studies show US companies waste <strong style="color:#f6b54d;">$37 billion per year</strong> on unnecessary meetings. A single 60-minute meeting with six people at average salaries costs $300–$800. Most teams have no idea. AgendaBurn makes that cost impossible to ignore.
+  </p>
+  <p style="font-size:16px;color:#9cb1c6;line-height:1.75;">
+    Unlike generic salary calculators, AgendaBurn tracks meetings in real time, generates AI-powered meeting summaries, syncs with Google and Apple Calendar, and posts debrief reports to Slack — all from one free tool. No signup required to start.
+  </p>
+</div>
 
 <div class="section proof-section-inline" style="padding-top:28px;">
   <div class="proof-grid fi" style="margin-top:0;">
@@ -1882,7 +1944,7 @@
 <!-- ════════════ HOW IT WORKS ════════════ -->
 <div class="section" id="how-it-works">
   <div class="eyebrow fi">How It Works</div>
-  <h2 class="fi">Four steps.<br />No clutter.</h2>
+  <h2 class="fi">How the Meeting Cost Calculator Works</h2>
   <p class="sec-sub fi">Open the app, pull in the meeting, hit start, and leave with a record your team can use.</p>
 
   <div class="steps">
@@ -1913,7 +1975,7 @@
 <div class="features-outer" id="features">
   <div class="section" style="max-width:1080px;margin:0 auto;">
     <div class="eyebrow fi">Features</div>
-    <h2 class="fi">The core workflow.<br />Trimmed down.</h2>
+    <h2 class="fi">Real-Time Meeting Cost Tracking — Built for Busy Teams</h2>
     <p class="sec-sub fi">AgendaBurn stays focused on the few things that actually make meetings better.</p>
 
     <!-- AI callout -->
@@ -1974,7 +2036,7 @@
 <div class="pricing-outer" id="pricing">
   <div class="section" style="max-width:1080px;margin:0 auto;">
     <div class="eyebrow fi" style="text-align:center;">Pricing</div>
-    <h2 class="fi" style="text-align:center;">Start free.<br />Upgrade when ready.</h2>
+    <h2 class="fi" style="text-align:center;">Free Meeting Cost Calculator — Upgrade When You Need More</h2>
     <p class="sec-sub fi" style="text-align:center;margin:0 auto 56px;">No hidden fees. No long-term contracts. Cancel anytime.</p>
 
     <div class="pricing-grid fi">
@@ -1988,7 +2050,7 @@
           <li class="on">Up to 3 attendees per meeting</li>
           <li class="on">Built-in role templates</li>
           <li class="on">Meeting timer &amp; history</li>
-          <li class="on">100% private — no data stored</li>
+          <li class="on">Data stays on your device — never uploaded</li>
           <li>Calendar import</li>
           <li>Slack integration</li>
           <li>AI meeting summaries</li>
@@ -2011,6 +2073,7 @@
           <li class="on">AI meeting summaries</li>
           <li class="on">PDF &amp; CSV export</li>
           <li class="on">Budget alerts &amp; overtime warnings</li>
+          <li class="on">Secure cross-device history sync</li>
           <li class="on">Priority support</li>
         </ul>
         <a href="https://buy.stripe.com/6oU00c1jn9Jl10x2fL48002" class="btn-plan btn-plan-pro">Get Pro Monthly</a>
@@ -2029,6 +2092,7 @@
           <li class="on">AI meeting summaries</li>
           <li class="on">PDF &amp; CSV export</li>
           <li class="on">Budget alerts &amp; overtime warnings</li>
+          <li class="on">Secure cross-device history sync</li>
           <li class="on">Priority support</li>
         </ul>
         <a href="https://buy.stripe.com/aFaeV60fj3kX9x3cUp48003" class="btn-plan btn-plan-pro">Get Pro Annual</a>
@@ -2045,10 +2109,32 @@
 </div>
 
 <!-- ════════════ FAQ ════════════ -->
+<!-- ════════════ WHY MEETING COSTS MATTER ════════════ -->
+<div style="max-width:800px;margin:0 auto;padding:80px 24px 0;">
+  <h2 style="font-size:clamp(20px,3vw,26px);font-weight:700;color:#eef5fb;margin-bottom:24px;text-align:center;">Why Every Team Needs a Meeting Cost Calculator</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;margin-bottom:32px;">
+    <div style="background:rgba(17,27,39,0.88);border:1px solid rgba(116,187,255,0.12);border-radius:12px;padding:20px;">
+      <div style="font-size:28px;font-weight:800;color:#f6b54d;margin-bottom:6px;">$37B</div>
+      <div style="font-size:13px;color:#9cb1c6;line-height:1.5;">Lost annually by US companies to unnecessary or poorly run meetings</div>
+    </div>
+    <div style="background:rgba(17,27,39,0.88);border:1px solid rgba(116,187,255,0.12);border-radius:12px;padding:20px;">
+      <div style="font-size:28px;font-weight:800;color:#f6b54d;margin-bottom:6px;">71%</div>
+      <div style="font-size:13px;color:#9cb1c6;line-height:1.5;">Of senior managers say meetings are unproductive and inefficient (HBR)</div>
+    </div>
+    <div style="background:rgba(17,27,39,0.88);border:1px solid rgba(116,187,255,0.12);border-radius:12px;padding:20px;">
+      <div style="font-size:28px;font-weight:800;color:#f6b54d;margin-bottom:6px;">$420</div>
+      <div style="font-size:13px;color:#9cb1c6;line-height:1.5;">Average cost of a 1-hour meeting with 6 mid-level employees at US salaries</div>
+    </div>
+  </div>
+  <p style="font-size:15px;color:#9cb1c6;line-height:1.75;text-align:center;">
+    The fastest way to run shorter, tighter meetings is to make the cost visible. When a team can see a live dollar counter climbing on screen, conversations get sharper, decisions get made faster, and status updates get moved to Slack. AgendaBurn is the simplest way to do that — free, instant, and no account required.
+  </p>
+</div>
+
 <div style="padding:100px 24px 80px;" id="faq">
   <div style="max-width:720px;margin:0 auto;">
     <div class="eyebrow fi" style="text-align:center;">FAQ</div>
-    <h2 class="fi" style="text-align:center;margin-bottom:8px;">Common questions</h2>
+    <h2 class="fi" style="text-align:center;margin-bottom:8px;">Meeting Cost Calculator — FAQ</h2>
     <p class="sec-sub fi" style="text-align:center;margin:0 auto 56px;max-width:480px;">Everything you need to know about AgendaBurn.</p>
 
     <div class="faq-list fi">
@@ -2089,7 +2175,7 @@
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          No. All salary data and meeting history are stored locally in your browser using localStorage — nothing is sent to our servers. Your data stays completely private on your own device.
+          Free users: your salary data and meeting history stay entirely on your device — nothing is uploaded to our servers. Pro users get secure cross-device sync, where meeting history is stored in a private database tied to your account and accessible only to you.
         </div>
       </div>
 
@@ -2165,7 +2251,7 @@
   <div class="cta-num" id="cta-counter">$0.00</div>
   <div class="cta-sub-label">and it's still running</div>
 
-  <h2 class="cta-headline">Time to start<br />measuring yours.</h2>
+  <h2 class="cta-headline">Start Tracking Your Meeting Costs Today</h2>
   <p class="cta-desc">Join teams who know exactly what their meetings cost — and run better ones because of it.</p>
   <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
     <a href="/app" class="btn-primary">Start Free — No Card Needed</a>
@@ -2183,6 +2269,7 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="/app">Open App</a></li>
+    <li><a href="https://blog.agendaburn.com/">Blog</a></li>
     <li><a href="mailto:support@agendaburn.com">Support</a></li>
     <li><a href="/privacy">Privacy</a></li>
     <li><a href="/terms">Terms</a></li>
@@ -2246,6 +2333,8 @@
   ];
   const rps = salaries.map(s => s / (52 * 40 * 3600));
   const previewRps = previewSalaries.map(s => s / (52 * 40 * 3600));
+  const ctaPageStart = Date.now();
+  const ctaRatePerSecond = rps.reduce((s, r) => s + r, 0); // $/sec for 4-person meeting
   let elapsed = 20;
   const costs = [0.42, 0.33, 0.28, 0.36];
   const previewCosts = [0.56, 0.49, 0.43];
@@ -2364,10 +2453,13 @@
     document.getElementById("preview-chart-total").textContent = `$${previewChartDisplayValue.toFixed(2)} today`;
     const topSeatRates = [...previewRps].sort((a, b) => b - a).slice(0, droppedSeats);
     const savedValue = ((livePreviewRate * 11) + (topSeatRates.reduce((sum, rate) => sum + rate, 0) * elapsed)).toFixed(2);
+    const ctaMins = Math.max(1, Math.round((Date.now() - ctaPageStart) / 60000));
+    const cfTime = ctaMins < 60 ? `${ctaMins} min` : `${Math.floor(ctaMins / 60)}h ${ctaMins % 60}m`;
+    document.getElementById("counterfactual-time").textContent = cfTime;
     document.getElementById("counterfactual-people").textContent = `${droppedSeats} fewer`;
     document.getElementById("counterfactual-value").textContent = `$${savedValue}`;
     document.getElementById("counterfactual-headline").innerHTML =
-      `If this meeting ended 11 minutes earlier and dropped ${droppedSeats} attendees, you would save <strong>$${savedValue}</strong>.`;
+      `If this meeting ended ${cfTime} earlier and dropped ${droppedSeats} attendees, you would save <strong>$${savedValue}</strong>.`;
     previewRoles.forEach((_, i) => {
       const personCost = previewCosts[i];
       const row = document.getElementById(`preview-person-${i}`);
@@ -2380,7 +2472,10 @@
       if (stat) stat.classList.toggle("is-pulse", i === 1);
     });
     const ctaEl = document.getElementById("cta-counter");
-    if (ctaEl) ctaEl.textContent = "$5.47";
+    if (ctaEl) {
+      const ctaSecs = (Date.now() - ctaPageStart) / 1000;
+      ctaEl.textContent = "$" + (ctaSecs * ctaRatePerSecond).toFixed(2);
+    }
   }
 
   renderPreviewSnapshot();
@@ -2399,6 +2494,15 @@
     renderPreviewSnapshot();
     renderPreviewChart();
   }, 900);
+
+  // ── CTA counter: tick every second independently ──
+  setInterval(() => {
+    const ctaEl = document.getElementById("cta-counter");
+    if (ctaEl) {
+      const ctaSecs = (Date.now() - ctaPageStart) / 1000;
+      ctaEl.textContent = "$" + (ctaSecs * ctaRatePerSecond).toFixed(2);
+    }
+  }, 1000);
 
   // ── Scroll fade-in ──
   const io = new IntersectionObserver(entries => {
