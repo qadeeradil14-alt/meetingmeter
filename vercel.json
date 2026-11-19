@@ -38,8 +38,26 @@
       "statusCode": 301
     },
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "meetingmeter-liard.vercel.app" }],
+      "destination": "https://agendaburn.com/",
+      "statusCode": 301
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "meetingmeter-liard.vercel.app" }],
+      "destination": "https://agendaburn.com/:path*",
+      "statusCode": 301
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "meetingmeter-f2wq.vercel.app" }],
+      "destination": "https://agendaburn.com/",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "meetingmeter-f2wq.vercel.app" }],
       "destination": "https://agendaburn.com/:path*",
       "statusCode": 301
     },
@@ -50,6 +68,8 @@
     { "source": "/landing", "destination": "/", "statusCode": 301 },
     { "source": "/staging", "destination": "/app", "statusCode": 301 },
     { "source": "/app/", "destination": "/app", "statusCode": 301 },
+    { "source": "/privacy/", "destination": "/privacy", "statusCode": 301 },
+    { "source": "/terms/", "destination": "/terms", "statusCode": 301 },
     { "source": "/blog/how-much-does-a-meeting-cost/", "destination": "/blog/how-much-does-a-meeting-cost", "statusCode": 301 },
     { "source": "/blog", "destination": "https://blog.agendaburn.com/", "statusCode": 301 },
     { "source": "/blog/", "destination": "https://blog.agendaburn.com/", "statusCode": 301 },
